@@ -62,6 +62,96 @@ local database. Stop the local services when finished:
 npx supabase stop
 ```
 
+## Hosted Supabase and Vercel preview
+
+The local application, database, and tests are complete for Milestone 1. “Hosted
+Supabase and Vercel preview remain deferred” means that the repository has not yet
+been connected to your Supabase and Vercel accounts, so there is no internet-accessible
+database or application URL. This account setup does not change the Milestone 2 code
+and can be completed now or before inviting testers.
+
+For the MVP, use one hosted Supabase project for both Vercel Preview and Production.
+A separate staging database or Supabase branching setup can be added later.
+
+### 1. Create the hosted Supabase project
+
+1. Open the [Supabase dashboard](https://supabase.com/dashboard) and select **New project**.
+2. Choose an organization, name the project `cratebook`, choose a nearby region, and
+   save the generated database password somewhere secure.
+3. When the project is ready, open its **Connect** dialog and copy:
+   - the project reference;
+   - the project URL;
+   - the publishable key (`sb_publishable_...`).
+4. From this repository, authenticate the CLI and apply the committed migration:
+
+```bash
+npx supabase login
+npx supabase link --project-ref YOUR_PROJECT_REF
+npx supabase db push --dry-run
+npx supabase db push
+```
+
+Read the dry-run output before running the final command. Do not run `supabase config
+push` yet: the committed `supabase/config.toml` intentionally contains local URLs.
+See the official [Supabase CLI deployment guide](https://supabase.com/docs/reference/cli/supabase-db-push).
+
+### 2. Import the GitHub repository into Vercel
+
+1. Open [Vercel New Project](https://vercel.com/new), connect GitHub if requested,
+   and import `TurkiNizar/cratebook`.
+2. Keep the detected **Next.js** framework, repository root, build command, and output
+   settings.
+3. Add these environment variables to both **Preview** and **Production**:
+
+| Variable                               | Value                           |
+| -------------------------------------- | ------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`             | Hosted Supabase project URL     |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Hosted Supabase publishable key |
+
+4. Deploy the project and copy its production URL, for example
+   `https://cratebook.vercel.app`.
+5. Add `NEXT_PUBLIC_SITE_URL` in Vercel's **Production** environment with that exact
+   URL, then redeploy Production so the new value is included in the build.
+
+Vercel will now deploy `main` to Production and create a separate Preview URL for each
+pull request or non-production branch. See [Vercel Git deployments](https://vercel.com/docs/git)
+and [environment-variable scopes](https://vercel.com/docs/environment-variables).
+
+### 3. Allow authentication redirects
+
+In Supabase, open **Authentication → URL Configuration**:
+
+1. Set **Site URL** to the exact Vercel production URL.
+2. Add these **Redirect URLs**:
+
+```text
+http://localhost:3000/**
+https://cratebook.vercel.app/auth/callback
+https://*-YOUR_VERCEL_TEAM_OR_ACCOUNT_SLUG.vercel.app/**
+```
+
+Replace the example production domain and Vercel account/team slug with the real
+values. The wildcard permits generated Vercel Preview URLs; keep the production
+callback exact. Supabase documents the same Vercel pattern in its
+[redirect URL guide](https://supabase.com/docs/guides/auth/redirect-urls#vercel-preview-urls).
+
+### 4. Verify the hosted environment
+
+1. Open the production URL on a phone or narrow browser window.
+2. Request a magic link using an email inbox you can access.
+3. Follow the email link, choose a username, and confirm `/collection` loads.
+4. Edit and save the profile at `/settings`.
+5. Create a small branch and pull request, then confirm Vercel posts a working Preview
+   deployment and that its magic-link flow returns to the Preview URL.
+
+If a magic link returns to localhost or is rejected, recheck the Supabase Site URL,
+redirect allowlist, Vercel team/account slug, and redeploy after environment changes.
+
+The publishable Supabase key is designed for browser use with RLS. Never put a
+Supabase secret/service-role key in a `NEXT_PUBLIC_` variable, `.env.local` in Git, or
+the repository. Refer to [Supabase API keys](https://supabase.com/docs/guides/api/api-keys)
+for the distinction.
+
 ## Verification
 
 ```bash
