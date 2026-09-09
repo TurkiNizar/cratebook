@@ -32,3 +32,31 @@ export function getUsernameError(value: string): string | null {
 
   return null;
 }
+
+type ProfileUpdate = {
+  username: string;
+  displayName: string;
+  bio: string;
+};
+
+export function getProfileUpdateError({
+  username,
+  displayName,
+  bio,
+}: ProfileUpdate): string | null {
+  const usernameError = getUsernameError(username);
+
+  if (usernameError) {
+    return usernameError;
+  }
+
+  if (displayName.length > 80) {
+    return "Display name must be 80 characters or fewer.";
+  }
+
+  if (bio.length > 280) {
+    return "Bio must be 280 characters or fewer.";
+  }
+
+  return null;
+}

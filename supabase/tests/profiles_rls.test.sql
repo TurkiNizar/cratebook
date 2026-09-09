@@ -40,7 +40,11 @@ select is(
 );
 
 select results_eq(
-  $$ select username from public.profiles $$,
+  $$
+    select username
+    from public.profiles
+    where id = '22222222-2222-4222-8222-222222222222'
+  $$,
   $$ values ('listener_b'::text) $$,
   'the public profile is visible anonymously'
 );

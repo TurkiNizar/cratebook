@@ -71,6 +71,9 @@ npm run test:run
 npm run build
 ```
 
+The same quality, browser, and database checks run on every push to `main` and every
+pull request through `.github/workflows/ci.yml`.
+
 Run browser tests after installing Playwright's browsers:
 
 ```bash

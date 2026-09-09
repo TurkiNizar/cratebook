@@ -83,5 +83,19 @@ test.describe("local passwordless authentication", () => {
     await expect(
       page.getByRole("heading", { name: "My collection" }),
     ).toBeVisible();
+
+    await page.getByRole("link", { name: /profile/i }).click();
+    await page.getByLabel("Display name").fill("Local Crate Digger");
+    await page
+      .getByLabel("About your collection")
+      .fill("Jazz discoveries and records with a story.");
+    await page.getByLabel("Public profile").check();
+    await page.getByRole("button", { name: "Save profile" }).click();
+
+    await expect(page.getByText("Your profile has been saved.")).toBeVisible();
+    await expect(page.getByText("Public", { exact: true })).toBeVisible();
+    await expect(page.getByLabel("Display name")).toHaveValue(
+      "Local Crate Digger",
+    );
   });
 });

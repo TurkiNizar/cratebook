@@ -4,7 +4,7 @@
 >
 > Last updated: 2026-09-09
 > Overall status: **In development**
-> Current milestone: **Milestone 1 — Foundation**
+> Current milestone: **Milestone 2 — Collection**
 
 ## How to use this document
 
@@ -610,7 +610,7 @@ should perform wishlist-to-collection conversion atomically.
 - [x] Define MVP feature boundaries
 - [x] Create living MVP plan and tracker
 - [~] Confirm working product name and visual direction — Cratebook and warm analogue are provisional
-- [ ] Review and approve this MVP scope
+- [x] Review and approve this MVP scope
 
 Exit condition: the product scope, main journeys, and technical direction are approved.
 
@@ -623,10 +623,11 @@ Exit condition: the product scope, main journeys, and technical direction are ap
 - [x] Create Supabase project configuration and local migrations
 - [x] Implement database foundation and generated types
 - [x] Configure email magic-link authentication
-- [~] Implement onboarding and profile editing — onboarding exists; full settings editing remains
+- [x] Implement onboarding and profile editing
 - [x] Add initial RLS policies and authorization tests
 - [x] Create PWA manifest, icons, and metadata foundation
-- [ ] Establish CI checks and preview deployment
+- [x] Establish GitHub Actions CI checks
+- [-] Configure hosted preview deployment — deferred until hosted Supabase and Vercel are connected
 
 Exit condition: a user can authenticate, create a profile, navigate the responsive
 application, and cannot access another user's private data.
@@ -765,16 +766,17 @@ production environment.
 
 ## 19. Decision log
 
-| Date       | Decision                                                        | Reason                                                                                    |
-| ---------- | --------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| 2026-09-09 | Build a mobile-first web application and installable PWA first  | Most usage is on phones, while links and public profiles should work without installation |
-| 2026-09-09 | Plan Capacitor as the route to native stores after validation   | Reuses the web codebase while allowing later access to native APIs                        |
-| 2026-09-09 | Use Next.js, TypeScript, Tailwind CSS, Supabase, and Vercel     | One pragmatic stack covers UI, public pages, data, auth, storage, and deployment          |
-| 2026-09-09 | Keep manual record entry as a permanent capability              | External catalogues cannot reliably contain or identify every physical release            |
-| 2026-09-09 | Model a release separately from a user's physical copy          | Supports copy-specific condition, provenance, privacy, and multiple pressings             |
-| 2026-09-09 | Keep social-network features outside the MVP                    | Sharing through a URL validates social value without feed and moderation complexity       |
-| 2026-09-09 | Use Cratebook and a warm analogue visual language provisionally | Establishes a coherent foundation without making the branding irreversible                |
-| 2026-09-09 | Use Next.js's webpack production builder initially              | Turbopack cannot create its internal CSS worker process in the development environment    |
+| Date       | Decision                                                         | Reason                                                                                    |
+| ---------- | ---------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| 2026-09-09 | Build a mobile-first web application and installable PWA first   | Most usage is on phones, while links and public profiles should work without installation |
+| 2026-09-09 | Plan Capacitor as the route to native stores after validation    | Reuses the web codebase while allowing later access to native APIs                        |
+| 2026-09-09 | Use Next.js, TypeScript, Tailwind CSS, Supabase, and Vercel      | One pragmatic stack covers UI, public pages, data, auth, storage, and deployment          |
+| 2026-09-09 | Keep manual record entry as a permanent capability               | External catalogues cannot reliably contain or identify every physical release            |
+| 2026-09-09 | Model a release separately from a user's physical copy           | Supports copy-specific condition, provenance, privacy, and multiple pressings             |
+| 2026-09-09 | Keep social-network features outside the MVP                     | Sharing through a URL validates social value without feed and moderation complexity       |
+| 2026-09-09 | Use Cratebook and a warm analogue visual language provisionally  | Establishes a coherent foundation without making the branding irreversible                |
+| 2026-09-09 | Use Next.js's webpack production builder initially               | Turbopack cannot create its internal CSS worker process in the development environment    |
+| 2026-09-09 | Defer hosted preview deployment without blocking collection work | Local integration is verified; hosted Supabase and Vercel require external project setup  |
 
 ## 20. Progress log
 
@@ -785,3 +787,4 @@ in version control; this log records product-level progress and changes.
 | ---------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
 | 2026-09-09 | 0         | Created the initial product specification, architecture, scope, and tracker                                                                                                                             | Review scope and settle the first open design decisions                |
 | 2026-09-09 | 1         | Built the responsive public experience, protected app shell, locally verified passwordless auth/onboarding, typed profile schema/RLS, PWA assets, and automated test foundation; 23 database tests pass | Connect a hosted Supabase project and complete profile settings and CI |
+| 2026-09-09 | 1         | Closed Milestone 1 locally with profile/privacy editing and GitHub Actions gates for application, browser, and database checks                                                                          | Begin Milestone 2 with release and physical-copy tables                |
