@@ -4,6 +4,7 @@ import {
   formatCollectionDate,
   getCollectionCardDetails,
   getCollectionCardEdition,
+  getCopyDetailRows,
   getRecordDetailRows,
 } from "./collection";
 
@@ -136,5 +137,30 @@ describe("formatCollectionDate", () => {
     expect(formatCollectionDate("2026-09-10T23:30:00+00:00")).toBe(
       "Sep 10, 2026",
     );
+  });
+});
+
+describe("getCopyDetailRows", () => {
+  it("formats personal copy details for private display", () => {
+    expect(
+      getCopyDetailRows({
+        purchase_state: "used",
+        media_condition: "near_mint",
+        sleeve_condition: "very_good_plus",
+        acquired_on: "2026-09-10",
+        acquired_from: "Local record shop",
+        price_paid_minor: 2499,
+        price_currency: "USD",
+        rating: 5,
+      }),
+    ).toEqual([
+      { label: "Bought as", value: "Used" },
+      { label: "Media condition", value: "Near Mint (NM)" },
+      { label: "Sleeve condition", value: "Very Good Plus (VG+)" },
+      { label: "Acquired", value: "Sep 10, 2026" },
+      { label: "Acquired from", value: "Local record shop" },
+      { label: "Price paid", value: "$24.99" },
+      { label: "Personal rating", value: "5 / 5" },
+    ]);
   });
 });

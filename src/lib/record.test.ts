@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { validateManualRecord, validateRecordDetails } from "./record";
+import {
+  formatPriceMinor,
+  priceMinorToInput,
+  validateCopyDetails,
+  validateManualRecord,
+  validateRecordDetails,
+} from "./record";
 
 const entryKey = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
 
@@ -149,5 +155,103 @@ describe("validateRecordDetails", () => {
         releaseYear: 1984,
       },
     });
+  });
+});
+
+describe("validateCopyDetails", () => {
+  it("normalizes complete personal-copy details and converts price to minor units", () => {
+    const result = validateCopyDetails(
+      formData({
+        purchaseState: "used",
+        mediaCondition: "near_mint",
+        sleeveCondition: "very_good_plus",
+        acquiredOn: "2026-09-10",
+        acquiredFrom: " Local record shop ",
+        pricePaid: "24.99",
+        priceCurrency: " usd ",
+        rating: "5",
+        isFavorite: "on",
+        notes: " A late-night favorite. ",
+      }),
+    );
+
+    expect(result).toEqual({
+      success: true,
+      data: {
+        purchaseState: "used",
+        mediaCondition: "near_mint",
+        sleeveCondition: "very_good_plus",
+        acquiredOn: "2026-09-10",
+        acquiredFrom: "Local record shop",
+        pricePaidMinor: 2499,
+        priceCurrency: "USD",
+        rating: 5,
+        isFavorite: true,
+        notes: "A late-night favorite.",
+      },
+    });
+  });
+
+  it("accepts an entirely unspecified copy", () => {
+    expect(validateCopyDetails(formData({}))).toEqual({
+      success: true,
+      data: {
+        purchaseState: "unknown",
+        mediaCondition: null,
+        sleeveCondition: null,
+        acquiredOn: null,
+        acquiredFrom: null,
+        pricePaidMinor: null,
+        priceCurrency: null,
+        rating: null,
+        isFavorite: false,
+        notes: null,
+      },
+    });
+  });
+
+  it("validates enums, calendar dates, ratings, and complete prices", () => {
+    expect(
+      validateCopyDetails(
+        formData({
+          purchaseState: "vintage",
+          mediaCondition: "perfect",
+          acquiredOn: "2026-02-30",
+          pricePaid: "12.345",
+          priceCurrency: "USD",
+          rating: "6",
+        }),
+      ),
+    ).toEqual({
+      success: false,
+      errors: {
+        purchaseState: "Choose a valid purchase state.",
+        mediaCondition: "Choose a valid media condition.",
+        acquiredOn: "Enter a valid acquisition date.",
+        pricePaid: "USD supports up to 2 decimal places.",
+        rating: "Choose a rating from 1 to 5.",
+      },
+    });
+  });
+
+  it("uses each currency's fraction digits", () => {
+    expect(
+      validateCopyDetails(
+        formData({ pricePaid: "2500", priceCurrency: "JPY" }),
+      ),
+    ).toMatchObject({ success: true, data: { pricePaidMinor: 2500 } });
+    expect(
+      validateCopyDetails(
+        formData({ pricePaid: "1.234", priceCurrency: "KWD" }),
+      ),
+    ).toMatchObject({ success: true, data: { pricePaidMinor: 1234 } });
+  });
+});
+
+describe("price display conversion", () => {
+  it("round-trips standard and zero-decimal currencies", () => {
+    expect(priceMinorToInput(2499, "USD")).toBe("24.99");
+    expect(priceMinorToInput(2500, "JPY")).toBe("2500");
+    expect(formatPriceMinor(2499, "USD")).toBe("$24.99");
   });
 });

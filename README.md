@@ -59,8 +59,9 @@ Start the app with `npm run dev`, then:
 6. Confirm that you arrive at the empty collection screen.
 7. Choose **Add → Add manually**, enter an artist and title, and save the record.
 8. Confirm the saved record appears in the collection grid with its release details.
-9. Open the record, choose **Edit record**, change a release detail, and confirm the
-   updated value appears on both its detail page and collection card.
+9. Open the record, choose **Edit record**, add a favorite, rating, condition,
+   acquisition detail, price, or private note, and confirm the saved details appear on
+   its detail page. Favorite records also show a star on the collection card.
 10. Choose **Remove from collection**, cancel once, then confirm removal and verify
     the collection returns to its empty state.
 
@@ -191,8 +192,8 @@ supabase start
 npm run db:test
 ```
 
-Run the optional real magic-link, onboarding, manual-entry, record-edit, deletion, and
-profile journey through Mailpit and mobile Chrome:
+Run the optional real magic-link, onboarding, manual-entry, personal-copy editing,
+deletion, and profile journey through Mailpit and mobile Chrome:
 
 ```bash
 RUN_LOCAL_AUTH_E2E=1 npm run e2e -- e2e/local-auth.spec.ts --project=mobile-chrome

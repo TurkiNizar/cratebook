@@ -17,7 +17,17 @@ const values: RecordFormValues = {
   vinylColor: "Black",
   barcode: "",
   matrixRunout: "",
+  purchaseState: "used",
+  mediaCondition: "near_mint",
+  sleeveCondition: "very_good_plus",
+  acquiredOn: "2026-09-10",
+  acquiredFrom: "Local record shop",
+  pricePaid: "24.99",
+  priceCurrency: "USD",
+  rating: "5",
+  notes: "A late-night favorite.",
   isReissue: false,
+  isFavorite: true,
 };
 
 describe("RecordForm", () => {
@@ -37,6 +47,9 @@ describe("RecordForm", () => {
     );
     expect(screen.getByLabelText("Format")).toHaveValue("lp");
     expect(screen.getByLabelText("Original release year")).toHaveValue(1965);
+    expect(screen.getByRole("checkbox", { name: /Favorite/ })).toBeChecked();
+    expect(screen.getByLabelText("Media condition")).toHaveValue("near_mint");
+    expect(screen.getByLabelText("Price paid")).toHaveValue("24.99");
     expect(screen.getByRole("button", { name: "Save changes" })).toBeVisible();
     expect(screen.getByRole("link", { name: "Cancel" })).toHaveAttribute(
       "href",

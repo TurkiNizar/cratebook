@@ -128,6 +128,18 @@ test.describe("local passwordless authentication", () => {
       "Pastel Blues",
     );
     await page.getByLabel("Album or release title").fill("Pastel Blues — Mono");
+    await page.getByRole("checkbox", { name: /Favorite/ }).check();
+    await page.getByLabel("Personal rating").selectOption("5");
+    await page.getByLabel("Bought as").selectOption("used");
+    await page.getByLabel("Media condition").selectOption("near_mint");
+    await page.getByLabel("Sleeve condition").selectOption("very_good_plus");
+    await page.getByLabel("Acquisition date").fill("2026-09-10");
+    await page.getByLabel("Acquired from").fill("Local record shop");
+    await page.getByLabel("Price paid").fill("24.99");
+    await page.getByLabel("Currency").fill("USD");
+    await page
+      .getByLabel("Personal notes or story")
+      .fill("A late-night favorite.");
     await page.getByText("Edition details").click();
     await page.getByLabel("Catalog number").fill("PHS 600-187");
     await page.getByRole("button", { name: "Save changes" }).click();
@@ -140,10 +152,22 @@ test.describe("local passwordless authentication", () => {
       page.getByRole("heading", { name: "Pastel Blues — Mono", level: 1 }),
     ).toBeVisible();
     await expect(page.getByText("PHS 600-187", { exact: true })).toBeVisible();
+    await expect(page.getByText("★ Favorite")).toBeVisible();
+    await expect(page.getByText("Near Mint (NM)")).toBeVisible();
+    await expect(page.getByText("Very Good Plus (VG+)")).toBeVisible();
+    await expect(page.getByText("Local record shop")).toBeVisible();
+    await expect(page.getByText("$24.99")).toBeVisible();
+    await expect(page.getByText("5 / 5")).toBeVisible();
+    await expect(page.getByText("A late-night favorite.")).toBeVisible();
 
     await page.getByRole("link", { name: "My collection" }).click();
     await expect(
       page.getByRole("article", { name: "Pastel Blues — Mono" }),
+    ).toBeVisible();
+    await expect(
+      page
+        .getByRole("article", { name: "Pastel Blues — Mono" })
+        .getByLabel("Favorite"),
     ).toBeVisible();
 
     await page

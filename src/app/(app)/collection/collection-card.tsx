@@ -8,6 +8,7 @@ import {
 
 export type CollectionCardItem = {
   id: string;
+  isFavorite: boolean;
   release: CollectionReleaseSummary & {
     artist_display: string;
     title: string;
@@ -26,6 +27,11 @@ export function CollectionCard({ item }: { item: CollectionCardItem }) {
         <div className="collection-cover" aria-hidden="true">
           <span>{release.title.slice(0, 1).toUpperCase()}</span>
         </div>
+        {item.isFavorite ? (
+          <span className="collection-favorite" aria-label="Favorite">
+            ★
+          </span>
+        ) : null}
         <div className="collection-card-copy">
           <h2 id={titleId}>{release.title}</h2>
           <p className="collection-artist">{release.artist_display}</p>

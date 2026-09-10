@@ -12,7 +12,7 @@ export async function getCollectionRecord(id: string) {
   const { data: item, error } = await supabase
     .from("collection_items")
     .select(
-      "id, created_at, is_public, releases(id, artist_display, title, format, disc_count, original_year, release_year, label, catalog_number, country, edition_description, is_reissue, vinyl_color, barcode, matrix_runout)",
+      "id, created_at, is_public, purchase_state, media_condition, sleeve_condition, acquired_on, acquired_from, price_paid_minor, price_currency, rating, is_favorite, notes, releases(id, artist_display, title, format, disc_count, original_year, release_year, label, catalog_number, country, edition_description, is_reissue, vinyl_color, barcode, matrix_runout)",
     )
     .eq("id", id)
     .maybeSingle();

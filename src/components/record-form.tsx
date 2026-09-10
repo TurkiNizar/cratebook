@@ -6,6 +6,8 @@ import Link from "next/link";
 import {
   type ManualRecordActionState,
   type ManualRecordField,
+  PURCHASE_STATE_OPTIONS,
+  RECORD_CONDITION_OPTIONS,
   RELEASE_FORMAT_OPTIONS,
 } from "@/lib/record";
 
@@ -14,11 +16,18 @@ const INITIAL_ACTION_STATE: ManualRecordActionState = {
   fieldErrors: {},
 };
 
+const CONDITION_FIELDS = [
+  ["mediaCondition", "Media condition"],
+  ["sleeveCondition", "Sleeve condition"],
+] as const;
+const RATING_OPTIONS = [5, 4, 3, 2, 1] as const;
+
 export type RecordFormValues = Record<
-  Exclude<ManualRecordField, "entryKey">,
+  Exclude<ManualRecordField, "entryKey" | "isFavorite">,
   string
 > & {
   isReissue: boolean;
+  isFavorite: boolean;
 };
 
 export const EMPTY_RECORD_FORM_VALUES: RecordFormValues = {
@@ -35,7 +44,17 @@ export const EMPTY_RECORD_FORM_VALUES: RecordFormValues = {
   vinylColor: "",
   barcode: "",
   matrixRunout: "",
+  purchaseState: "unknown",
+  mediaCondition: "",
+  sleeveCondition: "",
+  acquiredOn: "",
+  acquiredFrom: "",
+  pricePaid: "",
+  priceCurrency: "",
+  rating: "",
+  notes: "",
   isReissue: false,
+  isFavorite: false,
 };
 
 type RecordFormAction = (
@@ -52,15 +71,15 @@ type RecordFormProps = {
 };
 
 type TextFieldProps = {
-  id: Exclude<ManualRecordField, "entryKey" | "format">;
+  id: Exclude<ManualRecordField, "entryKey" | "format" | "isFavorite">;
   label: string;
   value: string;
   error?: string;
   maxLength?: number;
   placeholder?: string;
   required?: boolean;
-  inputMode?: "numeric";
-  type?: "text" | "number";
+  inputMode?: "numeric" | "decimal";
+  type?: "text" | "number" | "date";
   min?: number;
   max?: number;
   onChange: (field: keyof RecordFormValues, value: string | boolean) => void;
@@ -197,6 +216,188 @@ export function RecordForm({
           />
         </div>
       </section>
+
+      {isEditing ? (
+        <section
+          className="form-section"
+          aria-labelledby="copy-details-heading"
+        >
+          <div className="form-section-heading">
+            <p className="app-kicker">Your physical copy</p>
+            <h2 id="copy-details-heading">Crate details</h2>
+            <p>
+              Capture condition, where it came from, and what it means to you.
+            </p>
+          </div>
+
+          <div className="copy-preferences-grid">
+            <label className="checkbox-field" htmlFor="isFavorite">
+              <input
+                id="isFavorite"
+                name="isFavorite"
+                type="checkbox"
+                checked={values.isFavorite}
+                onChange={(event) =>
+                  updateValue("isFavorite", event.target.checked)
+                }
+              />
+              <span>
+                <strong>Favorite</strong>
+                <small>Mark this as one of the records you love most.</small>
+              </span>
+            </label>
+
+            <div className="field">
+              <label htmlFor="rating">Personal rating</label>
+              <select
+                id="rating"
+                name="rating"
+                value={values.rating}
+                aria-describedby={errors.rating ? "rating-error" : undefined}
+                aria-invalid={Boolean(errors.rating)}
+                onChange={(event) => updateValue("rating", event.target.value)}
+              >
+                <option value="">Not rated</option>
+                {RATING_OPTIONS.map((rating) => (
+                  <option key={rating} value={rating}>
+                    {rating} {rating === 1 ? "star" : "stars"}
+                  </option>
+                ))}
+              </select>
+              {errors.rating ? (
+                <p className="field-error" id="rating-error">
+                  {errors.rating}
+                </p>
+              ) : null}
+            </div>
+          </div>
+
+          <div className="field-grid copy-fields-grid">
+            <div className="field">
+              <label htmlFor="purchaseState">Bought as</label>
+              <select
+                id="purchaseState"
+                name="purchaseState"
+                value={values.purchaseState}
+                aria-describedby={
+                  errors.purchaseState ? "purchaseState-error" : undefined
+                }
+                aria-invalid={Boolean(errors.purchaseState)}
+                onChange={(event) =>
+                  updateValue("purchaseState", event.target.value)
+                }
+              >
+                {PURCHASE_STATE_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+              {errors.purchaseState ? (
+                <p className="field-error" id="purchaseState-error">
+                  {errors.purchaseState}
+                </p>
+              ) : null}
+            </div>
+
+            {CONDITION_FIELDS.map(([id, label]) => (
+              <div className="field" key={id}>
+                <label htmlFor={id}>{label}</label>
+                <select
+                  id={id}
+                  name={id}
+                  value={values[id]}
+                  aria-describedby={
+                    errors[id] ? `${id}-error` : "condition-hint"
+                  }
+                  aria-invalid={Boolean(errors[id])}
+                  onChange={(event) => updateValue(id, event.target.value)}
+                >
+                  <option value="">Not graded</option>
+                  {RECORD_CONDITION_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+                {errors[id] ? (
+                  <p className="field-error" id={`${id}-error`}>
+                    {errors[id]}
+                  </p>
+                ) : null}
+              </div>
+            ))}
+            <p className="field-hint condition-hint" id="condition-hint">
+              Use Goldmine grades when you know them; leaving either ungraded is
+              fine.
+            </p>
+
+            <TextField
+              id="acquiredOn"
+              label="Acquisition date"
+              value={values.acquiredOn}
+              error={errors.acquiredOn}
+              type="date"
+              onChange={updateValue}
+            />
+            <TextField
+              id="acquiredFrom"
+              label="Acquired from"
+              value={values.acquiredFrom}
+              error={errors.acquiredFrom}
+              maxLength={300}
+              placeholder="Local record shop"
+              onChange={updateValue}
+            />
+            <TextField
+              id="pricePaid"
+              label="Price paid"
+              value={values.pricePaid}
+              error={errors.pricePaid}
+              inputMode="decimal"
+              placeholder="24.99"
+              onChange={updateValue}
+            />
+            <TextField
+              id="priceCurrency"
+              label="Currency"
+              value={values.priceCurrency}
+              error={errors.priceCurrency}
+              maxLength={3}
+              placeholder="USD"
+              onChange={(field, value) =>
+                updateValue(
+                  field,
+                  typeof value === "string" ? value.toUpperCase() : value,
+                )
+              }
+            />
+          </div>
+
+          <div className="field copy-notes-field">
+            <label htmlFor="notes">Personal notes or story</label>
+            <textarea
+              id="notes"
+              name="notes"
+              value={values.notes}
+              maxLength={10000}
+              aria-describedby={errors.notes ? "notes-error" : "notes-hint"}
+              aria-invalid={Boolean(errors.notes)}
+              placeholder="Where you found it, who introduced you to it, or why it stays in rotation…"
+              onChange={(event) => updateValue("notes", event.target.value)}
+            />
+            {errors.notes ? (
+              <p className="field-error" id="notes-error">
+                {errors.notes}
+              </p>
+            ) : (
+              <p className="field-hint" id="notes-hint">
+                Private by default. Up to 10,000 characters.
+              </p>
+            )}
+          </div>
+        </section>
+      ) : null}
 
       <details className="advanced-fields">
         <summary>

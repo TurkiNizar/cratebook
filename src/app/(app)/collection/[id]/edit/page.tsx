@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { RecordForm, type RecordFormValues } from "@/components/record-form";
+import { priceMinorToInput } from "@/lib/record";
 
 import { getCollectionRecord } from "../data";
 import { updateRecord } from "./actions";
@@ -30,7 +31,17 @@ export default async function EditRecordPage({
     vinylColor: release.vinyl_color ?? "",
     barcode: release.barcode ?? "",
     matrixRunout: release.matrix_runout ?? "",
+    purchaseState: item.purchase_state,
+    mediaCondition: item.media_condition ?? "",
+    sleeveCondition: item.sleeve_condition ?? "",
+    acquiredOn: item.acquired_on ?? "",
+    acquiredFrom: item.acquired_from ?? "",
+    pricePaid: priceMinorToInput(item.price_paid_minor, item.price_currency),
+    priceCurrency: item.price_currency ?? "",
+    rating: item.rating?.toString() ?? "",
+    notes: item.notes ?? "",
     isReissue: release.is_reissue ?? false,
+    isFavorite: item.is_favorite,
   };
   const updateRecordWithId = updateRecord.bind(null, item.id);
 

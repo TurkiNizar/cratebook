@@ -5,6 +5,7 @@ import { CollectionCard, type CollectionCardItem } from "./collection-card";
 
 const item: CollectionCardItem = {
   id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+  isFavorite: true,
   release: {
     artist_display: "Nina Simone",
     title: "Pastel Blues",
@@ -32,6 +33,7 @@ describe("CollectionCard", () => {
     expect(within(card).getByText("1965")).toBeVisible();
     expect(within(card).getByText("US")).toBeVisible();
     expect(within(card).getByText("Philips · PHS 600-187")).toBeVisible();
+    expect(within(card).getByLabelText("Favorite")).toBeVisible();
   });
 
   it("keeps sparse manual records clear without empty metadata", () => {

@@ -216,6 +216,36 @@ export type Database = {
         };
         Returns: string;
       };
+      update_collection_item_details: {
+        Args: {
+          p_acquired_from?: string;
+          p_acquired_on?: string;
+          p_artist_display: string;
+          p_barcode?: string;
+          p_catalog_number?: string;
+          p_country?: string;
+          p_disc_count?: number;
+          p_edition_description?: string;
+          p_format?: Database["public"]["Enums"]["release_format"];
+          p_is_favorite?: boolean;
+          p_is_reissue?: boolean;
+          p_item_id: string;
+          p_label?: string;
+          p_matrix_runout?: string;
+          p_media_condition?: Database["public"]["Enums"]["record_condition"];
+          p_notes?: string;
+          p_original_year?: number;
+          p_price_currency?: string;
+          p_price_paid_minor?: number;
+          p_purchase_state?: Database["public"]["Enums"]["purchase_state"];
+          p_rating?: number;
+          p_release_year?: number;
+          p_sleeve_condition?: Database["public"]["Enums"]["record_condition"];
+          p_title: string;
+          p_vinyl_color?: string;
+        };
+        Returns: boolean;
+      };
     };
     Enums: {
       purchase_state: "new" | "used" | "unknown";

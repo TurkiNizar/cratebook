@@ -4,6 +4,7 @@ import Link from "next/link";
 import {
   formatCollectionDate,
   getCollectionCardDetails,
+  getCopyDetailRows,
   getRecordDetailRows,
 } from "@/lib/collection";
 
@@ -27,6 +28,7 @@ export default async function RecordDetailPage({
   const release = item.releases;
   const details = getCollectionCardDetails(release);
   const detailRows = getRecordDetailRows(release);
+  const copyRows = getCopyDetailRows(item);
   const deleteRecordWithId = deleteRecord.bind(null, item.id);
 
   return (
@@ -50,7 +52,10 @@ export default async function RecordDetailPage({
           <span>{release.title.slice(0, 1).toUpperCase()}</span>
         </div>
         <div className="record-hero-copy">
-          <p className="app-kicker">In your crate</p>
+          <div className="record-hero-kicker">
+            <p className="app-kicker">In your crate</p>
+            {item.is_favorite ? <span>★ Favorite</span> : null}
+          </div>
           <h1>{release.title}</h1>
           <p className="record-detail-artist">{release.artist_display}</p>
           {details.length > 0 ? (
@@ -111,12 +116,27 @@ export default async function RecordDetailPage({
               <dt>Visibility</dt>
               <dd>{item.is_public ? "Public" : "Private"}</dd>
             </div>
+            {copyRows.map((detail) => (
+              <div key={detail.label}>
+                <dt>{detail.label}</dt>
+                <dd>{detail.value}</dd>
+              </div>
+            ))}
           </dl>
-          <p className="record-copy-note">
-            Condition, acquisition details, ratings, and personal notes can be
-            added in a later collection step.
-          </p>
         </aside>
+
+        {item.notes ? (
+          <section
+            className="record-detail-panel record-story-panel"
+            aria-labelledby="story-heading"
+          >
+            <div className="record-detail-heading">
+              <p className="app-kicker">Personal and private</p>
+              <h2 id="story-heading">My notes</h2>
+            </div>
+            <p>{item.notes}</p>
+          </section>
+        ) : null}
       </div>
 
       <DeleteRecord action={deleteRecordWithId} title={release.title} />

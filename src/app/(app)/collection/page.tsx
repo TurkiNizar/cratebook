@@ -24,7 +24,7 @@ export default async function CollectionPage({
   const { data: items, error } = await supabase
     .from("collection_items")
     .select(
-      "id, created_at, releases(artist_display, title, format, disc_count, original_year, release_year, label, catalog_number, country)",
+      "id, created_at, is_favorite, releases(artist_display, title, format, disc_count, original_year, release_year, label, catalog_number, country)",
     )
     .order("created_at", { ascending: false });
 
@@ -98,7 +98,11 @@ export default async function CollectionPage({
             {items.map((item) => (
               <li key={item.id}>
                 <CollectionCard
-                  item={{ id: item.id, release: item.releases }}
+                  item={{
+                    id: item.id,
+                    isFavorite: item.is_favorite,
+                    release: item.releases,
+                  }}
                 />
               </li>
             ))}
