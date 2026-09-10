@@ -309,6 +309,24 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      convert_wishlist_item_to_collection: {
+        Args: {
+          p_acquired_from?: string;
+          p_acquired_on?: string;
+          p_entry_key: string;
+          p_is_favorite?: boolean;
+          p_media_condition?: Database["public"]["Enums"]["record_condition"];
+          p_notes?: string;
+          p_price_currency?: string;
+          p_price_paid_minor?: number;
+          p_purchase_state?: Database["public"]["Enums"]["purchase_state"];
+          p_rating?: number;
+          p_sleeve_condition?: Database["public"]["Enums"]["record_condition"];
+          p_tags?: string[];
+          p_wishlist_item_id: string;
+        };
+        Returns: string;
+      };
       create_manual_collection_item: {
         Args: {
           p_artist_display: string;

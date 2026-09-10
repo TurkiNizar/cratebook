@@ -16,14 +16,17 @@ export const metadata: Metadata = { title: "Record details" };
 
 type RecordDetailPageProps = {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ updated?: string }>;
+  searchParams: Promise<{ moved?: string; updated?: string }>;
 };
 
 export default async function RecordDetailPage({
   params,
   searchParams,
 }: RecordDetailPageProps) {
-  const [{ id }, { updated }] = await Promise.all([params, searchParams]);
+  const [{ id }, { moved, updated }] = await Promise.all([
+    params,
+    searchParams,
+  ]);
   const item = await getCollectionRecord(id);
   const release = item.releases;
   const details = getCollectionCardDetails(release);
@@ -40,7 +43,12 @@ export default async function RecordDetailPage({
         ← My collection
       </Link>
 
-      {updated === "1" ? (
+      {moved === "1" ? (
+        <div className="collection-notice" role="status">
+          <span aria-hidden="true">✓</span>
+          <p>The record moved from your wishlist into your collection.</p>
+        </div>
+      ) : updated === "1" ? (
         <div className="collection-notice" role="status">
           <span aria-hidden="true">✓</span>
           <p>Your changes to this record were saved.</p>

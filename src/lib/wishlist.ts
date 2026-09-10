@@ -1,5 +1,11 @@
 import type { Enums } from "@/types/database";
 
+import {
+  type CopyDetailsInput,
+  type ManualRecordField,
+  validateCopyDetails,
+} from "./record";
+
 export const WISHLIST_PRIORITY_OPTIONS = [
   { value: "interested", label: "Interested" },
   { value: "wanted", label: "Wanted" },
@@ -51,6 +57,13 @@ type WishlistValidation =
 type ManualWishlistValidation =
   | { success: true; data: ManualWishlistInput }
   | { success: false; errors: Partial<Record<WishlistField, string>> };
+
+type WishlistConversionValidation =
+  | { success: true; data: CopyDetailsInput & { entryKey: string } }
+  | {
+      success: false;
+      errors: Partial<Record<ManualRecordField, string>>;
+    };
 
 function text(formData: FormData, name: string) {
   return String(formData.get(name) ?? "").trim();
@@ -210,4 +223,30 @@ export function validateManualWishlist(
     };
   }
   return { success: true, data: { ...validation.data, entryKey } };
+}
+
+export function validateWishlistConversion(
+  formData: FormData,
+): WishlistConversionValidation {
+  const copy = validateCopyDetails(formData);
+  const entryKey = text(formData, "entryKey");
+
+  if (!copy.success) {
+    return {
+      success: false,
+      errors: {
+        ...copy.errors,
+        ...(isValidWishlistId(entryKey)
+          ? {}
+          : { entryKey: "Refresh the page and try again." }),
+      },
+    };
+  }
+  if (!isValidWishlistId(entryKey)) {
+    return {
+      success: false,
+      errors: { entryKey: "Refresh the page and try again." },
+    };
+  }
+  return { success: true, data: { ...copy.data, entryKey } };
 }

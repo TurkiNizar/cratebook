@@ -401,16 +401,75 @@ test.describe("local passwordless authentication", () => {
     await expect(page.getByText("Private", { exact: true })).toBeVisible();
     await expectNoHorizontalOverflow(page);
 
+    await page.getByRole("link", { name: "Move to collection" }).click();
+    await expect(page).toHaveURL(/\/wishlist\/[0-9a-f-]+\/move$/);
+    await expect(
+      page.getByRole("heading", { name: "Move to collection", level: 1 }),
+    ).toBeVisible();
+    await expect(page.getByText("Impulse stereo pressing")).toBeVisible();
+    await expect(
+      page.getByText(/private spending limit.*\$60\.00/i),
+    ).toBeVisible();
+    await expect(page.getByLabel("Personal notes or story")).toHaveValue(
+      "Check the sleeve.",
+    );
+    await page.getByLabel("Bought as").selectOption("used");
+    await page.getByLabel("Media condition").selectOption("near_mint");
+    await page.getByLabel("Acquisition date").fill("2026-09-10");
+    await page.getByLabel("Acquired from").fill("Local record shop");
+    await page.getByLabel("Price paid").fill("55.00");
+    await page.getByLabel("Tags").fill("Spiritual jazz, Wishlist find");
+    await page
+      .getByLabel("Personal notes or story")
+      .fill("Check the sleeve. Found a clean copy.");
+    await page.getByRole("button", { name: "Move to collection" }).click();
+
+    await expect(page).toHaveURL(/\/collection\/[0-9a-f-]+\?moved=1$/);
+    await expect(
+      page.getByText(
+        "The record moved from your wishlist into your collection.",
+      ),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("heading", {
+        name: "Journey in Satchidananda — Reissue",
+        level: 1,
+      }),
+    ).toBeVisible();
+    await expect(page.getByText("Local record shop")).toBeVisible();
+    await expect(page.getByText("$55.00")).toBeVisible();
+    await expect(
+      page.getByText("Check the sleeve. Found a clean copy."),
+    ).toBeVisible();
+    await expect(page.getByLabel("Tags")).toHaveText(
+      "Spiritual jazzWishlist find",
+    );
+    await expect(page.getByText("Private", { exact: true })).toBeVisible();
+    await expectNoHorizontalOverflow(page);
+
+    await page.getByRole("link", { name: "Wishlist", exact: true }).click();
+    await expect(
+      page.getByRole("heading", { name: "Your want list is wide open" }),
+    ).toBeVisible();
+    await page.getByRole("link", { name: "Add your first wish" }).click();
+    await page.getByLabel("Artist").fill("Dorothy Ashby");
+    await page.getByLabel("Album or release title").fill("Afro-Harping");
+    await page.getByRole("button", { name: "Add to wishlist" }).click();
+    await page
+      .getByRole("article", { name: "Afro-Harping" })
+      .getByRole("link")
+      .click();
+
     await page.getByRole("button", { name: "Remove from wishlist" }).click();
     await expect(
       page.getByRole("group", {
-        name: "Remove Journey in Satchidananda — Reissue?",
+        name: "Remove Afro-Harping?",
       }),
     ).toBeVisible();
     await page.getByRole("button", { name: "Keep wish" }).click();
     await expect(
       page.getByRole("heading", {
-        name: "Journey in Satchidananda — Reissue",
+        name: "Afro-Harping",
         level: 1,
       }),
     ).toBeVisible();

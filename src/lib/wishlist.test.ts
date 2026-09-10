@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   getWishlistPriorityLabel,
   validateManualWishlist,
+  validateWishlistConversion,
   validateWishlist,
 } from "./wishlist";
 
@@ -121,6 +122,56 @@ describe("validateWishlist", () => {
         preferredEdition: "Preferred edition must be 1000 characters or fewer.",
         notes: "Notes must be 10000 characters or fewer.",
       },
+    });
+  });
+});
+
+describe("validateWishlistConversion", () => {
+  it("accepts copy details and an idempotency key", () => {
+    expect(
+      validateWishlistConversion(
+        formData({
+          entryKey,
+          purchaseState: "used",
+          mediaCondition: "near_mint",
+          acquiredOn: "2026-09-10",
+          pricePaid: "60.00",
+          priceCurrency: "usd",
+          notes: "Check the sleeve. Found a clean copy.",
+          tags: "Jazz, Spiritual jazz, jazz",
+        }),
+      ),
+    ).toEqual({
+      success: true,
+      data: expect.objectContaining({
+        entryKey,
+        purchaseState: "used",
+        mediaCondition: "near_mint",
+        acquiredOn: "2026-09-10",
+        pricePaidMinor: 6000,
+        priceCurrency: "USD",
+        notes: "Check the sleeve. Found a clean copy.",
+        tags: ["Jazz", "Spiritual jazz"],
+      }),
+    });
+  });
+
+  it("rejects invalid copy details and a missing idempotency key together", () => {
+    expect(
+      validateWishlistConversion(
+        formData({
+          purchaseState: "borrowed",
+          pricePaid: "12.999",
+          priceCurrency: "USD",
+        }),
+      ),
+    ).toEqual({
+      success: false,
+      errors: expect.objectContaining({
+        entryKey: "Refresh the page and try again.",
+        purchaseState: "Choose a valid purchase state.",
+        pricePaid: "USD supports up to 2 decimal places.",
+      }),
     });
   });
 });

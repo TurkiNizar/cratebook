@@ -1648,6 +1648,10 @@ a.add-option:hover {
   margin-top: 28px;
 }
 
+.record-hero-copy > .record-form-buttons {
+  margin-top: 28px;
+}
+
 .record-detail-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.5fr) minmax(240px, 0.8fr);
@@ -1660,6 +1664,22 @@ a.add-option:hover {
   border: 1px solid var(--line);
   border-radius: 22px;
   background: var(--paper-light);
+}
+
+.wishlist-conversion-summary {
+  display: grid;
+  gap: 10px;
+  margin-top: 30px;
+}
+
+.wishlist-conversion-summary p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.wishlist-conversion-summary strong {
+  color: var(--ink);
 }
 
 .record-detail-heading {

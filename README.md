@@ -75,8 +75,13 @@ Start the app with `npm run dev`, then:
     edition, maximum price, notes, and visibility.
 14. Open the saved wish, edit its preferences, and confirm maximum price and private
     notes remain clearly identified as private.
-15. Choose **Remove from wishlist**, cancel once, then confirm removal and verify the
-    wishlist returns to its empty state.
+15. Choose **Move to collection**, review the carried-over wishlist guidance, enter
+    any copy-specific condition, acquisition, price, rating, favorite, note, or tag
+    details, and complete the move.
+16. Confirm the release metadata and edited notes appear on the new private collection
+    copy and that the original wishlist item is gone.
+17. Add another wishlist item, choose **Remove from wishlist**, cancel once, then
+    confirm removal and verify the wishlist returns to its empty state.
 
 Supabase Studio is available at <http://127.0.0.1:54323> if you want to inspect the
 local database. Stop the local services when finished:

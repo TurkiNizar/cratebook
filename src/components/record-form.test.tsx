@@ -107,4 +107,30 @@ describe("RecordForm", () => {
       screen.getByRole("button", { name: "Add another copy" }),
     ).toBeVisible();
   });
+
+  it("asks only for copy details when moving a wishlist item", () => {
+    render(
+      <RecordForm
+        action={async () => ({ message: "", fieldErrors: {} })}
+        cancelHref="/wishlist/wish-id"
+        entryKey="bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb"
+        initialValues={values}
+        variant="convert"
+      />,
+    );
+
+    expect(screen.queryByLabelText("Artist")).toBeNull();
+    expect(screen.queryByLabelText("Format")).toBeNull();
+    expect(screen.getByLabelText("Bought as")).toHaveValue("used");
+    expect(screen.getByLabelText("Personal notes or story")).toHaveValue(
+      "A late-night favorite.",
+    );
+    expect(
+      screen.getByRole("button", { name: "Move to collection" }),
+    ).toBeVisible();
+    expect(screen.getByRole("link", { name: "Cancel" })).toHaveAttribute(
+      "href",
+      "/wishlist/wish-id",
+    );
+  });
 });

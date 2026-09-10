@@ -49,9 +49,17 @@ export default async function WishlistDetailPage({
           </div>
           <h1>{release.title}</h1>
           <p className="record-detail-artist">{release.artist_display}</p>
-          <Link className="button" href={`/wishlist/${item.id}/edit`}>
-            Edit wish
-          </Link>
+          <div className="record-form-buttons">
+            <Link className="button" href={`/wishlist/${item.id}/move`}>
+              Move to collection
+            </Link>
+            <Link
+              className="secondary-button"
+              href={`/wishlist/${item.id}/edit`}
+            >
+              Edit wish
+            </Link>
+          </div>
         </div>
       </article>
 
