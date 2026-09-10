@@ -3,7 +3,9 @@ import { randomUUID } from "node:crypto";
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { ManualRecordForm } from "./manual-record-form";
+import { RecordForm } from "@/components/record-form";
+
+import { createManualRecord } from "./actions";
 
 export const metadata: Metadata = { title: "Add a record manually" };
 
@@ -19,7 +21,11 @@ export default function ManualRecordPage() {
         Start with what you know. You can add copy condition, purchase details,
         and your story later.
       </p>
-      <ManualRecordForm entryKey={randomUUID()} />
+      <RecordForm
+        action={createManualRecord}
+        entryKey={randomUUID()}
+        variant="create"
+      />
     </main>
   );
 }

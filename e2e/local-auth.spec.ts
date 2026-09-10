@@ -8,7 +8,7 @@ test.describe("local passwordless authentication", () => {
     "Set RUN_LOCAL_AUTH_E2E=1 with the local Supabase stack running",
   );
 
-  test("signs in, completes onboarding, and adds a manual record", async ({
+  test("signs in, completes onboarding, and adds and edits a manual record", async ({
     page,
     request,
   }, testInfo) => {
@@ -114,6 +114,43 @@ test.describe("local passwordless authentication", () => {
     await expect(record.getByText("LP")).toBeVisible();
     await expect(record.getByText("1965")).toBeVisible();
     await expect(record.getByText(/Philips/)).toBeVisible();
+
+    await record.getByRole("link").click();
+    await expect(page).toHaveURL(/\/collection\/[0-9a-f-]+$/);
+    await expect(
+      page.getByRole("heading", { name: "Pastel Blues", level: 1 }),
+    ).toBeVisible();
+    await expect(page.getByText("Nina Simone", { exact: true })).toBeVisible();
+    await page.getByRole("link", { name: "Edit record" }).click();
+    await expect(page).toHaveURL(/\/collection\/[0-9a-f-]+\/edit$/);
+    await expect(page.getByLabel("Artist")).toHaveValue("Nina Simone");
+    await expect(page.getByLabel("Album or release title")).toHaveValue(
+      "Pastel Blues",
+    );
+    await page.getByLabel("Album or release title").fill("Pastel Blues — Mono");
+    await page.getByText("Edition details").click();
+    await page.getByLabel("Catalog number").fill("PHS 600-187");
+    await page.getByRole("button", { name: "Save changes" }).click();
+
+    await expect(page).toHaveURL(/\/collection\/[0-9a-f-]+\?updated=1$/);
+    await expect(
+      page.getByText("Your changes to this record were saved."),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Pastel Blues — Mono", level: 1 }),
+    ).toBeVisible();
+    await expect(page.getByText("PHS 600-187", { exact: true })).toBeVisible();
+
+    await page.getByRole("link", { name: "My collection" }).click();
+    await expect(
+      page.getByRole("article", { name: "Pastel Blues — Mono" }),
+    ).toBeVisible();
+
+    await page.goto("/collection/not-a-record-id");
+    await expect(
+      page.getByRole("heading", { name: "Record not found" }),
+    ).toBeVisible();
+    await page.getByRole("link", { name: "Back to my collection" }).click();
 
     await page.getByRole("link", { name: /profile/i }).click();
     await page.getByLabel("Display name").fill("Local Crate Digger");

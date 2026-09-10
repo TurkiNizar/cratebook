@@ -1,6 +1,6 @@
 begin;
 
-select plan(15);
+select plan(16);
 
 insert into auth.users (id, aud, role, email, created_at, updated_at)
 values
@@ -76,6 +76,20 @@ select is(
   'new collection items are private'
 );
 
+update public.releases
+set title = 'Kind of Blue (Edited)'
+where id = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+
+select is(
+  (
+    select title
+    from public.releases
+    where id = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
+  ),
+  'Kind of Blue (Edited)'::text,
+  'a user can update their own release metadata'
+);
+
 select throws_like(
   $$
     insert into public.releases (created_by, artist_display, title)
@@ -120,7 +134,7 @@ reset role;
 
 select is(
   (select title from public.releases where id = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'),
-  'Kind of Blue'::text,
+  'Kind of Blue (Edited)'::text,
   'another user cannot update a release'
 );
 select is(

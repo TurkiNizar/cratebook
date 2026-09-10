@@ -59,6 +59,8 @@ Start the app with `npm run dev`, then:
 6. Confirm that you arrive at the empty collection screen.
 7. Choose **Add → Add manually**, enter an artist and title, and save the record.
 8. Confirm the saved record appears in the collection grid with its release details.
+9. Open the record, choose **Edit record**, change a release detail, and confirm the
+   updated value appears on both its detail page and collection card.
 
 Supabase Studio is available at <http://127.0.0.1:54323> if you want to inspect the
 local database. Stop the local services when finished:
@@ -187,8 +189,8 @@ supabase start
 npm run db:test
 ```
 
-Run the optional real magic-link, onboarding, manual-entry, and profile journey through
-Mailpit and mobile Chrome:
+Run the optional real magic-link, onboarding, manual-entry, record-edit, and profile
+journey through Mailpit and mobile Chrome:
 
 ```bash
 RUN_LOCAL_AUTH_E2E=1 npm run e2e -- e2e/local-auth.spec.ts --project=mobile-chrome

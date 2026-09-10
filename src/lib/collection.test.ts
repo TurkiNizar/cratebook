@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  formatCollectionDate,
   getCollectionCardDetails,
   getCollectionCardEdition,
+  getRecordDetailRows,
 } from "./collection";
 
 const release = {
@@ -59,6 +61,80 @@ describe("getCollectionCardEdition", () => {
   it("does not add separators around missing values", () => {
     expect(getCollectionCardEdition({ ...release, label: null })).toBe(
       "PHS 600-187",
+    );
+  });
+});
+
+describe("getRecordDetailRows", () => {
+  it("labels all known edition metadata for the detail screen", () => {
+    expect(
+      getRecordDetailRows({
+        ...release,
+        edition_description: "Stereo reissue",
+        is_reissue: true,
+        vinyl_color: "Black",
+        barcode: "602508910657",
+        matrix_runout: "A1 600-187",
+      }),
+    ).toEqual([
+      { label: "Format", value: "LP" },
+      { label: "Disc count", value: "2" },
+      { label: "Original release year", value: "1965" },
+      { label: "This edition's year", value: "2020" },
+      { label: "Label", value: "Philips" },
+      { label: "Catalog number", value: "PHS 600-187" },
+      { label: "Country", value: "US" },
+      { label: "Edition description", value: "Stereo reissue" },
+      { label: "Reissue", value: "Yes" },
+      { label: "Vinyl color", value: "Black" },
+      { label: "Barcode", value: "602508910657" },
+      { label: "Matrix / runout", value: "A1 600-187" },
+    ]);
+  });
+
+  it("omits unknown metadata", () => {
+    expect(
+      getRecordDetailRows({
+        format: null,
+        disc_count: null,
+        original_year: null,
+        release_year: null,
+        label: null,
+        catalog_number: null,
+        country: null,
+        edition_description: null,
+        is_reissue: null,
+        vinyl_color: null,
+        barcode: null,
+        matrix_runout: null,
+      }),
+    ).toEqual([]);
+  });
+
+  it("does not present an unchecked reissue field as a definitive answer", () => {
+    expect(
+      getRecordDetailRows({
+        format: null,
+        disc_count: null,
+        original_year: null,
+        release_year: null,
+        label: null,
+        catalog_number: null,
+        country: null,
+        edition_description: null,
+        is_reissue: false,
+        vinyl_color: null,
+        barcode: null,
+        matrix_runout: null,
+      }),
+    ).toEqual([]);
+  });
+});
+
+describe("formatCollectionDate", () => {
+  it("formats stored timestamps without local-time drift", () => {
+    expect(formatCollectionDate("2026-09-10T23:30:00+00:00")).toBe(
+      "Sep 10, 2026",
     );
   });
 });

@@ -17,6 +17,16 @@
   box-sizing: border-box;
 }
 
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -1022,6 +1032,12 @@ a.add-option:hover {
   cursor: pointer;
 }
 
+.record-form-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .collection-notice {
   display: flex;
   align-items: center;
@@ -1083,6 +1099,22 @@ a.add-option:hover {
 
 .collection-card {
   min-width: 0;
+}
+
+.collection-card-link {
+  display: block;
+  border-radius: 7px;
+}
+
+.collection-card-link .collection-cover {
+  transition:
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+.collection-card-link:hover .collection-cover {
+  box-shadow: 10px 14px 30px rgba(55, 40, 27, 0.2);
+  transform: translateY(-3px);
 }
 
 .collection-cover {
@@ -1240,6 +1272,7 @@ a.add-option:hover {
   text-align: center;
 }
 
+.collection-error h1,
 .collection-error h2 {
   margin: 25px 0 8px;
   font-family: Georgia, "Times New Roman", serif;
@@ -1275,6 +1308,145 @@ a.add-option:hover {
   to {
     background-position: -100% 0;
   }
+}
+
+.record-detail-page {
+  max-width: 980px;
+}
+
+.record-hero {
+  display: grid;
+  grid-template-columns: minmax(220px, 320px) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(34px, 7vw, 78px);
+  margin-top: 14px;
+}
+
+.record-detail-page > .collection-notice {
+  margin: 0 0 28px;
+}
+
+.record-detail-cover {
+  width: 100%;
+}
+
+.record-detail-cover span {
+  font-size: clamp(13px, 3vw, 20px);
+}
+
+.record-hero-copy h1 {
+  margin: 5px 0 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(42px, 7vw, 72px);
+  font-weight: 500;
+  letter-spacing: -0.055em;
+  line-height: 0.98;
+}
+
+.record-detail-artist {
+  margin: 15px 0 0;
+  color: var(--muted);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(20px, 3vw, 28px);
+}
+
+.record-hero-copy > .button {
+  margin-top: 28px;
+}
+
+.record-detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(240px, 0.8fr);
+  gap: 18px;
+  margin-top: clamp(44px, 8vw, 82px);
+}
+
+.record-detail-panel {
+  padding: clamp(22px, 4vw, 34px);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--paper-light);
+}
+
+.record-detail-heading {
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.record-detail-heading h2 {
+  margin: 4px 0 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 27px;
+  font-weight: 500;
+}
+
+.record-detail-list {
+  margin: 0;
+}
+
+.record-detail-list > div {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.7fr) minmax(0, 1fr);
+  gap: 20px;
+  padding: 17px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.record-detail-list > div:last-child {
+  border-bottom: 0;
+}
+
+.record-detail-list dt {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.record-detail-list dd {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.record-detail-empty {
+  padding: 28px 0 6px;
+  color: var(--muted);
+}
+
+.record-detail-empty p {
+  margin: 0 0 10px;
+}
+
+.record-detail-empty a {
+  color: var(--terracotta-dark);
+  font-weight: 800;
+}
+
+.record-copy-panel .record-detail-list > div {
+  grid-template-columns: 1fr;
+  gap: 5px;
+}
+
+.record-copy-note {
+  margin: 20px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.record-hero-loading {
+  align-items: start;
+  margin-top: 36px;
+}
+
+.record-hero-loading > div {
+  display: grid;
+  gap: 15px;
+  padding-top: 24px;
 }
 
 .settings-card {
@@ -1529,6 +1701,10 @@ a.add-option:hover {
   .auth-panel > .brand-link {
     margin-bottom: 64px;
   }
+
+  .record-detail-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 520px) {
@@ -1631,8 +1807,36 @@ a.add-option:hover {
     flex-direction: column;
   }
 
+  .record-form-buttons {
+    align-items: stretch;
+    flex-direction: column-reverse;
+  }
+
+  .record-form-buttons .secondary-button {
+    width: 100%;
+  }
+
   .manual-form-actions .button {
     width: 100%;
+  }
+
+  .record-hero {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .record-detail-cover,
+  .record-hero-loading > .skeleton-cover {
+    width: min(100%, 300px);
+  }
+
+  .record-hero-copy h1 {
+    font-size: clamp(40px, 13vw, 58px);
+  }
+
+  .record-detail-list > div {
+    grid-template-columns: 1fr;
+    gap: 5px;
   }
 
   .collection-error-actions {

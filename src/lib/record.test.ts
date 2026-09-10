@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { validateManualRecord } from "./record";
+import { validateManualRecord, validateRecordDetails } from "./record";
 
 const entryKey = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
 
@@ -124,6 +124,29 @@ describe("validateManualRecord", () => {
         catalogNumber: "Catalog number must be 100 characters or fewer.",
         editionDescription:
           "Edition description must be 1000 characters or fewer.",
+      },
+    });
+  });
+});
+
+describe("validateRecordDetails", () => {
+  it("validates edits without requiring a create-entry key", () => {
+    const result = validateRecordDetails(
+      formData({
+        artist: "  Sade ",
+        title: " Diamond Life ",
+        format: "lp",
+        releaseYear: "1984",
+      }),
+    );
+
+    expect(result).toMatchObject({
+      success: true,
+      data: {
+        artist: "Sade",
+        title: "Diamond Life",
+        format: "lp",
+        releaseYear: 1984,
       },
     });
   });

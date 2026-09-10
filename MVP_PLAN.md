@@ -650,7 +650,8 @@ application, and cannot access another user's private data.
 - [x] Implement atomic, idempotent manual record entry with validation, progressive
       release details, private defaults, and responsive browser coverage
 - [x] Build responsive collection grid with intentional empty, loading, and error states
-- [ ] Build record detail and edit screens
+- [x] Build private record detail and release-metadata edit screens with responsive
+      loading, not-found, success, validation, and error states
 - [ ] Add deletion with confirmation
 - [ ] Add favorites, ratings, notes, acquisition data, and conditions
 - [ ] Add user tags
@@ -810,6 +811,7 @@ in version control; this log records product-level progress and changes.
 | 2026-09-10 | 2         | Added typed release and physical-copy tables with validation, indexing, idempotency keys, private defaults, owner-only RLS, same-owner foreign keys, generated TypeScript types, and 44 collection database assertions                                                | Build manual record entry on the verified collection schema            |
 | 2026-09-10 | 2         | Built phone-first manual entry with required artist/title, progressive edition fields, server validation, atomic idempotent persistence, saved-record confirmation, a real auth-to-entry browser journey, and deployed both Milestone 2 migrations to hosted Supabase | Build the collection grid/list and complete its empty and error states |
 | 2026-09-10 | 2         | Built the newest-first responsive collection grid with resilient sparse metadata, generated cover placeholders, intentional empty/loading/error states, component coverage, and authenticated desktop and mobile browser verification                                 | Build record detail and edit screens                                   |
+| 2026-09-10 | 2         | Built private record detail and release-metadata edit routes with shared validated fields, ownership-safe lookups and updates, responsive loading/not-found/error states, and authenticated edit verification on desktop Chrome, Android Chrome, and iPhone Safari    | Add deletion with confirmation                                         |
 
 ## 21. Hosted environment checklist
 

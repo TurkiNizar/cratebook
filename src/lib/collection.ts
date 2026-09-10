@@ -9,6 +9,10 @@ const FORMAT_LABELS: Record<Enums<"release_format">, string> = {
   other: "Other format",
 };
 
+export function getReleaseFormatLabel(format: Enums<"release_format">) {
+  return FORMAT_LABELS[format];
+}
+
 export type CollectionReleaseSummary = {
   format: Enums<"release_format"> | null;
   disc_count: number | null;
@@ -23,7 +27,7 @@ export function getCollectionCardDetails(release: CollectionReleaseSummary) {
   const details: string[] = [];
 
   if (release.format) {
-    details.push(FORMAT_LABELS[release.format]);
+    details.push(getReleaseFormatLabel(release.format));
   }
 
   if (release.disc_count && release.disc_count > 1) {
@@ -44,4 +48,46 @@ export function getCollectionCardDetails(release: CollectionReleaseSummary) {
 
 export function getCollectionCardEdition(release: CollectionReleaseSummary) {
   return [release.label, release.catalog_number].filter(Boolean).join(" · ");
+}
+
+export type RecordDetailRelease = CollectionReleaseSummary & {
+  edition_description: string | null;
+  is_reissue: boolean | null;
+  vinyl_color: string | null;
+  barcode: string | null;
+  matrix_runout: string | null;
+};
+
+export function getRecordDetailRows(release: RecordDetailRelease) {
+  const rows: Array<{ label: string; value: string }> = [];
+
+  const candidates: Array<[string, string | number | null]> = [
+    ["Format", release.format ? getReleaseFormatLabel(release.format) : null],
+    ["Disc count", release.disc_count],
+    ["Original release year", release.original_year],
+    ["This edition's year", release.release_year],
+    ["Label", release.label],
+    ["Catalog number", release.catalog_number],
+    ["Country", release.country],
+    ["Edition description", release.edition_description],
+    ["Reissue", release.is_reissue ? "Yes" : null],
+    ["Vinyl color", release.vinyl_color],
+    ["Barcode", release.barcode],
+    ["Matrix / runout", release.matrix_runout],
+  ];
+
+  for (const [label, value] of candidates) {
+    if (value !== null && value !== "") {
+      rows.push({ label, value: String(value) });
+    }
+  }
+
+  return rows;
+}
+
+export function formatCollectionDate(value: string) {
+  return new Intl.DateTimeFormat("en", {
+    dateStyle: "medium",
+    timeZone: "UTC",
+  }).format(new Date(value));
 }

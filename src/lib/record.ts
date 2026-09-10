@@ -18,7 +18,7 @@ const RELEASE_FORMATS = new Set<string>(
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-export type ManualRecordField =
+export type RecordDetailsField =
   | "artist"
   | "title"
   | "format"
@@ -31,18 +31,18 @@ export type ManualRecordField =
   | "editionDescription"
   | "vinylColor"
   | "barcode"
-  | "matrixRunout"
-  | "entryKey";
+  | "matrixRunout";
+
+export type ManualRecordField = RecordDetailsField | "entryKey";
 
 export type ManualRecordActionState = {
   message: string;
   fieldErrors: Partial<Record<ManualRecordField, string>>;
 };
 
-export type ManualRecordInput = {
+export type RecordDetailsInput = {
   artist: string;
   title: string;
-  entryKey: string;
   format: Enums<"release_format"> | null;
   discCount: number | null;
   originalYear: number | null;
@@ -56,6 +56,17 @@ export type ManualRecordInput = {
   barcode: string | null;
   matrixRunout: string | null;
 };
+
+export type ManualRecordInput = RecordDetailsInput & {
+  entryKey: string;
+};
+
+export type RecordDetailsValidation =
+  | { success: true; data: RecordDetailsInput }
+  | {
+      success: false;
+      errors: Partial<Record<RecordDetailsField, string>>;
+    };
 
 export type ManualRecordValidation =
   | { success: true; data: ManualRecordInput }
@@ -112,13 +123,16 @@ function optionalInteger(
   return parsed;
 }
 
-export function validateManualRecord(
+export function isValidRecordId(value: string) {
+  return UUID_PATTERN.test(value);
+}
+
+export function validateRecordDetails(
   formData: FormData,
-): ManualRecordValidation {
+): RecordDetailsValidation {
   const errors: Partial<Record<ManualRecordField, string>> = {};
   const artist = text(formData, "artist");
   const title = text(formData, "title");
-  const entryKey = text(formData, "entryKey");
   const rawFormat = text(formData, "format");
   const label = optionalText(formData, "label");
   const catalogNumber = optionalText(formData, "catalogNumber");
@@ -138,10 +152,6 @@ export function validateManualRecord(
     errors.title = "Enter the record title.";
   } else if (title.length > 300) {
     errors.title = "Title must be 300 characters or fewer.";
-  }
-
-  if (!UUID_PATTERN.test(entryKey)) {
-    errors.entryKey = "Refresh the page and try again.";
   }
 
   if (rawFormat && !RELEASE_FORMATS.has(rawFormat)) {
@@ -196,7 +206,6 @@ export function validateManualRecord(
     data: {
       artist,
       title,
-      entryKey,
       format: (rawFormat || null) as Enums<"release_format"> | null,
       discCount,
       originalYear,
@@ -210,5 +219,36 @@ export function validateManualRecord(
       barcode,
       matrixRunout,
     },
+  };
+}
+
+export function validateManualRecord(
+  formData: FormData,
+): ManualRecordValidation {
+  const details = validateRecordDetails(formData);
+  const entryKey = text(formData, "entryKey");
+
+  if (!details.success) {
+    return {
+      success: false,
+      errors: {
+        ...details.errors,
+        ...(isValidRecordId(entryKey)
+          ? {}
+          : { entryKey: "Refresh the page and try again." }),
+      },
+    };
+  }
+
+  if (!isValidRecordId(entryKey)) {
+    return {
+      success: false,
+      errors: { entryKey: "Refresh the page and try again." },
+    };
+  }
+
+  return {
+    success: true,
+    data: { ...details.data, entryKey },
   };
 }

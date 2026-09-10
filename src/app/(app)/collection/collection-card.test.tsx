@@ -23,6 +23,10 @@ describe("CollectionCard", () => {
     render(<CollectionCard item={item} />);
 
     const card = screen.getByRole("article", { name: "Pastel Blues" });
+    expect(within(card).getByRole("link")).toHaveAttribute(
+      "href",
+      `/collection/${item.id}`,
+    );
     expect(within(card).getByText("Nina Simone")).toBeVisible();
     expect(within(card).getByText("LP")).toBeVisible();
     expect(within(card).getByText("1965")).toBeVisible();

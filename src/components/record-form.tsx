@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import Link from "next/link";
 
 import {
   type ManualRecordActionState,
@@ -8,18 +9,19 @@ import {
   RELEASE_FORMAT_OPTIONS,
 } from "@/lib/record";
 
-import { createManualRecord } from "./actions";
-
 const INITIAL_ACTION_STATE: ManualRecordActionState = {
   message: "",
   fieldErrors: {},
 };
 
-type FormValues = Record<Exclude<ManualRecordField, "entryKey">, string> & {
+export type RecordFormValues = Record<
+  Exclude<ManualRecordField, "entryKey">,
+  string
+> & {
   isReissue: boolean;
 };
 
-const INITIAL_VALUES: FormValues = {
+export const EMPTY_RECORD_FORM_VALUES: RecordFormValues = {
   artist: "",
   title: "",
   format: "",
@@ -36,6 +38,19 @@ const INITIAL_VALUES: FormValues = {
   isReissue: false,
 };
 
+type RecordFormAction = (
+  previousState: ManualRecordActionState,
+  formData: FormData,
+) => Promise<ManualRecordActionState>;
+
+type RecordFormProps = {
+  action: RecordFormAction;
+  variant: "create" | "edit";
+  initialValues?: RecordFormValues;
+  entryKey?: string;
+  cancelHref?: string;
+};
+
 type TextFieldProps = {
   id: Exclude<ManualRecordField, "entryKey" | "format">;
   label: string;
@@ -48,7 +63,7 @@ type TextFieldProps = {
   type?: "text" | "number";
   min?: number;
   max?: number;
-  onChange: (field: keyof FormValues, value: string | boolean) => void;
+  onChange: (field: keyof RecordFormValues, value: string | boolean) => void;
 };
 
 function TextField({
@@ -82,28 +97,46 @@ function TextField({
   );
 }
 
-export function ManualRecordForm({ entryKey }: { entryKey: string }) {
+export function RecordForm({
+  action,
+  variant,
+  initialValues,
+  entryKey,
+  cancelHref,
+}: RecordFormProps) {
   const [actionState, formAction, isPending] = useActionState(
-    createManualRecord,
+    action,
     INITIAL_ACTION_STATE,
   );
-  const [values, setValues] = useState(INITIAL_VALUES);
+  const [values, setValues] = useState(
+    () => initialValues ?? EMPTY_RECORD_FORM_VALUES,
+  );
 
-  function updateValue(field: keyof FormValues, value: string | boolean) {
+  function updateValue(field: keyof RecordFormValues, value: string | boolean) {
     setValues((current) => ({ ...current, [field]: value }));
   }
 
   const errors = actionState.fieldErrors;
+  const isEditing = variant === "edit";
+  const submitLabel = isEditing ? "Save changes" : "Add to my collection";
+  const pendingLabel = isEditing ? "Saving changes…" : "Adding record…";
 
   return (
     <form className="manual-record-form" action={formAction}>
-      <input type="hidden" name="entryKey" value={entryKey} />
+      {entryKey ? (
+        <input type="hidden" name="entryKey" value={entryKey} />
+      ) : null}
 
       <section className="form-section" aria-labelledby="record-basics-heading">
         <div className="form-section-heading">
           <p className="app-kicker">The essentials</p>
-          <h2 id="record-basics-heading">What are you adding?</h2>
-          <p>Artist and title are all you need. Everything else can wait.</p>
+          <h2 id="record-basics-heading">
+            {isEditing ? "Name this record" : "What are you adding?"}
+          </h2>
+          <p>
+            Artist and title are required. Keep the rest as simple or precise as
+            you like.
+          </p>
         </div>
 
         <div className="field-grid">
@@ -323,10 +356,21 @@ export function ManualRecordForm({ entryKey }: { entryKey: string }) {
       ) : null}
 
       <div className="manual-form-actions">
-        <p>New records stay private unless you share them later.</p>
-        <button className="button" type="submit" disabled={isPending}>
-          {isPending ? "Adding record…" : "Add to my collection"}
-        </button>
+        <p>
+          {isEditing
+            ? "Changes appear anywhere this edition is shown."
+            : "New records stay private unless you share them later."}
+        </p>
+        <div className="record-form-buttons">
+          {cancelHref ? (
+            <Link className="secondary-button" href={cancelHref}>
+              Cancel
+            </Link>
+          ) : null}
+          <button className="button" type="submit" disabled={isPending}>
+            {isPending ? pendingLabel : submitLabel}
+          </button>
+        </div>
       </div>
     </form>
   );
