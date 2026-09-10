@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 
 import { RecordForm, type RecordFormValues } from "./record-form";
@@ -57,5 +58,53 @@ describe("RecordForm", () => {
       "href",
       "/collection/item-id",
     );
+  });
+
+  it("shows a non-blocking duplicate warning and preserves entered values", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <RecordForm
+        action={async () => ({
+          message: "",
+          fieldErrors: {},
+          duplicate: {
+            collectionItemId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+            artist: "Nina Simone",
+            title: "Pastel Blues",
+            copyCount: 2,
+            confirmationValue: '["nina simone","pastel blues"]',
+          },
+        })}
+        entryKey="bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb"
+        variant="create"
+      />,
+    );
+
+    await user.type(screen.getByLabelText("Artist"), "Nina Simone");
+    await user.type(
+      screen.getByLabelText("Album or release title"),
+      "Pastel Blues",
+    );
+    await user.click(
+      screen.getByRole("button", { name: "Add to my collection" }),
+    );
+
+    expect(await screen.findByRole("status")).toHaveTextContent(
+      "You already have 2 copies of Pastel Blues by Nina Simone",
+    );
+    expect(screen.getByLabelText("Artist")).toHaveValue("Nina Simone");
+    expect(screen.getByLabelText("Album or release title")).toHaveValue(
+      "Pastel Blues",
+    );
+    expect(
+      screen.getByRole("link", { name: "Review an existing copy" }),
+    ).toHaveAttribute(
+      "href",
+      "/collection/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+    );
+    expect(
+      screen.getByRole("button", { name: "Add another copy" }),
+    ).toBeVisible();
   });
 });

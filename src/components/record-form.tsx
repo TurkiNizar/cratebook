@@ -138,13 +138,29 @@ export function RecordForm({
 
   const errors = actionState.fieldErrors;
   const isEditing = variant === "edit";
-  const submitLabel = isEditing ? "Save changes" : "Add to my collection";
-  const pendingLabel = isEditing ? "Saving changes…" : "Adding record…";
+  const duplicate = isEditing ? undefined : actionState.duplicate;
+  const submitLabel = isEditing
+    ? "Save changes"
+    : duplicate
+      ? "Add another copy"
+      : "Add to my collection";
+  const pendingLabel = isEditing
+    ? "Saving changes…"
+    : duplicate
+      ? "Adding another copy…"
+      : "Adding record…";
 
   return (
     <form className="manual-record-form" action={formAction}>
       {entryKey ? (
         <input type="hidden" name="entryKey" value={entryKey} />
+      ) : null}
+      {duplicate ? (
+        <input
+          type="hidden"
+          name="duplicateConfirmation"
+          value={duplicate.confirmationValue}
+        />
       ) : null}
 
       <section className="form-section" aria-labelledby="record-basics-heading">
@@ -572,6 +588,25 @@ export function RecordForm({
           </label>
         </div>
       </details>
+
+      {duplicate ? (
+        <aside className="duplicate-warning" role="status">
+          <span aria-hidden="true">!</span>
+          <div>
+            <p className="app-kicker">Possible duplicate</p>
+            <h2>This may already be in your collection</h2>
+            <p>
+              You already have {duplicate.copyCount}{" "}
+              {duplicate.copyCount === 1 ? "copy" : "copies"} of{" "}
+              <strong>{duplicate.title}</strong> by {duplicate.artist}. If this
+              is another physical copy, you can still add it.
+            </p>
+            <Link href={`/collection/${duplicate.collectionItemId}`}>
+              Review an existing copy
+            </Link>
+          </div>
+        </aside>
+      ) : null}
 
       {actionState.message ? (
         <p className="form-message form-message-error" role="alert">

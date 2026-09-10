@@ -181,6 +181,40 @@ test.describe("local passwordless authentication", () => {
       .locator(".collection-toolbar")
       .getByRole("link", { name: "Add a record" })
       .click();
+    await page.getByLabel("Artist").fill(" nina   simone ");
+    await page.getByLabel("Album or release title").fill("PASTEL BLUES — MONO");
+    await page.getByRole("button", { name: "Add to my collection" }).click();
+
+    const duplicateWarning = page.getByRole("status");
+    await expect(duplicateWarning).toContainText(
+      "This may already be in your collection",
+    );
+    await expect(duplicateWarning).toContainText(
+      "You already have 1 copy of Pastel Blues — Mono by Nina Simone",
+    );
+    await expect(
+      duplicateWarning.getByRole("link", { name: "Review an existing copy" }),
+    ).toHaveAttribute("href", /\/collection\/[0-9a-f-]+/);
+    await expect(page.getByLabel("Artist")).toHaveValue(" nina   simone ");
+    await page.getByRole("button", { name: "Add another copy" }).click();
+    await expect(page).toHaveURL(/\/collection\?added=[0-9a-f-]+$/);
+    const duplicateCopies = page.getByRole("article", {
+      name: /Pastel Blues — Mono/i,
+    });
+    await expect(duplicateCopies).toHaveCount(2);
+
+    await duplicateCopies.first().getByRole("link").click();
+    await page.getByRole("button", { name: "Remove from collection" }).click();
+    await page.getByRole("button", { name: "Yes, remove this copy" }).click();
+    await expect(page).toHaveURL(/\/collection\?removed=1$/);
+    await expect(
+      page.getByRole("article", { name: "Pastel Blues — Mono" }),
+    ).toHaveCount(1);
+
+    await page
+      .locator(".collection-toolbar")
+      .getByRole("link", { name: "Add a record" })
+      .click();
     await expect(page).toHaveURL(/\/add\/manual$/);
     await page.getByLabel("Artist").fill("Sade");
     await page.getByLabel("Album or release title").fill("Diamond Life");

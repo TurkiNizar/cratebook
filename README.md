@@ -63,10 +63,13 @@ Start the app with `npm run dev`, then:
    acquisition detail, price, private note, or comma-separated tags, and confirm the
    saved details appear on its detail page. Favorite records and tags also appear on
    the collection card.
-10. Add a second record, then search by artist, title, label, catalog number, tag, or
+10. Try adding the same artist and title again with different capitalization or spacing.
+    Confirm the possible-duplicate warning offers the existing copy for review and
+    still allows another physical copy to be added.
+11. Add a second record, then search by artist, title, label, catalog number, tag, or
     private note. Try the favorite, purchase-state, format, and condition filters and
     the newest-added, recently-acquired, artist, and title sort options.
-11. Choose **Remove from collection**, cancel once, then confirm removal. Remove the
+12. Choose **Remove from collection**, cancel once, then confirm removal. Remove the
     remaining test copy and verify the collection returns to its empty state.
 
 Supabase Studio is available at <http://127.0.0.1:54323> if you want to inspect the

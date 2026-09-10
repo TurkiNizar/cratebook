@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   formatPriceMinor,
+  getDuplicateConfirmationValue,
   priceMinorToInput,
   validateCopyDetails,
   validateManualRecord,
@@ -132,6 +133,19 @@ describe("validateManualRecord", () => {
           "Edition description must be 1000 characters or fewer.",
       },
     });
+  });
+});
+
+describe("getDuplicateConfirmationValue", () => {
+  it("binds confirmation to a normalized artist and title", () => {
+    expect(
+      getDuplicateConfirmationValue(" Nina   Simone ", " PASTEL Blues "),
+    ).toBe(getDuplicateConfirmationValue("nina simone", "pastel blues"));
+    expect(
+      getDuplicateConfirmationValue("Nina Simone", "Pastel Blues"),
+    ).not.toBe(
+      getDuplicateConfirmationValue("Nina Simone", "Little Girl Blue"),
+    );
   });
 });
 

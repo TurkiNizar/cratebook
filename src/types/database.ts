@@ -276,6 +276,16 @@ export type Database = {
         };
         Returns: string;
       };
+      find_collection_duplicates: {
+        Args: { p_artist_display: string; p_title: string };
+        Returns: {
+          artist_display: string;
+          collection_item_id: string;
+          copy_count: number;
+          created_at: string;
+          title: string;
+        }[];
+      };
       search_collection_items: {
         Args: {
           p_condition?: Database["public"]["Enums"]["record_condition"];

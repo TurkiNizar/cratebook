@@ -81,6 +81,13 @@ export type ManualRecordField =
 export type ManualRecordActionState = {
   message: string;
   fieldErrors: Partial<Record<ManualRecordField, string>>;
+  duplicate?: {
+    collectionItemId: string;
+    artist: string;
+    title: string;
+    copyCount: number;
+    confirmationValue: string;
+  };
 };
 
 export type RecordDetailsInput = {
@@ -145,6 +152,17 @@ function text(formData: FormData, name: string) {
 
 function optionalText(formData: FormData, name: string) {
   return text(formData, name) || null;
+}
+
+function normalizeDuplicateText(value: string) {
+  return value.trim().replace(/\s+/g, " ").toLocaleLowerCase("en");
+}
+
+export function getDuplicateConfirmationValue(artist: string, title: string) {
+  return JSON.stringify([
+    normalizeDuplicateText(artist),
+    normalizeDuplicateText(title),
+  ]);
 }
 
 function validateLength(

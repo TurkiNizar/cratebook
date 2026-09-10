@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import {
+  getDuplicateConfirmationValue,
   type ManualRecordActionState,
   validateManualRecord,
 } from "@/lib/record";
@@ -31,6 +32,39 @@ export async function createManualRecord(
   }
 
   const input = validation.data;
+  const confirmationValue = getDuplicateConfirmationValue(
+    input.artist,
+    input.title,
+  );
+
+  if (formData.get("duplicateConfirmation") !== confirmationValue) {
+    const { data: duplicate, error: duplicateError } = await supabase
+      .rpc("find_collection_duplicates", {
+        p_artist_display: input.artist,
+        p_title: input.title,
+      })
+      .maybeSingle();
+
+    if (duplicateError) {
+      console.error("Duplicate lookup failed", {
+        code: duplicateError.code,
+        message: duplicateError.message,
+      });
+    } else if (duplicate) {
+      return {
+        message: "",
+        fieldErrors: {},
+        duplicate: {
+          collectionItemId: duplicate.collection_item_id,
+          artist: duplicate.artist_display,
+          title: duplicate.title,
+          copyCount: duplicate.copy_count,
+          confirmationValue,
+        },
+      };
+    }
+  }
+
   const { data: collectionItemId, error } = await supabase.rpc(
     "create_manual_collection_item",
     {
