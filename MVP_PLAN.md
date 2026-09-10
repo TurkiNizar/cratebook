@@ -683,7 +683,9 @@ Exit condition: users can reliably maintain and search a private collection usin
       Cover Art Archive as the optional artwork companion
 - [x] Review provider terms, attribution, image policy, caching, and limits in
       `docs/catalogue-provider.md`
-- [ ] Build server-side provider adapter
+- [x] Build a provider-neutral, server-only MusicBrainz adapter with validated and
+      normalized release/cover responses, caching, request coalescing, throttling,
+      bounded retries and timeouts, safe query construction, and typed failure states
 - [ ] Build catalogue search and result selection
 - [ ] Provide manual fallback for errors and missing results
 - [ ] Store source identifiers and provenance
@@ -849,6 +851,7 @@ in version control; this log records product-level progress and changes.
 | 2026-09-10 | 3         | Built the responsive manual wishlist journey with atomic idempotent creation and editing, safe release cleanup on removal, priority, preferred edition, currency-aware target prices, private notes, visibility guidance, intentional route states, generated types, unit/component/database coverage, and authenticated desktop/mobile browser verification | Implement atomic wishlist-to-collection conversion                     |
 | 2026-09-10 | 3         | Added atomic, idempotent wishlist-to-collection conversion with release reuse, editable note carryover, private copy defaults, acquisition details, normalized tags, rollback and authorization coverage, generated types, and authenticated desktop/mobile browser verification                                                                             | Select and document the external catalogue provider                    |
 | 2026-09-10 | 3         | Selected MusicBrainz releases with Cover Art Archive artwork after reviewing licensing, attribution, image handling, caching, rate limits, failure behavior, provenance, and Discogs tradeoffs; chose remote artwork references and documented the server-only integration contract                                                                          | Build the server-side provider adapter                                 |
+| 2026-09-10 | 3         | Built the provider-neutral, server-only MusicBrainz and Cover Art Archive adapter with validated normalized metadata, bounded provenance, safe Lucene queries, explicit cache lifetimes, in-flight coalescing, one-second request serialization, bounded retry/timeout behavior, typed failures, and focused automated coverage                              | Build catalogue search and result selection                            |
 
 ## 21. Hosted environment checklist
 

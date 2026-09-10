@@ -107,11 +107,19 @@ deletes the release because they form part of the user's own collection record.
 
 ## Adapter boundary and failure behavior
 
-The next implementation task should expose a provider-neutral server-only interface
-with search input, normalized candidate results, a provider source identifier, and
-typed success, no-result, invalid-query, rate-limited, unavailable, and malformed-
-response outcomes. Provider payload validation must happen before values reach forms
-or persistence code.
+The server-only provider adapter is implemented in
+`src/lib/catalogue/musicbrainz.ts`, behind the provider-neutral types in
+`src/lib/catalogue/types.ts`. It exposes normalized candidate results, a provider
+source identifier, and typed success, no-result, invalid-query, rate-limited,
+unavailable, and malformed-response outcomes. Provider payload validation happens
+before values reach forms or persistence code.
+
+MusicBrainz search requests use a 24-hour Next.js data-cache lifetime, coalesce
+identical in-flight calls, and pass through a process-local queue that starts requests
+at least one second apart. One bounded retry respects `Retry-After` up to five seconds.
+Requests time out after six seconds. Cover Art Archive metadata is fetched separately
+with a seven-day cache so callers can resolve artwork only for candidates that need it
+instead of creating an upstream request for every search result.
 
 The adapter must not expose an unrestricted proxy or accept arbitrary upstream URLs.
 Queries are length-limited and encoded as data. Search should request vinyl releases
@@ -120,7 +128,9 @@ country, date, barcode, format, and disc-count context for the collector to choo
 
 No provider account, API key, new environment variable, hosted-data mutation, or
 external-service authorization is required for the MusicBrainz read-only MVP
-integration.
+integration. The next task is to build the catalogue search and selection interface
+on this adapter and connect selected candidates to the existing collection and
+wishlist persistence flows.
 
 ## Re-review triggers
 
