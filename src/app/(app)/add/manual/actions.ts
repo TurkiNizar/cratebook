@@ -1,0 +1,69 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+
+import {
+  type ManualRecordActionState,
+  validateManualRecord,
+} from "@/lib/record";
+import { createClient } from "@/lib/supabase/server";
+
+export async function createManualRecord(
+  _previousState: ManualRecordActionState,
+  formData: FormData,
+): Promise<ManualRecordActionState> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/sign-in");
+  }
+
+  const validation = validateManualRecord(formData);
+  if (!validation.success) {
+    return {
+      message: "Check the highlighted fields and try again.",
+      fieldErrors: validation.errors,
+    };
+  }
+
+  const input = validation.data;
+  const { data: collectionItemId, error } = await supabase.rpc(
+    "create_manual_collection_item",
+    {
+      p_artist_display: input.artist,
+      p_title: input.title,
+      p_entry_key: input.entryKey,
+      p_format: input.format ?? undefined,
+      p_disc_count: input.discCount ?? undefined,
+      p_original_year: input.originalYear ?? undefined,
+      p_release_year: input.releaseYear ?? undefined,
+      p_label: input.label ?? undefined,
+      p_catalog_number: input.catalogNumber ?? undefined,
+      p_country: input.country ?? undefined,
+      p_edition_description: input.editionDescription ?? undefined,
+      p_is_reissue: input.isReissue,
+      p_vinyl_color: input.vinylColor ?? undefined,
+      p_barcode: input.barcode ?? undefined,
+      p_matrix_runout: input.matrixRunout ?? undefined,
+    },
+  );
+
+  if (error || !collectionItemId) {
+    console.error("Manual record creation failed", {
+      code: error?.code,
+      message: error?.message,
+    });
+    return {
+      message:
+        "We could not add this record. Your details are still here—please try again.",
+      fieldErrors: {},
+    };
+  }
+
+  revalidatePath("/collection");
+  redirect(`/collection?added=${collectionItemId}`);
+}

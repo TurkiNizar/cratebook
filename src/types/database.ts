@@ -196,7 +196,26 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
-      [_ in never]: never;
+      create_manual_collection_item: {
+        Args: {
+          p_artist_display: string;
+          p_barcode?: string;
+          p_catalog_number?: string;
+          p_country?: string;
+          p_disc_count?: number;
+          p_edition_description?: string;
+          p_entry_key: string;
+          p_format?: Database["public"]["Enums"]["release_format"];
+          p_is_reissue?: boolean;
+          p_label?: string;
+          p_matrix_runout?: string;
+          p_original_year?: number;
+          p_release_year?: number;
+          p_title: string;
+          p_vinyl_color?: string;
+        };
+        Returns: string;
+      };
     };
     Enums: {
       purchase_state: "new" | "used" | "unknown";

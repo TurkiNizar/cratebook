@@ -27,7 +27,8 @@ npm run dev
 Open <http://localhost:3000>.
 
 The landing and sign-in screens work without backend configuration. Protected pages
-need Supabase; use the full setup below to test sign-in and onboarding.
+need Supabase; use the full setup below to test sign-in, onboarding, and manual record
+entry.
 
 ## Full local setup
 
@@ -56,6 +57,8 @@ Start the app with `npm run dev`, then:
 4. Open the newest email and follow its sign-in link.
 5. Choose a username on the onboarding screen.
 6. Confirm that you arrive at the empty collection screen.
+7. Choose **Add → Add manually**, enter an artist and title, and save the record.
+8. Confirm the collection shows the saved-record message and a count of one.
 
 Supabase Studio is available at <http://127.0.0.1:54323> if you want to inspect the
 local database. Stop the local services when finished:
@@ -184,7 +187,8 @@ supabase start
 npm run db:test
 ```
 
-Run the optional real magic-link journey through Mailpit and mobile Chrome:
+Run the optional real magic-link, onboarding, manual-entry, and profile journey through
+Mailpit and mobile Chrome:
 
 ```bash
 RUN_LOCAL_AUTH_E2E=1 npm run e2e -- e2e/local-auth.spec.ts --project=mobile-chrome

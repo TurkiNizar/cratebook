@@ -37,6 +37,7 @@ a {
 
 button,
 input,
+select,
 textarea {
   font: inherit;
 }
@@ -164,6 +165,12 @@ a {
 .button:hover {
   transform: translateY(-2px);
   background: var(--terracotta-dark);
+}
+
+.button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+  transform: none;
 }
 
 .button-small {
@@ -636,6 +643,7 @@ a {
 }
 
 .field input,
+.field select,
 .field textarea {
   width: 100%;
   min-height: 50px;
@@ -644,6 +652,18 @@ a {
   border-radius: 10px;
   background: white;
   color: var(--ink);
+}
+
+.field select {
+  appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--muted) 50%),
+    linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+  background-position:
+    calc(100% - 18px) calc(50% - 2px),
+    calc(100% - 13px) calc(50% - 2px);
+  background-repeat: no-repeat;
+  background-size: 5px 5px;
 }
 
 .field textarea {
@@ -657,6 +677,13 @@ a {
   color: var(--muted);
   font-size: 12px;
   line-height: 1.5;
+}
+
+.field-error {
+  margin: 0;
+  color: #9d2f20;
+  font-size: 12px;
+  line-height: 1.45;
 }
 
 .form-message-error {
@@ -767,6 +794,284 @@ a {
   margin: 0 auto 22px;
   color: var(--muted);
   line-height: 1.55;
+}
+
+.add-options {
+  display: grid;
+  gap: 14px;
+  margin-top: 38px;
+}
+
+.add-option {
+  display: grid;
+  min-height: 98px;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 18px;
+  padding: 20px 24px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--paper);
+  transition:
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+
+a.add-option:hover {
+  border-color: var(--terracotta);
+  transform: translateY(-2px);
+}
+
+.add-option-number {
+  color: var(--terracotta);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 14px;
+  font-style: italic;
+}
+
+.add-option strong,
+.add-option small {
+  display: block;
+}
+
+.add-option strong {
+  margin-bottom: 5px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 21px;
+}
+
+.add-option small {
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.add-option-disabled {
+  opacity: 0.58;
+}
+
+.back-link {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  margin-bottom: 24px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.back-link:hover {
+  color: var(--terracotta);
+}
+
+.manual-record-page {
+  max-width: 850px;
+}
+
+.manual-record-form {
+  display: grid;
+  gap: 18px;
+  margin-top: 38px;
+}
+
+.form-section,
+.advanced-fields {
+  padding: clamp(22px, 5vw, 38px);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--paper);
+  box-shadow: 0 16px 45px rgba(71, 52, 34, 0.06);
+}
+
+.form-section-heading {
+  margin-bottom: 26px;
+}
+
+.form-section-heading h2 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 27px;
+  font-weight: 500;
+}
+
+.form-section-heading > p:last-child {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.advanced-fields {
+  padding: 0;
+  overflow: hidden;
+}
+
+.advanced-fields summary {
+  display: flex;
+  min-height: 82px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px clamp(22px, 5vw, 38px);
+  cursor: pointer;
+  list-style: none;
+}
+
+.advanced-fields summary::-webkit-details-marker {
+  display: none;
+}
+
+.advanced-fields summary::after {
+  color: var(--terracotta);
+  content: "+";
+  font-size: 28px;
+  font-weight: 300;
+}
+
+.advanced-fields[open] summary::after {
+  content: "−";
+}
+
+.advanced-fields summary strong,
+.advanced-fields summary small {
+  display: block;
+}
+
+.advanced-fields summary strong {
+  margin-bottom: 4px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 20px;
+}
+
+.advanced-fields summary small {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.advanced-fields-body {
+  display: grid;
+  gap: 20px;
+  padding: 4px clamp(22px, 5vw, 38px) clamp(22px, 5vw, 38px);
+  border-top: 1px solid var(--line);
+}
+
+.advanced-fields-body > .field:first-of-type,
+.advanced-fields-body > .field-grid:first-child {
+  margin-top: 24px;
+}
+
+.checkbox-field {
+  display: flex;
+  min-height: 66px;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.checkbox-field input {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  margin: 1px 0 0;
+  accent-color: var(--terracotta);
+}
+
+.checkbox-field strong,
+.checkbox-field small {
+  display: block;
+}
+
+.checkbox-field strong {
+  margin-bottom: 4px;
+  font-size: 13px;
+}
+
+.checkbox-field small {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.manual-form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding-top: 4px;
+}
+
+.manual-form-actions p {
+  max-width: 330px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.manual-form-actions .button {
+  min-width: 230px;
+  border: 0;
+  cursor: pointer;
+}
+
+.collection-notice {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-top: 32px;
+  padding: 16px 18px;
+  border: 1px solid #c9d7c0;
+  border-radius: 14px;
+  background: #e7eee2;
+  color: #3f593a;
+}
+
+.collection-notice > span {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  flex: none;
+  place-items: center;
+  border-radius: 50%;
+  background: #62795b;
+  color: white;
+  font-weight: 800;
+}
+
+.collection-notice p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.collection-summary {
+  margin-top: 22px;
+  padding: clamp(28px, 6vw, 54px);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: var(--paper);
+}
+
+.collection-summary h2 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(27px, 5vw, 38px);
+  font-weight: 500;
+}
+
+.collection-summary > p:not(.app-kicker) {
+  max-width: 480px;
+  margin: 10px 0 22px;
+  color: var(--muted);
+  line-height: 1.6;
 }
 
 .settings-card {
@@ -1108,6 +1413,23 @@ a {
 
   .app-content {
     padding-top: 50px;
+  }
+
+  .field-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .add-option {
+    padding-inline: 18px;
+  }
+
+  .manual-form-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .manual-form-actions .button {
+    width: 100%;
   }
 
   .settings-form-grid {

@@ -647,7 +647,8 @@ application, and cannot access another user's private data.
 
 - [x] Implement release and physical-copy database tables, typed schema, constraints,
       indexes, owner-only RLS, and authorization tests
-- [ ] Implement manual record entry
+- [x] Implement atomic, idempotent manual record entry with validation, progressive
+      release details, private defaults, and responsive browser coverage
 - [ ] Build collection grid/list and intentional empty state
 - [ ] Build record detail and edit screens
 - [ ] Add deletion with confirmation
@@ -799,14 +800,15 @@ production environment.
 Add concise entries after meaningful work sessions. Detailed technical history belongs
 in version control; this log records product-level progress and changes.
 
-| Date       | Milestone | Progress                                                                                                                                                                                                               | Next step                                                              |
-| ---------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| 2026-09-09 | 0         | Created the initial product specification, architecture, scope, and tracker                                                                                                                                            | Review scope and settle the first open design decisions                |
-| 2026-09-09 | 1         | Built the responsive public experience, protected app shell, locally verified passwordless auth/onboarding, typed profile schema/RLS, PWA assets, and automated test foundation; 23 database tests pass                | Connect a hosted Supabase project and complete profile settings and CI |
-| 2026-09-09 | 1         | Closed Milestone 1 locally with profile/privacy editing and GitHub Actions gates for application, browser, and database checks                                                                                         | Begin Milestone 2 with release and physical-copy tables                |
-| 2026-09-09 | 1         | Documented the exact hosted Supabase migration, Vercel Git deployment, environment variables, authentication redirects, and hosted smoke test                                                                          | Complete the external hosting checklist before inviting testers        |
-| 2026-09-10 | 1         | Deployed hosted Supabase and Vercel production at `https://cratebook.vercel.app`; verified passwordless auth, onboarding, protected routes, collection access, profile editing, manifest, and PWA icons                | Verify one pull-request Preview while Milestone 2 proceeds             |
-| 2026-09-10 | 2         | Added typed release and physical-copy tables with validation, indexing, idempotency keys, private defaults, owner-only RLS, same-owner foreign keys, generated TypeScript types, and 44 collection database assertions | Build manual record entry on the verified collection schema            |
+| Date       | Milestone | Progress                                                                                                                                                                                                                                                              | Next step                                                              |
+| ---------- | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| 2026-09-09 | 0         | Created the initial product specification, architecture, scope, and tracker                                                                                                                                                                                           | Review scope and settle the first open design decisions                |
+| 2026-09-09 | 1         | Built the responsive public experience, protected app shell, locally verified passwordless auth/onboarding, typed profile schema/RLS, PWA assets, and automated test foundation; 23 database tests pass                                                               | Connect a hosted Supabase project and complete profile settings and CI |
+| 2026-09-09 | 1         | Closed Milestone 1 locally with profile/privacy editing and GitHub Actions gates for application, browser, and database checks                                                                                                                                        | Begin Milestone 2 with release and physical-copy tables                |
+| 2026-09-09 | 1         | Documented the exact hosted Supabase migration, Vercel Git deployment, environment variables, authentication redirects, and hosted smoke test                                                                                                                         | Complete the external hosting checklist before inviting testers        |
+| 2026-09-10 | 1         | Deployed hosted Supabase and Vercel production at `https://cratebook.vercel.app`; verified passwordless auth, onboarding, protected routes, collection access, profile editing, manifest, and PWA icons                                                               | Verify one pull-request Preview while Milestone 2 proceeds             |
+| 2026-09-10 | 2         | Added typed release and physical-copy tables with validation, indexing, idempotency keys, private defaults, owner-only RLS, same-owner foreign keys, generated TypeScript types, and 44 collection database assertions                                                | Build manual record entry on the verified collection schema            |
+| 2026-09-10 | 2         | Built phone-first manual entry with required artist/title, progressive edition fields, server validation, atomic idempotent persistence, saved-record confirmation, a real auth-to-entry browser journey, and deployed both Milestone 2 migrations to hosted Supabase | Build the collection grid/list and complete its empty and error states |
 
 ## 21. Hosted environment checklist
 

@@ -8,11 +8,11 @@ test.describe("local passwordless authentication", () => {
     "Set RUN_LOCAL_AUTH_E2E=1 with the local Supabase stack running",
   );
 
-  test("signs in from Mailpit and completes onboarding", async ({
+  test("signs in, completes onboarding, and adds a manual record", async ({
     page,
     request,
-  }) => {
-    const unique = Date.now();
+  }, testInfo) => {
+    const unique = `${Date.now()}-${testInfo.workerIndex}`;
     const email = `collector-${unique}@example.test`;
     const username = `collector_${unique}`;
 
@@ -83,6 +83,26 @@ test.describe("local passwordless authentication", () => {
     await expect(
       page.getByRole("heading", { name: "My collection" }),
     ).toBeVisible();
+
+    await page.getByRole("link", { name: "Add a record", exact: true }).click();
+    await expect(page).toHaveURL(/\/add$/);
+    await page.getByRole("link", { name: /add manually/i }).click();
+    await expect(page).toHaveURL(/\/add\/manual$/);
+
+    await page.getByLabel("Artist").fill("Nina Simone");
+    await page.getByLabel("Album or release title").fill("Pastel Blues");
+    await page.getByLabel("Format").selectOption("lp");
+    await page.getByLabel("Number of discs").fill("1");
+    await page.getByText("Edition details").click();
+    await page.getByLabel("Original release year").fill("1965");
+    await page.getByLabel("Label").fill("Philips");
+    await page.getByRole("button", { name: /add to my collection/i }).click();
+
+    await expect(page).toHaveURL(/\/collection\?added=[0-9a-f-]+$/);
+    await expect(
+      page.getByText(/pastel blues.*nina simone.*added to your collection/i),
+    ).toBeVisible();
+    await expect(page.getByText("1 record in your crate")).toBeVisible();
 
     await page.getByRole("link", { name: /profile/i }).click();
     await page.getByLabel("Display name").fill("Local Crate Digger");
