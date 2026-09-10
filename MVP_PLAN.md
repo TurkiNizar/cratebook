@@ -423,9 +423,11 @@ After validating the web MVP:
 This is a planned adaptation, not a zero-effort conversion. Core domain logic, UI,
 validation, and backend services should remain reusable.
 
-## 9. Proposed data model
+## 9. Data model
 
-Names are provisional until migrations are implemented.
+The collection foundation below is implemented in committed Supabase migrations.
+Wishlist, tags, photos, and public projections remain provisional until their milestone
+tasks are implemented.
 
 ### `profiles`
 
@@ -446,9 +448,12 @@ Names are provisional until migrations are implemented.
 
 ### `releases`
 
-Represents shared musical/release metadata, not ownership.
+Represents musical/release metadata shared by one user's physical copies and, later,
+wishlist items. Rows are user-scoped so private collection metadata cannot be read by
+another user; a future public view must expose an explicit safe projection.
 
 - `id`
+- `created_by` — authenticated user who owns this release row
 - `title`
 - `artist_display`
 - `cover_url` or managed cover path
@@ -463,7 +468,9 @@ Represents shared musical/release metadata, not ownership.
 - `is_reissue`
 - `vinyl_color`
 - `barcode`
+- `matrix_runout`
 - `external_source`, `external_id`
+- `source_data` — original catalogue payload for private provenance
 - `created_at`, `updated_at`
 
 Artist normalization can begin with display text and evolve into a many-to-many
@@ -476,6 +483,7 @@ Represents one user's physical copy.
 - `id`
 - `user_id`
 - `release_id`
+- `entry_key` — per-user idempotency key for safe form retries
 - `purchase_state` — new, used, or unknown
 - `media_condition`
 - `sleeve_condition`
@@ -637,7 +645,8 @@ application, and cannot access another user's private data.
 
 ### Milestone 2 — Collection
 
-- [ ] Implement release and physical-copy database tables
+- [x] Implement release and physical-copy database tables, typed schema, constraints,
+      indexes, owner-only RLS, and authorization tests
 - [ ] Implement manual record entry
 - [ ] Build collection grid/list and intentional empty state
 - [ ] Build record detail and edit screens
@@ -741,11 +750,11 @@ These items require a scope decision before being promoted into an MVP milestone
 - [ ] Confirm **Cratebook** as the product name or choose another name.
 - [ ] Select the visual personality: warm analogue, clean archival, or another direction.
 - [ ] Decide the default item visibility for users who enable a public profile.
-- [ ] Decide which condition vocabulary to use and how much guidance to show beginners.
+- [x] Use Goldmine-compatible condition grades; beginner-facing guidance remains a UI task.
 - [ ] Select the first external catalogue provider after policy and API evaluation.
 - [ ] Decide whether catalogue covers are referenced remotely or copied under permitted terms.
 - [ ] Decide whether photos of a user's physical copy belong in the MVP or first follow-up.
-- [ ] Define supported currencies and date precision for the initial audience.
+- [x] Accept uppercase ISO 4217-style currency codes and whole acquisition dates.
 - [ ] Decide whether public pages should be indexed by search engines by default.
 
 None of these decisions should block project scaffolding except where explicitly noted.
@@ -769,32 +778,35 @@ production environment.
 
 ## 19. Decision log
 
-| Date       | Decision                                                         | Reason                                                                                     |
-| ---------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| 2026-09-09 | Build a mobile-first web application and installable PWA first   | Most usage is on phones, while links and public profiles should work without installation  |
-| 2026-09-09 | Plan Capacitor as the route to native stores after validation    | Reuses the web codebase while allowing later access to native APIs                         |
-| 2026-09-09 | Use Next.js, TypeScript, Tailwind CSS, Supabase, and Vercel      | One pragmatic stack covers UI, public pages, data, auth, storage, and deployment           |
-| 2026-09-09 | Keep manual record entry as a permanent capability               | External catalogues cannot reliably contain or identify every physical release             |
-| 2026-09-09 | Model a release separately from a user's physical copy           | Supports copy-specific condition, provenance, privacy, and multiple pressings              |
-| 2026-09-09 | Keep social-network features outside the MVP                     | Sharing through a URL validates social value without feed and moderation complexity        |
-| 2026-09-09 | Use Cratebook and a warm analogue visual language provisionally  | Establishes a coherent foundation without making the branding irreversible                 |
-| 2026-09-09 | Use Next.js's webpack production builder initially               | Turbopack cannot create its internal CSS worker process in the development environment     |
-| 2026-09-09 | Defer hosted preview deployment without blocking collection work | Local integration was verified while hosted Supabase and Vercel required owner setup       |
-| 2026-09-09 | Use one hosted Supabase project for initial Vercel environments  | This keeps the MVP setup simple; isolated staging data or database branches can come later |
-| 2026-09-10 | Use `https://cratebook.vercel.app` as the initial production URL | Hosted Supabase, Vercel deployment, authentication, and primary foundation flows are live  |
+| Date       | Decision                                                              | Reason                                                                                                      |
+| ---------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| 2026-09-09 | Build a mobile-first web application and installable PWA first        | Most usage is on phones, while links and public profiles should work without installation                   |
+| 2026-09-09 | Plan Capacitor as the route to native stores after validation         | Reuses the web codebase while allowing later access to native APIs                                          |
+| 2026-09-09 | Use Next.js, TypeScript, Tailwind CSS, Supabase, and Vercel           | One pragmatic stack covers UI, public pages, data, auth, storage, and deployment                            |
+| 2026-09-09 | Keep manual record entry as a permanent capability                    | External catalogues cannot reliably contain or identify every physical release                              |
+| 2026-09-09 | Model a release separately from a user's physical copy                | Supports copy-specific condition, provenance, privacy, and multiple pressings                               |
+| 2026-09-09 | Keep social-network features outside the MVP                          | Sharing through a URL validates social value without feed and moderation complexity                         |
+| 2026-09-09 | Use Cratebook and a warm analogue visual language provisionally       | Establishes a coherent foundation without making the branding irreversible                                  |
+| 2026-09-09 | Use Next.js's webpack production builder initially                    | Turbopack cannot create its internal CSS worker process in the development environment                      |
+| 2026-09-09 | Defer hosted preview deployment without blocking collection work      | Local integration was verified while hosted Supabase and Vercel required owner setup                        |
+| 2026-09-09 | Use one hosted Supabase project for initial Vercel environments       | This keeps the MVP setup simple; isolated staging data or database branches can come later                  |
+| 2026-09-10 | Use `https://cratebook.vercel.app` as the initial production URL      | Hosted Supabase, Vercel deployment, authentication, and primary foundation flows are live                   |
+| 2026-09-10 | Use Goldmine condition grades and ISO-style currency codes            | Familiar record grading supports collectors, while three-letter codes avoid prematurely limiting currencies |
+| 2026-09-10 | Keep release rows user-scoped and collection items private by default | Prevents private metadata leaks while allowing multiple copies and later wishlist reuse                     |
 
 ## 20. Progress log
 
 Add concise entries after meaningful work sessions. Detailed technical history belongs
 in version control; this log records product-level progress and changes.
 
-| Date       | Milestone | Progress                                                                                                                                                                                                | Next step                                                              |
-| ---------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| 2026-09-09 | 0         | Created the initial product specification, architecture, scope, and tracker                                                                                                                             | Review scope and settle the first open design decisions                |
-| 2026-09-09 | 1         | Built the responsive public experience, protected app shell, locally verified passwordless auth/onboarding, typed profile schema/RLS, PWA assets, and automated test foundation; 23 database tests pass | Connect a hosted Supabase project and complete profile settings and CI |
-| 2026-09-09 | 1         | Closed Milestone 1 locally with profile/privacy editing and GitHub Actions gates for application, browser, and database checks                                                                          | Begin Milestone 2 with release and physical-copy tables                |
-| 2026-09-09 | 1         | Documented the exact hosted Supabase migration, Vercel Git deployment, environment variables, authentication redirects, and hosted smoke test                                                           | Complete the external hosting checklist before inviting testers        |
-| 2026-09-10 | 1         | Deployed hosted Supabase and Vercel production at `https://cratebook.vercel.app`; verified passwordless auth, onboarding, protected routes, collection access, profile editing, manifest, and PWA icons | Verify one pull-request Preview while Milestone 2 proceeds             |
+| Date       | Milestone | Progress                                                                                                                                                                                                               | Next step                                                              |
+| ---------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| 2026-09-09 | 0         | Created the initial product specification, architecture, scope, and tracker                                                                                                                                            | Review scope and settle the first open design decisions                |
+| 2026-09-09 | 1         | Built the responsive public experience, protected app shell, locally verified passwordless auth/onboarding, typed profile schema/RLS, PWA assets, and automated test foundation; 23 database tests pass                | Connect a hosted Supabase project and complete profile settings and CI |
+| 2026-09-09 | 1         | Closed Milestone 1 locally with profile/privacy editing and GitHub Actions gates for application, browser, and database checks                                                                                         | Begin Milestone 2 with release and physical-copy tables                |
+| 2026-09-09 | 1         | Documented the exact hosted Supabase migration, Vercel Git deployment, environment variables, authentication redirects, and hosted smoke test                                                                          | Complete the external hosting checklist before inviting testers        |
+| 2026-09-10 | 1         | Deployed hosted Supabase and Vercel production at `https://cratebook.vercel.app`; verified passwordless auth, onboarding, protected routes, collection access, profile editing, manifest, and PWA icons                | Verify one pull-request Preview while Milestone 2 proceeds             |
+| 2026-09-10 | 2         | Added typed release and physical-copy tables with validation, indexing, idempotency keys, private defaults, owner-only RLS, same-owner foreign keys, generated TypeScript types, and 44 collection database assertions | Build manual record entry on the verified collection schema            |
 
 ## 21. Hosted environment checklist
 
