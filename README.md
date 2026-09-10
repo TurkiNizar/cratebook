@@ -185,10 +185,11 @@ npm run build
 The same quality, browser, and database checks run on every push to `main` and every
 pull request through `.github/workflows/ci.yml`.
 
-Run browser tests after installing Playwright's browsers:
+Run public smoke tests across desktop Chromium, Firefox, WebKit, Android Chrome,
+and iPhone Safari profiles after installing Playwright's browser engines:
 
 ```bash
-npx playwright install
+npx playwright install chromium firefox webkit
 npm run e2e
 ```
 
@@ -200,11 +201,15 @@ npm run db:test
 ```
 
 Run the optional real magic-link, onboarding, manual-entry, personal-copy editing,
-deletion, and profile journey through Mailpit and mobile Chrome:
+deletion, search, and profile journey through Mailpit across the full browser matrix:
 
 ```bash
-RUN_LOCAL_AUTH_E2E=1 npm run e2e -- e2e/local-auth.spec.ts --project=mobile-chrome
+RUN_LOCAL_AUTH_E2E=1 npm run e2e
 ```
+
+The authenticated matrix runs serially because every browser shares one local Supabase
+stack and Mailpit inbox. Add `--project=mobile-chrome` (or another configured project)
+for a faster targeted run.
 
 Regenerate `src/types/database.ts` after a migration with:
 

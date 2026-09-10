@@ -1,8 +1,23 @@
-import { expect, test } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
 
 const runLocalAuth = process.env.RUN_LOCAL_AUTH_E2E === "1";
 
+async function expectNoHorizontalOverflow(page: Page) {
+  const overflow = await page.evaluate(() => {
+    const documentWidth = Math.max(
+      document.documentElement.scrollWidth,
+      document.body.scrollWidth,
+    );
+
+    return documentWidth - document.documentElement.clientWidth;
+  });
+
+  expect(overflow).toBeLessThanOrEqual(1);
+}
+
 test.describe("local passwordless authentication", () => {
+  test.setTimeout(90_000);
+
   test.skip(
     !runLocalAuth,
     "Set RUN_LOCAL_AUTH_E2E=1 with the local Supabase stack running",
@@ -86,11 +101,13 @@ test.describe("local passwordless authentication", () => {
     await expect(
       page.getByRole("heading", { name: "Your crate is waiting" }),
     ).toBeVisible();
+    await expectNoHorizontalOverflow(page);
 
     await page.getByRole("link", { name: "Add a record", exact: true }).click();
     await expect(page).toHaveURL(/\/add$/);
     await page.getByRole("link", { name: /add manually/i }).click();
     await expect(page).toHaveURL(/\/add\/manual$/);
+    await expectNoHorizontalOverflow(page);
 
     await page.getByLabel("Artist").fill("Nina Simone");
     await page.getByLabel("Album or release title").fill("Pastel Blues");
@@ -161,6 +178,7 @@ test.describe("local passwordless authentication", () => {
     await expect(page.getByText("5 / 5")).toBeVisible();
     await expect(page.getByLabel("Tags")).toHaveText("JazzSunday morning");
     await expect(page.getByText("A late-night favorite.")).toBeVisible();
+    await expectNoHorizontalOverflow(page);
 
     await page.getByRole("link", { name: "My collection" }).click();
     await expect(
@@ -230,6 +248,7 @@ test.describe("local passwordless authentication", () => {
     await page.getByLabel("Sort by").selectOption("artist");
     await page.getByRole("button", { name: "Apply" }).click();
     await expect(page).toHaveURL(/sort=artist/);
+    await expectNoHorizontalOverflow(page);
     const sortedRecords = page
       .getByRole("list", { name: "Records in your collection" })
       .getByRole("article");
