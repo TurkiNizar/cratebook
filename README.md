@@ -3,6 +3,10 @@
 Cratebook is a mobile-first vinyl collection and wishlist companion. The product
 specification and progress tracker live in [MVP_PLAN.md](./MVP_PLAN.md).
 
+The first catalogue integration will use MusicBrainz metadata with Cover Art Archive
+artwork. The reviewed provider, attribution, artwork, caching, and rate-limit policy
+is documented in [docs/catalogue-provider.md](./docs/catalogue-provider.md).
+
 Production: [https://cratebook.vercel.app](https://cratebook.vercel.app)
 
 ## Quick UI preview

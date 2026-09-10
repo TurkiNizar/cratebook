@@ -679,8 +679,10 @@ Exit condition: users can reliably maintain and search a private collection usin
 - [x] Implement atomic, idempotent wishlist-to-collection conversion that reuses the
       release, collects copy-specific details, preserves editable notes, normalizes
       tags, removes the wish only on success, and keeps the new copy private
-- [ ] Select and document the external catalogue provider
-- [ ] Review provider terms, attribution, image policy, caching, and limits
+- [x] Select and document MusicBrainz releases as the first catalogue provider, with
+      Cover Art Archive as the optional artwork companion
+- [x] Review provider terms, attribution, image policy, caching, and limits in
+      `docs/catalogue-provider.md`
 - [ ] Build server-side provider adapter
 - [ ] Build catalogue search and result selection
 - [ ] Provide manual fallback for errors and missing results
@@ -765,8 +767,10 @@ These items require a scope decision before being promoted into an MVP milestone
 - [ ] Select the visual personality: warm analogue, clean archival, or another direction.
 - [ ] Decide the default item visibility for users who enable a public profile.
 - [x] Use Goldmine-compatible condition grades; beginner-facing guidance remains a UI task.
-- [ ] Select the first external catalogue provider after policy and API evaluation.
-- [ ] Decide whether catalogue covers are referenced remotely or copied under permitted terms.
+- [x] Use MusicBrainz releases as the first external catalogue provider, with Cover Art
+      Archive as the artwork companion.
+- [x] Reference Cover Art Archive thumbnails remotely for the MVP; do not copy them to
+      Supabase Storage.
 - [x] Defer photos of a user's physical copy until after the MVP.
 - [x] Accept uppercase ISO 4217-style currency codes and whole acquisition dates.
 - [ ] Decide whether public pages should be indexed by search engines by default.
@@ -792,30 +796,32 @@ production environment.
 
 ## 19. Decision log
 
-| Date       | Decision                                                                                                                 | Reason                                                                                                                                   |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-09-09 | Build a mobile-first web application and installable PWA first                                                           | Most usage is on phones, while links and public profiles should work without installation                                                |
-| 2026-09-09 | Plan Capacitor as the route to native stores after validation                                                            | Reuses the web codebase while allowing later access to native APIs                                                                       |
-| 2026-09-09 | Use Next.js, TypeScript, Tailwind CSS, Supabase, and Vercel                                                              | One pragmatic stack covers UI, public pages, data, auth, storage, and deployment                                                         |
-| 2026-09-09 | Keep manual record entry as a permanent capability                                                                       | External catalogues cannot reliably contain or identify every physical release                                                           |
-| 2026-09-09 | Model a release separately from a user's physical copy                                                                   | Supports copy-specific condition, provenance, privacy, and multiple pressings                                                            |
-| 2026-09-09 | Keep social-network features outside the MVP                                                                             | Sharing through a URL validates social value without feed and moderation complexity                                                      |
-| 2026-09-09 | Use Cratebook and a warm analogue visual language provisionally                                                          | Establishes a coherent foundation without making the branding irreversible                                                               |
-| 2026-09-09 | Use Next.js's webpack production builder initially                                                                       | Turbopack cannot create its internal CSS worker process in the development environment                                                   |
-| 2026-09-09 | Defer hosted preview deployment without blocking collection work                                                         | Local integration was verified while hosted Supabase and Vercel required owner setup                                                     |
-| 2026-09-09 | Use one hosted Supabase project for initial Vercel environments                                                          | This keeps the MVP setup simple; isolated staging data or database branches can come later                                               |
-| 2026-09-10 | Use `https://cratebook.vercel.app` as the initial production URL                                                         | Hosted Supabase, Vercel deployment, authentication, and primary foundation flows are live                                                |
-| 2026-09-10 | Use Goldmine condition grades and ISO-style currency codes                                                               | Familiar record grading supports collectors, while three-letter codes avoid prematurely limiting currencies                              |
-| 2026-09-10 | Keep release rows user-scoped and collection items private by default                                                    | Prevents private metadata leaks while allowing multiple copies and later wishlist reuse                                                  |
-| 2026-09-10 | Delete a physical copy without deleting its shared release row                                                           | Prevents removing edition metadata that another owned copy or future wishlist item may still reference                                   |
-| 2026-09-10 | Convert prices using the entered currency's standard fraction digits                                                     | Preserves accurate minor units for two-, zero-, and three-decimal currencies without floating-point writes                               |
-| 2026-09-10 | Normalize tags case-insensitively and limit each copy to 20 tags                                                         | Reusable owner-scoped tags stay tidy and searchable while the comma-separated phone UI remains lightweight                               |
-| 2026-09-10 | Keep collection discovery state in validated URL parameters                                                              | Bookmarkable server-rendered controls pair with an owner-only search function for private fields                                         |
-| 2026-09-10 | Treat normalized artist and title matches as possible duplicates                                                         | A private warning catches likely repeats while preserving intentional ownership of multiple physical copies                              |
-| 2026-09-10 | Defer personal-copy photos until after the MVP                                                                           | Collection maintenance is complete without uploads, while storage lifecycle and account-deletion behavior can be designed together later |
-| 2026-09-10 | Reuse owner-scoped releases for one private-by-default wishlist item per user/release                                    | Avoids duplicating metadata, preserves the existing privacy boundary, and prepares for atomic wishlist conversion                        |
-| 2026-09-10 | Remove unreferenced release rows when a wishlist item is deleted                                                         | Prevents orphaned metadata while preserving releases still referenced by a physical copy                                                 |
-| 2026-09-10 | Prefill wishlist notes during conversion, keep the new copy private, and do not infer price paid from the wishlist limit | Preserves the user's context while keeping acquisition facts explicit and maintaining the established private default                    |
+| Date       | Decision                                                                                                                  | Reason                                                                                                                                   |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-09-09 | Build a mobile-first web application and installable PWA first                                                            | Most usage is on phones, while links and public profiles should work without installation                                                |
+| 2026-09-09 | Plan Capacitor as the route to native stores after validation                                                             | Reuses the web codebase while allowing later access to native APIs                                                                       |
+| 2026-09-09 | Use Next.js, TypeScript, Tailwind CSS, Supabase, and Vercel                                                               | One pragmatic stack covers UI, public pages, data, auth, storage, and deployment                                                         |
+| 2026-09-09 | Keep manual record entry as a permanent capability                                                                        | External catalogues cannot reliably contain or identify every physical release                                                           |
+| 2026-09-09 | Model a release separately from a user's physical copy                                                                    | Supports copy-specific condition, provenance, privacy, and multiple pressings                                                            |
+| 2026-09-09 | Keep social-network features outside the MVP                                                                              | Sharing through a URL validates social value without feed and moderation complexity                                                      |
+| 2026-09-09 | Use Cratebook and a warm analogue visual language provisionally                                                           | Establishes a coherent foundation without making the branding irreversible                                                               |
+| 2026-09-09 | Use Next.js's webpack production builder initially                                                                        | Turbopack cannot create its internal CSS worker process in the development environment                                                   |
+| 2026-09-09 | Defer hosted preview deployment without blocking collection work                                                          | Local integration was verified while hosted Supabase and Vercel required owner setup                                                     |
+| 2026-09-09 | Use one hosted Supabase project for initial Vercel environments                                                           | This keeps the MVP setup simple; isolated staging data or database branches can come later                                               |
+| 2026-09-10 | Use `https://cratebook.vercel.app` as the initial production URL                                                          | Hosted Supabase, Vercel deployment, authentication, and primary foundation flows are live                                                |
+| 2026-09-10 | Use Goldmine condition grades and ISO-style currency codes                                                                | Familiar record grading supports collectors, while three-letter codes avoid prematurely limiting currencies                              |
+| 2026-09-10 | Keep release rows user-scoped and collection items private by default                                                     | Prevents private metadata leaks while allowing multiple copies and later wishlist reuse                                                  |
+| 2026-09-10 | Delete a physical copy without deleting its shared release row                                                            | Prevents removing edition metadata that another owned copy or future wishlist item may still reference                                   |
+| 2026-09-10 | Convert prices using the entered currency's standard fraction digits                                                      | Preserves accurate minor units for two-, zero-, and three-decimal currencies without floating-point writes                               |
+| 2026-09-10 | Normalize tags case-insensitively and limit each copy to 20 tags                                                          | Reusable owner-scoped tags stay tidy and searchable while the comma-separated phone UI remains lightweight                               |
+| 2026-09-10 | Keep collection discovery state in validated URL parameters                                                               | Bookmarkable server-rendered controls pair with an owner-only search function for private fields                                         |
+| 2026-09-10 | Treat normalized artist and title matches as possible duplicates                                                          | A private warning catches likely repeats while preserving intentional ownership of multiple physical copies                              |
+| 2026-09-10 | Defer personal-copy photos until after the MVP                                                                            | Collection maintenance is complete without uploads, while storage lifecycle and account-deletion behavior can be designed together later |
+| 2026-09-10 | Reuse owner-scoped releases for one private-by-default wishlist item per user/release                                     | Avoids duplicating metadata, preserves the existing privacy boundary, and prepares for atomic wishlist conversion                        |
+| 2026-09-10 | Remove unreferenced release rows when a wishlist item is deleted                                                          | Prevents orphaned metadata while preserving releases still referenced by a physical copy                                                 |
+| 2026-09-10 | Prefill wishlist notes during conversion, keep the new copy private, and do not infer price paid from the wishlist limit  | Preserves the user's context while keeping acquisition facts explicit and maintaining the established private default                    |
+| 2026-09-10 | Use MusicBrainz releases for catalogue metadata and Cover Art Archive for optional remotely referenced artwork            | MusicBrainz provides pressing-aware CC0 core metadata without user credentials; the companion archive uses the same release identifiers  |
+| 2026-09-10 | Persist bounded MusicBrainz provenance, credit its source, and keep catalogue search behind a rate-limited server adapter | Traceable user-owned records and a permanent manual path preserve usefulness without exposing an unrestricted proxy or provider coupling |
 
 ## 20. Progress log
 
@@ -842,6 +848,7 @@ in version control; this log records product-level progress and changes.
 | 2026-09-10 | 3         | Added the typed wishlist schema with private defaults, priority and target-price validation, one-item-per-release enforcement, same-owner release integrity, indexes, timestamps, least-privilege grants, owner-only RLS, generated TypeScript types, and 40 database assertions                                                                             | Build wishlist list, detail, add, edit, and remove flows               |
 | 2026-09-10 | 3         | Built the responsive manual wishlist journey with atomic idempotent creation and editing, safe release cleanup on removal, priority, preferred edition, currency-aware target prices, private notes, visibility guidance, intentional route states, generated types, unit/component/database coverage, and authenticated desktop/mobile browser verification | Implement atomic wishlist-to-collection conversion                     |
 | 2026-09-10 | 3         | Added atomic, idempotent wishlist-to-collection conversion with release reuse, editable note carryover, private copy defaults, acquisition details, normalized tags, rollback and authorization coverage, generated types, and authenticated desktop/mobile browser verification                                                                             | Select and document the external catalogue provider                    |
+| 2026-09-10 | 3         | Selected MusicBrainz releases with Cover Art Archive artwork after reviewing licensing, attribution, image handling, caching, rate limits, failure behavior, provenance, and Discogs tradeoffs; chose remote artwork references and documented the server-only integration contract                                                                          | Build the server-side provider adapter                                 |
 
 ## 21. Hosted environment checklist
 
