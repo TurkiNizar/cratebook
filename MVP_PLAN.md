@@ -424,8 +424,8 @@ validation, and backend services should remain reusable.
 
 ## 9. Data model
 
-The collection foundation below is implemented in committed Supabase migrations.
-Wishlist and public projections remain provisional until their milestone tasks are
+The collection and wishlist foundations below are implemented in committed Supabase
+migrations. Public projections remain provisional until their milestone tasks are
 implemented. Personal-copy photos are deferred until after the MVP.
 
 ### `profiles`
@@ -669,7 +669,8 @@ Exit condition: users can reliably maintain and search a private collection usin
 
 ### Milestone 3 — Wishlist and catalogue discovery
 
-- [ ] Implement wishlist tables and RLS policies
+- [x] Implement wishlist tables and RLS policies with private defaults, same-owner
+      release references, typed priorities, validation, indexes, and authorization tests
 - [ ] Build wishlist list, detail, add, edit, and remove flows
 - [ ] Add priority, preferred edition, target price, and visibility
 - [ ] Implement atomic wishlist-to-collection conversion
@@ -786,27 +787,28 @@ production environment.
 
 ## 19. Decision log
 
-| Date       | Decision                                                              | Reason                                                                                                                                   |
-| ---------- | --------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-09-09 | Build a mobile-first web application and installable PWA first        | Most usage is on phones, while links and public profiles should work without installation                                                |
-| 2026-09-09 | Plan Capacitor as the route to native stores after validation         | Reuses the web codebase while allowing later access to native APIs                                                                       |
-| 2026-09-09 | Use Next.js, TypeScript, Tailwind CSS, Supabase, and Vercel           | One pragmatic stack covers UI, public pages, data, auth, storage, and deployment                                                         |
-| 2026-09-09 | Keep manual record entry as a permanent capability                    | External catalogues cannot reliably contain or identify every physical release                                                           |
-| 2026-09-09 | Model a release separately from a user's physical copy                | Supports copy-specific condition, provenance, privacy, and multiple pressings                                                            |
-| 2026-09-09 | Keep social-network features outside the MVP                          | Sharing through a URL validates social value without feed and moderation complexity                                                      |
-| 2026-09-09 | Use Cratebook and a warm analogue visual language provisionally       | Establishes a coherent foundation without making the branding irreversible                                                               |
-| 2026-09-09 | Use Next.js's webpack production builder initially                    | Turbopack cannot create its internal CSS worker process in the development environment                                                   |
-| 2026-09-09 | Defer hosted preview deployment without blocking collection work      | Local integration was verified while hosted Supabase and Vercel required owner setup                                                     |
-| 2026-09-09 | Use one hosted Supabase project for initial Vercel environments       | This keeps the MVP setup simple; isolated staging data or database branches can come later                                               |
-| 2026-09-10 | Use `https://cratebook.vercel.app` as the initial production URL      | Hosted Supabase, Vercel deployment, authentication, and primary foundation flows are live                                                |
-| 2026-09-10 | Use Goldmine condition grades and ISO-style currency codes            | Familiar record grading supports collectors, while three-letter codes avoid prematurely limiting currencies                              |
-| 2026-09-10 | Keep release rows user-scoped and collection items private by default | Prevents private metadata leaks while allowing multiple copies and later wishlist reuse                                                  |
-| 2026-09-10 | Delete a physical copy without deleting its shared release row        | Prevents removing edition metadata that another owned copy or future wishlist item may still reference                                   |
-| 2026-09-10 | Convert prices using the entered currency's standard fraction digits  | Preserves accurate minor units for two-, zero-, and three-decimal currencies without floating-point writes                               |
-| 2026-09-10 | Normalize tags case-insensitively and limit each copy to 20 tags      | Reusable owner-scoped tags stay tidy and searchable while the comma-separated phone UI remains lightweight                               |
-| 2026-09-10 | Keep collection discovery state in validated URL parameters           | Bookmarkable server-rendered controls pair with an owner-only search function for private fields                                         |
-| 2026-09-10 | Treat normalized artist and title matches as possible duplicates      | A private warning catches likely repeats while preserving intentional ownership of multiple physical copies                              |
-| 2026-09-10 | Defer personal-copy photos until after the MVP                        | Collection maintenance is complete without uploads, while storage lifecycle and account-deletion behavior can be designed together later |
+| Date       | Decision                                                                              | Reason                                                                                                                                   |
+| ---------- | ------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-09-09 | Build a mobile-first web application and installable PWA first                        | Most usage is on phones, while links and public profiles should work without installation                                                |
+| 2026-09-09 | Plan Capacitor as the route to native stores after validation                         | Reuses the web codebase while allowing later access to native APIs                                                                       |
+| 2026-09-09 | Use Next.js, TypeScript, Tailwind CSS, Supabase, and Vercel                           | One pragmatic stack covers UI, public pages, data, auth, storage, and deployment                                                         |
+| 2026-09-09 | Keep manual record entry as a permanent capability                                    | External catalogues cannot reliably contain or identify every physical release                                                           |
+| 2026-09-09 | Model a release separately from a user's physical copy                                | Supports copy-specific condition, provenance, privacy, and multiple pressings                                                            |
+| 2026-09-09 | Keep social-network features outside the MVP                                          | Sharing through a URL validates social value without feed and moderation complexity                                                      |
+| 2026-09-09 | Use Cratebook and a warm analogue visual language provisionally                       | Establishes a coherent foundation without making the branding irreversible                                                               |
+| 2026-09-09 | Use Next.js's webpack production builder initially                                    | Turbopack cannot create its internal CSS worker process in the development environment                                                   |
+| 2026-09-09 | Defer hosted preview deployment without blocking collection work                      | Local integration was verified while hosted Supabase and Vercel required owner setup                                                     |
+| 2026-09-09 | Use one hosted Supabase project for initial Vercel environments                       | This keeps the MVP setup simple; isolated staging data or database branches can come later                                               |
+| 2026-09-10 | Use `https://cratebook.vercel.app` as the initial production URL                      | Hosted Supabase, Vercel deployment, authentication, and primary foundation flows are live                                                |
+| 2026-09-10 | Use Goldmine condition grades and ISO-style currency codes                            | Familiar record grading supports collectors, while three-letter codes avoid prematurely limiting currencies                              |
+| 2026-09-10 | Keep release rows user-scoped and collection items private by default                 | Prevents private metadata leaks while allowing multiple copies and later wishlist reuse                                                  |
+| 2026-09-10 | Delete a physical copy without deleting its shared release row                        | Prevents removing edition metadata that another owned copy or future wishlist item may still reference                                   |
+| 2026-09-10 | Convert prices using the entered currency's standard fraction digits                  | Preserves accurate minor units for two-, zero-, and three-decimal currencies without floating-point writes                               |
+| 2026-09-10 | Normalize tags case-insensitively and limit each copy to 20 tags                      | Reusable owner-scoped tags stay tidy and searchable while the comma-separated phone UI remains lightweight                               |
+| 2026-09-10 | Keep collection discovery state in validated URL parameters                           | Bookmarkable server-rendered controls pair with an owner-only search function for private fields                                         |
+| 2026-09-10 | Treat normalized artist and title matches as possible duplicates                      | A private warning catches likely repeats while preserving intentional ownership of multiple physical copies                              |
+| 2026-09-10 | Defer personal-copy photos until after the MVP                                        | Collection maintenance is complete without uploads, while storage lifecycle and account-deletion behavior can be designed together later |
+| 2026-09-10 | Reuse owner-scoped releases for one private-by-default wishlist item per user/release | Avoids duplicating metadata, preserves the existing privacy boundary, and prepares for atomic wishlist conversion                        |
 
 ## 20. Progress log
 
@@ -830,6 +832,7 @@ in version control; this log records product-level progress and changes.
 | 2026-09-10 | 2         | Added owner-scoped collection search across release metadata, tags, and private notes; combined filters, URL sorting, no-result recovery, indexes, and database/component/desktop/mobile browser coverage                                                                             | Add non-blocking duplicate detection                                   |
 | 2026-09-10 | 2         | Added owner-scoped duplicate detection using case-insensitive artist/title equality with collapsed whitespace, an existing-copy review link, explicit add-another-copy confirmation, and database, component, desktop, and mobile browser coverage                                    | Decide whether personal-copy photos remain in the MVP                  |
 | 2026-09-10 | 2         | Deferred personal-copy photos; completed the authenticated collection journey across desktop Chromium, Firefox, and WebKit plus Android Chrome and iPhone Safari, added overflow assertions and persistent cross-browser CI smoke coverage, and fixed a post-delete revalidation race | Begin Milestone 3 with wishlist tables and owner-only RLS              |
+| 2026-09-10 | 3         | Added the typed wishlist schema with private defaults, priority and target-price validation, one-item-per-release enforcement, same-owner release integrity, indexes, timestamps, least-privilege grants, owner-only RLS, generated TypeScript types, and 40 database assertions      | Build wishlist list, detail, add, edit, and remove flows               |
 
 ## 21. Hosted environment checklist
 

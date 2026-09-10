@@ -251,6 +251,56 @@ export type Database = {
         };
         Relationships: [];
       };
+      wishlist_items: {
+        Row: {
+          created_at: string;
+          id: string;
+          is_public: boolean;
+          max_price_minor: number | null;
+          notes: string | null;
+          preferred_edition: string | null;
+          price_currency: string | null;
+          priority: Database["public"]["Enums"]["wishlist_priority"];
+          release_id: string;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          is_public?: boolean;
+          max_price_minor?: number | null;
+          notes?: string | null;
+          preferred_edition?: string | null;
+          price_currency?: string | null;
+          priority?: Database["public"]["Enums"]["wishlist_priority"];
+          release_id: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          is_public?: boolean;
+          max_price_minor?: number | null;
+          notes?: string | null;
+          preferred_edition?: string | null;
+          price_currency?: string | null;
+          priority?: Database["public"]["Enums"]["wishlist_priority"];
+          release_id?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "wishlist_items_release_owner_fk";
+            columns: ["release_id", "user_id"];
+            isOneToOne: false;
+            referencedRelation: "releases";
+            referencedColumns: ["id", "created_by"];
+          },
+        ];
+      };
     };
     Views: {
       [_ in never]: never;
@@ -360,6 +410,7 @@ export type Database = {
         | "poor";
       release_format:
         "lp" | "seven_inch" | "ten_inch" | "twelve_inch" | "box_set" | "other";
+      wishlist_priority: "interested" | "wanted" | "must_have";
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -506,6 +557,7 @@ export const Constants = {
         "box_set",
         "other",
       ],
+      wishlist_priority: ["interested", "wanted", "must_have"],
     },
   },
 } as const;
