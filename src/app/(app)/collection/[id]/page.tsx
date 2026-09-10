@@ -29,6 +29,9 @@ export default async function RecordDetailPage({
   const details = getCollectionCardDetails(release);
   const detailRows = getRecordDetailRows(release);
   const copyRows = getCopyDetailRows(item);
+  const tags = item.collection_item_tags
+    .map(({ tags }) => tags.name)
+    .sort((left, right) => left.localeCompare(right));
   const deleteRecordWithId = deleteRecord.bind(null, item.id);
 
   return (
@@ -123,6 +126,13 @@ export default async function RecordDetailPage({
               </div>
             ))}
           </dl>
+          {tags.length > 0 ? (
+            <div className="record-tags" aria-label="Tags">
+              {tags.map((tag) => (
+                <span key={tag}>{tag}</span>
+              ))}
+            </div>
+          ) : null}
         </aside>
 
         {item.notes ? (

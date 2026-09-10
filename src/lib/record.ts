@@ -72,7 +72,8 @@ export type CopyDetailsField =
   | "priceCurrency"
   | "rating"
   | "isFavorite"
-  | "notes";
+  | "notes"
+  | "tags";
 
 export type ManualRecordField =
   RecordDetailsField | CopyDetailsField | "entryKey";
@@ -114,6 +115,7 @@ export type CopyDetailsInput = {
   rating: number | null;
   isFavorite: boolean;
   notes: string | null;
+  tags: string[];
 };
 
 export type CopyDetailsValidation =
@@ -406,6 +408,7 @@ export function validateCopyDetails(formData: FormData): CopyDetailsValidation {
   const priceCurrency = text(formData, "priceCurrency").toUpperCase();
   const rawRating = text(formData, "rating");
   const notes = optionalText(formData, "notes");
+  const rawTags = text(formData, "tags");
 
   if (!PURCHASE_STATES.has(rawPurchaseState)) {
     errors.purchaseState = "Choose a valid purchase state.";
@@ -421,6 +424,30 @@ export function validateCopyDetails(formData: FormData): CopyDetailsValidation {
   }
   validateLength(errors, "acquiredFrom", acquiredFrom, 300, "Acquired from");
   validateLength(errors, "notes", notes, 10000, "Notes");
+
+  const tags: string[] = [];
+  const normalizedTags = new Set<string>();
+  for (const rawTag of rawTags.split(",")) {
+    const tag = rawTag.trim().replace(/\s+/g, " ");
+    if (!tag) {
+      continue;
+    }
+
+    if (tag.length > 50) {
+      errors.tags = "Each tag must be 50 characters or fewer.";
+      break;
+    }
+
+    const normalized = tag.toLocaleLowerCase("en");
+    if (!normalizedTags.has(normalized)) {
+      normalizedTags.add(normalized);
+      tags.push(tag);
+    }
+  }
+
+  if (tags.length > 20) {
+    errors.tags = "Add no more than 20 tags.";
+  }
 
   let rating: number | null = null;
   if (rawRating) {
@@ -452,6 +479,7 @@ export function validateCopyDetails(formData: FormData): CopyDetailsValidation {
       rating,
       isFavorite: formData.get("isFavorite") === "on",
       notes,
+      tags,
     },
   };
 }

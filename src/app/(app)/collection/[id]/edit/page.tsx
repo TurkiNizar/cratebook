@@ -40,6 +40,10 @@ export default async function EditRecordPage({
     priceCurrency: item.price_currency ?? "",
     rating: item.rating?.toString() ?? "",
     notes: item.notes ?? "",
+    tags: item.collection_item_tags
+      .map(({ tags }) => tags.name)
+      .sort((left, right) => left.localeCompare(right))
+      .join(", "),
     isReissue: release.is_reissue ?? false,
     isFavorite: item.is_favorite,
   };

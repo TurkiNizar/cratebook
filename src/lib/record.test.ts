@@ -172,6 +172,7 @@ describe("validateCopyDetails", () => {
         rating: "5",
         isFavorite: "on",
         notes: " A late-night favorite. ",
+        tags: " Jazz,  Sunday   morning, jazz ",
       }),
     );
 
@@ -188,6 +189,7 @@ describe("validateCopyDetails", () => {
         rating: 5,
         isFavorite: true,
         notes: "A late-night favorite.",
+        tags: ["Jazz", "Sunday morning"],
       },
     });
   });
@@ -206,6 +208,7 @@ describe("validateCopyDetails", () => {
         rating: null,
         isFavorite: false,
         notes: null,
+        tags: [],
       },
     });
   });
@@ -245,6 +248,25 @@ describe("validateCopyDetails", () => {
         formData({ pricePaid: "1.234", priceCurrency: "KWD" }),
       ),
     ).toMatchObject({ success: true, data: { pricePaidMinor: 1234 } });
+  });
+
+  it("limits tag count and length", () => {
+    expect(
+      validateCopyDetails(
+        formData({
+          tags: Array.from({ length: 21 }, (_, index) => `tag ${index}`).join(
+            ",",
+          ),
+        }),
+      ),
+    ).toEqual({
+      success: false,
+      errors: { tags: "Add no more than 20 tags." },
+    });
+    expect(validateCopyDetails(formData({ tags: "x".repeat(51) }))).toEqual({
+      success: false,
+      errors: { tags: "Each tag must be 50 characters or fewer." },
+    });
   });
 });
 

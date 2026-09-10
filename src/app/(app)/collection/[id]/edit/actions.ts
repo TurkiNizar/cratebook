@@ -74,6 +74,7 @@ export async function updateRecord(
       p_rating: copy.rating ?? undefined,
       p_is_favorite: copy.isFavorite,
       p_notes: copy.notes ?? undefined,
+      p_tags: copy.tags,
     },
   );
 

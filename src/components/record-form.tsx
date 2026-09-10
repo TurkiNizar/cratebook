@@ -53,6 +53,7 @@ export const EMPTY_RECORD_FORM_VALUES: RecordFormValues = {
   priceCurrency: "",
   rating: "",
   notes: "",
+  tags: "",
   isReissue: false,
   isFavorite: false,
 };
@@ -372,6 +373,28 @@ export function RecordForm({
                 )
               }
             />
+          </div>
+
+          <div className="field copy-notes-field">
+            <label htmlFor="tags">Tags</label>
+            <input
+              id="tags"
+              name="tags"
+              value={values.tags}
+              aria-describedby={errors.tags ? "tags-error" : "tags-hint"}
+              aria-invalid={Boolean(errors.tags)}
+              placeholder="Jazz, Sunday morning, Blue Note"
+              onChange={(event) => updateValue("tags", event.target.value)}
+            />
+            {errors.tags ? (
+              <p className="field-error" id="tags-error">
+                {errors.tags}
+              </p>
+            ) : (
+              <p className="field-hint" id="tags-hint">
+                Separate tags with commas. Up to 20 tags, 50 characters each.
+              </p>
+            )}
           </div>
 
           <div className="field copy-notes-field">

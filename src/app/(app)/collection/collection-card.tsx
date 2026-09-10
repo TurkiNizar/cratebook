@@ -9,6 +9,7 @@ import {
 export type CollectionCardItem = {
   id: string;
   isFavorite: boolean;
+  tags: string[];
   release: CollectionReleaseSummary & {
     artist_display: string;
     title: string;
@@ -43,6 +44,13 @@ export function CollectionCard({ item }: { item: CollectionCardItem }) {
             </ul>
           ) : null}
           {edition ? <p className="collection-edition">{edition}</p> : null}
+          {item.tags.length > 0 ? (
+            <div className="collection-tags" aria-label="Tags">
+              {item.tags.map((tag) => (
+                <span key={tag}>{tag}</span>
+              ))}
+            </div>
+          ) : null}
         </div>
       </Link>
     </article>

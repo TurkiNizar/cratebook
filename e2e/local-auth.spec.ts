@@ -137,6 +137,7 @@ test.describe("local passwordless authentication", () => {
     await page.getByLabel("Acquired from").fill("Local record shop");
     await page.getByLabel("Price paid").fill("24.99");
     await page.getByLabel("Currency").fill("USD");
+    await page.getByLabel("Tags").fill("Jazz, Sunday morning, jazz");
     await page
       .getByLabel("Personal notes or story")
       .fill("A late-night favorite.");
@@ -158,6 +159,7 @@ test.describe("local passwordless authentication", () => {
     await expect(page.getByText("Local record shop")).toBeVisible();
     await expect(page.getByText("$24.99")).toBeVisible();
     await expect(page.getByText("5 / 5")).toBeVisible();
+    await expect(page.getByLabel("Tags")).toHaveText("JazzSunday morning");
     await expect(page.getByText("A late-night favorite.")).toBeVisible();
 
     await page.getByRole("link", { name: "My collection" }).click();
@@ -169,6 +171,11 @@ test.describe("local passwordless authentication", () => {
         .getByRole("article", { name: "Pastel Blues — Mono" })
         .getByLabel("Favorite"),
     ).toBeVisible();
+    await expect(
+      page
+        .getByRole("article", { name: "Pastel Blues — Mono" })
+        .getByLabel("Tags"),
+    ).toHaveText("JazzSunday morning");
 
     await page
       .getByRole("article", { name: "Pastel Blues — Mono" })

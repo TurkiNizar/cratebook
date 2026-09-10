@@ -655,7 +655,8 @@ application, and cannot access another user's private data.
 - [x] Add owner-only physical-copy deletion with explicit, cancellable confirmation
 - [x] Add favorites, ratings, private notes, acquisition data, currency-aware prices,
       purchase state, and Goldmine media/sleeve conditions
-- [ ] Add user tags
+- [x] Add reusable owner-scoped user tags with case-insensitive normalization,
+      atomic record editing, RLS coverage, and responsive collection/detail display
 - [ ] Add search, filters, and sorting
 - [ ] Add non-blocking duplicate detection
 - [ ] Add personal-copy photo upload
@@ -798,6 +799,7 @@ production environment.
 | 2026-09-10 | Keep release rows user-scoped and collection items private by default | Prevents private metadata leaks while allowing multiple copies and later wishlist reuse                     |
 | 2026-09-10 | Delete a physical copy without deleting its shared release row        | Prevents removing edition metadata that another owned copy or future wishlist item may still reference      |
 | 2026-09-10 | Convert prices using the entered currency's standard fraction digits  | Preserves accurate minor units for two-, zero-, and three-decimal currencies without floating-point writes  |
+| 2026-09-10 | Normalize tags case-insensitively and limit each copy to 20 tags      | Reusable owner-scoped tags stay tidy and searchable while the comma-separated phone UI remains lightweight  |
 
 ## 20. Progress log
 
@@ -817,6 +819,7 @@ in version control; this log records product-level progress and changes.
 | 2026-09-10 | 2         | Built private record detail and release-metadata edit routes with shared validated fields, ownership-safe lookups and updates, responsive loading/not-found/error states, and authenticated edit verification on desktop Chrome, Android Chrome, and iPhone Safari            | Add deletion with confirmation                                         |
 | 2026-09-10 | 2         | Added owner-only physical-copy deletion with an explicit cancellable confirmation, non-destructive shared-release handling, failure and success messaging, RLS coverage, and authenticated desktop and mobile browser verification                                            | Add favorites, ratings, notes, acquisition data, and conditions        |
 | 2026-09-10 | 2         | Added atomic personal-copy editing for favorites, ratings, private notes, purchase state, Goldmine conditions, acquisition provenance, dates, and currency-aware prices; surfaced details and favorites across private detail/grid views and verified desktop/mobile journeys | Add user tags                                                          |
+| 2026-09-10 | 2         | Added reusable owner-scoped tags with normalized uniqueness, same-owner foreign keys, RLS, atomic edit/clear behavior, validation, collection/detail chips, generated types, and database, component, desktop Chrome, Android Chrome, and iPhone Safari coverage              | Add collection search, filters, and sorting                            |
 
 ## 21. Hosted environment checklist
 

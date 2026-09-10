@@ -24,7 +24,7 @@ export default async function CollectionPage({
   const { data: items, error } = await supabase
     .from("collection_items")
     .select(
-      "id, created_at, is_favorite, releases(artist_display, title, format, disc_count, original_year, release_year, label, catalog_number, country)",
+      "id, created_at, is_favorite, collection_item_tags(tags(name)), releases(artist_display, title, format, disc_count, original_year, release_year, label, catalog_number, country)",
     )
     .order("created_at", { ascending: false });
 
@@ -101,6 +101,9 @@ export default async function CollectionPage({
                   item={{
                     id: item.id,
                     isFavorite: item.is_favorite,
+                    tags: item.collection_item_tags
+                      .map(({ tags }) => tags.name)
+                      .sort((left, right) => left.localeCompare(right)),
                     release: item.releases,
                   }}
                 />

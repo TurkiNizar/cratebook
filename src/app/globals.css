@@ -1264,6 +1264,32 @@ a.add-option:hover {
   white-space: nowrap;
 }
 
+.collection-tags,
+.record-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.collection-tags {
+  margin-top: 10px;
+}
+
+.collection-tags span,
+.record-tags span {
+  max-width: 100%;
+  overflow: hidden;
+  padding: 4px 8px;
+  border: 1px solid #d7c8ae;
+  border-radius: 999px;
+  color: var(--terracotta-dark);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .collection-card-skeleton {
   display: grid;
   gap: 11px;
@@ -1466,6 +1492,11 @@ a.add-option:hover {
   overflow-wrap: anywhere;
   font-size: 14px;
   line-height: 1.5;
+}
+
+.record-tags {
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
 }
 
 .record-detail-empty {

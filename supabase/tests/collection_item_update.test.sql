@@ -1,6 +1,6 @@
 begin;
 
-select plan(7);
+select plan(10);
 
 insert into auth.users (id, aud, role, email, created_at, updated_at)
 values
@@ -38,7 +38,8 @@ select is(
     p_price_currency => 'usd',
     p_rating => 5::smallint,
     p_is_favorite => true,
-    p_notes => 'A late-night favorite.'
+    p_notes => 'A late-night favorite.',
+    p_tags => array['Jazz', ' Late   night ', 'jazz']
   ),
   true,
   'the owner can atomically update release and physical-copy details'
@@ -58,6 +59,55 @@ select results_eq(
     5::smallint, true, 'A late-night favorite.'::text
   ) $$,
   'copy details are normalized and stored'
+);
+
+select results_eq(
+  $$
+    select tags.name
+    from public.collection_item_tags
+    join public.tags on tags.id = collection_item_tags.tag_id
+    where collection_item_tags.collection_item_id = (
+      select id from public.collection_items
+      where entry_key = '77777777-0000-4000-8000-777777777777'
+    )
+    order by tags.normalized_name
+  $$,
+  $$ values ('Jazz'::text), ('Late night'::text) $$,
+  'tags are normalized, deduplicated, and stored with the copy'
+);
+
+select throws_like(
+  $$
+    select public.update_collection_item_details(
+      p_item_id => (
+        select id from public.collection_items
+        where entry_key = '77777777-0000-4000-8000-777777777777'
+      ),
+      p_artist_display => 'Nina Simone',
+      p_title => 'Pastel Blues — Mono',
+      p_tags => array(
+        select 'tag ' || number
+        from generate_series(1, 21) as number
+      )
+    )
+  $$,
+  '%at most 20 tags%',
+  'the database rejects more than 20 tags'
+);
+
+select is(
+  public.update_collection_item_details(
+    p_item_id => (
+      select id from public.collection_items
+      where entry_key = '77777777-0000-4000-8000-777777777777'
+    ),
+    p_artist_display => 'Nina Simone',
+    p_title => 'Pastel Blues — Mono',
+    p_rating => 5::smallint,
+    p_tags => array[]::text[]
+  ),
+  true,
+  'clearing the field removes all tags'
 );
 
 select throws_like(

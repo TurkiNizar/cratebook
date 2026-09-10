@@ -26,6 +26,7 @@ const values: RecordFormValues = {
   priceCurrency: "USD",
   rating: "5",
   notes: "A late-night favorite.",
+  tags: "Jazz, Sunday morning",
   isReissue: false,
   isFavorite: true,
 };
@@ -50,6 +51,7 @@ describe("RecordForm", () => {
     expect(screen.getByRole("checkbox", { name: /Favorite/ })).toBeChecked();
     expect(screen.getByLabelText("Media condition")).toHaveValue("near_mint");
     expect(screen.getByLabelText("Price paid")).toHaveValue("24.99");
+    expect(screen.getByLabelText("Tags")).toHaveValue("Jazz, Sunday morning");
     expect(screen.getByRole("button", { name: "Save changes" })).toBeVisible();
     expect(screen.getByRole("link", { name: "Cancel" })).toHaveAttribute(
       "href",

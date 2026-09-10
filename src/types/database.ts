@@ -9,6 +9,42 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      collection_item_tags: {
+        Row: {
+          collection_item_id: string;
+          created_at: string;
+          tag_id: string;
+          user_id: string;
+        };
+        Insert: {
+          collection_item_id: string;
+          created_at?: string;
+          tag_id: string;
+          user_id: string;
+        };
+        Update: {
+          collection_item_id?: string;
+          created_at?: string;
+          tag_id?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "collection_item_tags_item_owner_fk";
+            columns: ["collection_item_id", "user_id"];
+            isOneToOne: false;
+            referencedRelation: "collection_items";
+            referencedColumns: ["id", "user_id"];
+          },
+          {
+            foreignKeyName: "collection_item_tags_tag_owner_fk";
+            columns: ["tag_id", "user_id"];
+            isOneToOne: false;
+            referencedRelation: "tags";
+            referencedColumns: ["id", "user_id"];
+          },
+        ];
+      };
       collection_items: {
         Row: {
           acquired_from: string | null;
@@ -191,6 +227,30 @@ export type Database = {
         };
         Relationships: [];
       };
+      tags: {
+        Row: {
+          created_at: string;
+          id: string;
+          name: string;
+          normalized_name: string | null;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          name: string;
+          normalized_name?: string | null;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          name?: string;
+          normalized_name?: string | null;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;
@@ -241,6 +301,7 @@ export type Database = {
           p_rating?: number;
           p_release_year?: number;
           p_sleeve_condition?: Database["public"]["Enums"]["record_condition"];
+          p_tags?: string[];
           p_title: string;
           p_vinyl_color?: string;
         };

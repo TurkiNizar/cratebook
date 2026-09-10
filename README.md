@@ -60,8 +60,9 @@ Start the app with `npm run dev`, then:
 7. Choose **Add → Add manually**, enter an artist and title, and save the record.
 8. Confirm the saved record appears in the collection grid with its release details.
 9. Open the record, choose **Edit record**, add a favorite, rating, condition,
-   acquisition detail, price, or private note, and confirm the saved details appear on
-   its detail page. Favorite records also show a star on the collection card.
+   acquisition detail, price, private note, or comma-separated tags, and confirm the
+   saved details appear on its detail page. Favorite records and tags also appear on
+   the collection card.
 10. Choose **Remove from collection**, cancel once, then confirm removal and verify
     the collection returns to its empty state.
 
