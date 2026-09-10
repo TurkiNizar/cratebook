@@ -652,7 +652,7 @@ application, and cannot access another user's private data.
 - [x] Build responsive collection grid with intentional empty, loading, and error states
 - [x] Build private record detail and release-metadata edit screens with responsive
       loading, not-found, success, validation, and error states
-- [ ] Add deletion with confirmation
+- [x] Add owner-only physical-copy deletion with explicit, cancellable confirmation
 - [ ] Add favorites, ratings, notes, acquisition data, and conditions
 - [ ] Add user tags
 - [ ] Add search, filters, and sorting
@@ -795,6 +795,7 @@ production environment.
 | 2026-09-10 | Use `https://cratebook.vercel.app` as the initial production URL      | Hosted Supabase, Vercel deployment, authentication, and primary foundation flows are live                   |
 | 2026-09-10 | Use Goldmine condition grades and ISO-style currency codes            | Familiar record grading supports collectors, while three-letter codes avoid prematurely limiting currencies |
 | 2026-09-10 | Keep release rows user-scoped and collection items private by default | Prevents private metadata leaks while allowing multiple copies and later wishlist reuse                     |
+| 2026-09-10 | Delete a physical copy without deleting its shared release row        | Prevents removing edition metadata that another owned copy or future wishlist item may still reference      |
 
 ## 20. Progress log
 
@@ -812,6 +813,7 @@ in version control; this log records product-level progress and changes.
 | 2026-09-10 | 2         | Built phone-first manual entry with required artist/title, progressive edition fields, server validation, atomic idempotent persistence, saved-record confirmation, a real auth-to-entry browser journey, and deployed both Milestone 2 migrations to hosted Supabase | Build the collection grid/list and complete its empty and error states |
 | 2026-09-10 | 2         | Built the newest-first responsive collection grid with resilient sparse metadata, generated cover placeholders, intentional empty/loading/error states, component coverage, and authenticated desktop and mobile browser verification                                 | Build record detail and edit screens                                   |
 | 2026-09-10 | 2         | Built private record detail and release-metadata edit routes with shared validated fields, ownership-safe lookups and updates, responsive loading/not-found/error states, and authenticated edit verification on desktop Chrome, Android Chrome, and iPhone Safari    | Add deletion with confirmation                                         |
+| 2026-09-10 | 2         | Added owner-only physical-copy deletion with an explicit cancellable confirmation, non-destructive shared-release handling, failure and success messaging, RLS coverage, and authenticated desktop and mobile browser verification                                    | Add favorites, ratings, notes, acquisition data, and conditions        |
 
 ## 21. Hosted environment checklist
 

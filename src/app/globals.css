@@ -1449,6 +1449,89 @@ a.add-option:hover {
   padding-top: 24px;
 }
 
+.record-danger-zone {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  margin-top: 18px;
+  padding: clamp(22px, 4vw, 30px);
+  border: 1px solid #d7afa5;
+  border-radius: 22px;
+  background: #f5e5dc;
+}
+
+.record-danger-zone h2 {
+  margin: 4px 0 7px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 24px;
+  font-weight: 500;
+}
+
+.record-danger-zone > div > p:last-child {
+  max-width: 560px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.danger-button {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  padding: 0 19px;
+  border: 1px solid #9d321f;
+  border-radius: 999px;
+  background: transparent;
+  color: #852b1b;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 800;
+  transition:
+    background 160ms ease,
+    color 160ms ease;
+}
+
+.danger-button:hover {
+  background: #9d321f;
+  color: #fffaf0;
+}
+
+.danger-button:disabled {
+  cursor: wait;
+  opacity: 0.68;
+}
+
+.delete-record-confirmation {
+  display: grid;
+  min-width: min(100%, 350px);
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid #c98d7e;
+  border-radius: 14px;
+  background: var(--paper-light);
+}
+
+.delete-record-confirmation > p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.delete-record-confirmation form {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.delete-record-confirmation .secondary-button,
+.delete-record-confirmation .danger-button {
+  min-height: 44px;
+}
+
 .settings-card {
   margin-top: 38px;
   padding: clamp(22px, 5vw, 38px);
@@ -1837,6 +1920,21 @@ a.add-option:hover {
   .record-detail-list > div {
     grid-template-columns: 1fr;
     gap: 5px;
+  }
+
+  .record-danger-zone {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .record-danger-zone > .danger-button,
+  .delete-record-confirmation {
+    width: 100%;
+  }
+
+  .delete-record-confirmation form {
+    align-items: stretch;
+    flex-direction: column-reverse;
   }
 
   .collection-error-actions {

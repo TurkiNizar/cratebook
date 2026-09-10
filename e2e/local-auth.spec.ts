@@ -8,7 +8,7 @@ test.describe("local passwordless authentication", () => {
     "Set RUN_LOCAL_AUTH_E2E=1 with the local Supabase stack running",
   );
 
-  test("signs in, completes onboarding, and adds and edits a manual record", async ({
+  test("signs in, completes onboarding, and adds, edits, and removes a manual record", async ({
     page,
     request,
   }, testInfo) => {
@@ -144,6 +144,29 @@ test.describe("local passwordless authentication", () => {
     await page.getByRole("link", { name: "My collection" }).click();
     await expect(
       page.getByRole("article", { name: "Pastel Blues — Mono" }),
+    ).toBeVisible();
+
+    await page
+      .getByRole("article", { name: "Pastel Blues — Mono" })
+      .getByRole("link")
+      .click();
+    await page.getByRole("button", { name: "Remove from collection" }).click();
+    await expect(
+      page.getByRole("group", { name: "Remove Pastel Blues — Mono?" }),
+    ).toBeVisible();
+    await page.getByRole("button", { name: "Keep record" }).click();
+    await expect(
+      page.getByRole("heading", { name: "Pastel Blues — Mono", level: 1 }),
+    ).toBeVisible();
+
+    await page.getByRole("button", { name: "Remove from collection" }).click();
+    await page.getByRole("button", { name: "Yes, remove this copy" }).click();
+    await expect(page).toHaveURL(/\/collection\?removed=1$/);
+    await expect(
+      page.getByText("The copy was removed from your collection."),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Your crate is waiting" }),
     ).toBeVisible();
 
     await page.goto("/collection/not-a-record-id");

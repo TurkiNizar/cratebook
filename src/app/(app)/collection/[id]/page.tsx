@@ -7,7 +7,9 @@ import {
   getRecordDetailRows,
 } from "@/lib/collection";
 
+import { deleteRecord } from "./actions";
 import { getCollectionRecord } from "./data";
+import { DeleteRecord } from "./delete-record";
 
 export const metadata: Metadata = { title: "Record details" };
 
@@ -25,6 +27,7 @@ export default async function RecordDetailPage({
   const release = item.releases;
   const details = getCollectionCardDetails(release);
   const detailRows = getRecordDetailRows(release);
+  const deleteRecordWithId = deleteRecord.bind(null, item.id);
 
   return (
     <main className="app-content record-detail-page">
@@ -115,6 +118,8 @@ export default async function RecordDetailPage({
           </p>
         </aside>
       </div>
+
+      <DeleteRecord action={deleteRecordWithId} title={release.title} />
     </main>
   );
 }

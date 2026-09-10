@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 type CollectionPageProps = {
-  searchParams: Promise<{ added?: string }>;
+  searchParams: Promise<{ added?: string; removed?: string }>;
 };
 
 const UUID_PATTERN =
@@ -19,7 +19,7 @@ const UUID_PATTERN =
 export default async function CollectionPage({
   searchParams,
 }: CollectionPageProps) {
-  const { added } = await searchParams;
+  const { added, removed } = await searchParams;
   const supabase = await createClient();
   const { data: items, error } = await supabase
     .from("collection_items")
@@ -58,6 +58,12 @@ export default async function CollectionPage({
             {addedRelease.artist_display}
             {" was added to your collection."}
           </p>
+        </div>
+      ) : null}
+      {removed === "1" ? (
+        <div className="collection-notice" role="status">
+          <span aria-hidden="true">✓</span>
+          <p>The copy was removed from your collection.</p>
         </div>
       ) : null}
       {items.length === 0 ? (

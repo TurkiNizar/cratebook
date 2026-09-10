@@ -1,6 +1,6 @@
 begin;
 
-select plan(16);
+select plan(17);
 
 insert into auth.users (id, aud, role, email, created_at, updated_at)
 values
@@ -88,6 +88,15 @@ select is(
   ),
   'Kind of Blue (Edited)'::text,
   'a user can update their own release metadata'
+);
+
+delete from public.collection_items
+where id = 'aaaaaaaa-2222-4222-8222-aaaaaaaaaaaa';
+
+select is(
+  (select count(*) from public.collection_items),
+  1::bigint,
+  'a user can delete their own physical copy without deleting the shared release'
 );
 
 select throws_like(
