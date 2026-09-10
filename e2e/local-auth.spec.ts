@@ -83,6 +83,9 @@ test.describe("local passwordless authentication", () => {
     await expect(
       page.getByRole("heading", { name: "My collection" }),
     ).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Your crate is waiting" }),
+    ).toBeVisible();
 
     await page.getByRole("link", { name: "Add a record", exact: true }).click();
     await expect(page).toHaveURL(/\/add$/);
@@ -102,7 +105,15 @@ test.describe("local passwordless authentication", () => {
     await expect(
       page.getByText(/pastel blues.*nina simone.*added to your collection/i),
     ).toBeVisible();
-    await expect(page.getByText("1 record in your crate")).toBeVisible();
+    const collection = page.getByRole("list", {
+      name: "Records in your collection",
+    });
+    await expect(collection).toBeVisible();
+    const record = collection.getByRole("article", { name: "Pastel Blues" });
+    await expect(record.getByText("Nina Simone")).toBeVisible();
+    await expect(record.getByText("LP")).toBeVisible();
+    await expect(record.getByText("1965")).toBeVisible();
+    await expect(record.getByText(/Philips/)).toBeVisible();
 
     await page.getByRole("link", { name: /profile/i }).click();
     await page.getByLabel("Display name").fill("Local Crate Digger");

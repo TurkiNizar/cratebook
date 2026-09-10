@@ -58,7 +58,7 @@ Start the app with `npm run dev`, then:
 5. Choose a username on the onboarding screen.
 6. Confirm that you arrive at the empty collection screen.
 7. Choose **Add → Add manually**, enter an artist and title, and save the record.
-8. Confirm the collection shows the saved-record message and a count of one.
+8. Confirm the saved record appears in the collection grid with its release details.
 
 Supabase Studio is available at <http://127.0.0.1:54323> if you want to inspect the
 local database. Stop the local services when finished:

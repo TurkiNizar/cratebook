@@ -3,6 +3,8 @@ import Link from "next/link";
 
 import { createClient } from "@/lib/supabase/server";
 
+import { CollectionCard } from "./collection-card";
+
 export const metadata: Metadata = {
   title: "My collection",
 };
@@ -19,21 +21,25 @@ export default async function CollectionPage({
 }: CollectionPageProps) {
   const { added } = await searchParams;
   const supabase = await createClient();
-  const countRequest = supabase
+  const { data: items, error } = await supabase
     .from("collection_items")
-    .select("id", { count: "exact", head: true });
-  const addedRequest =
+    .select(
+      "id, created_at, releases(artist_display, title, format, disc_count, original_year, release_year, label, catalog_number, country)",
+    )
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Collection query failed", {
+      code: error.code,
+      message: error.message,
+    });
+    throw new Error("Unable to load collection");
+  }
+
+  const addedItem =
     added && UUID_PATTERN.test(added)
-      ? supabase
-          .from("collection_items")
-          .select("id, releases(artist_display, title)")
-          .eq("id", added)
-          .maybeSingle()
-      : Promise.resolve({ data: null });
-  const [{ count }, { data: addedItem }] = await Promise.all([
-    countRequest,
-    addedRequest,
-  ]);
+      ? items.find((item) => item.id === added)
+      : undefined;
   const addedRelease = addedItem?.releases;
 
   return (
@@ -54,7 +60,7 @@ export default async function CollectionPage({
           </p>
         </div>
       ) : null}
-      {count === 0 ? (
+      {items.length === 0 ? (
         <section className="empty-crate">
           <div>
             <span className="empty-record" aria-hidden="true" />
@@ -63,25 +69,35 @@ export default async function CollectionPage({
               Add your first record with just an artist and title. Details can
               come later.
             </p>
-            <Link className="button" href="/add">
+            <Link className="button" href="/add/manual">
               Add your first record
             </Link>
           </div>
         </section>
       ) : (
-        <section className="collection-summary">
-          <p className="app-kicker">Safely tucked away</p>
-          <h2>
-            {count} {count === 1 ? "record" : "records"} in your crate
-          </h2>
-          <p>
-            Your records are saved and private. Add another now, or come back
-            whenever your crate grows.
-          </p>
-          <Link className="button" href="/add/manual">
-            Add another record
-          </Link>
-        </section>
+        <>
+          <div className="collection-toolbar">
+            <p aria-live="polite">
+              <strong>{items.length}</strong>{" "}
+              {items.length === 1 ? "record" : "records"}
+            </p>
+            <Link className="button button-small" href="/add/manual">
+              Add a record
+            </Link>
+          </div>
+          <ul
+            className="collection-grid"
+            aria-label="Records in your collection"
+          >
+            {items.map((item) => (
+              <li key={item.id}>
+                <CollectionCard
+                  item={{ id: item.id, release: item.releases }}
+                />
+              </li>
+            ))}
+          </ul>
+        </>
       )}
     </main>
   );
