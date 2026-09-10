@@ -6,6 +6,7 @@ import {
   getCollectionCardEdition,
   getCopyDetailRows,
   getRecordDetailRows,
+  parseCollectionControls,
 } from "./collection";
 
 const release = {
@@ -162,5 +163,58 @@ describe("getCopyDetailRows", () => {
       { label: "Price paid", value: "$24.99" },
       { label: "Personal rating", value: "5 / 5" },
     ]);
+  });
+});
+
+describe("parseCollectionControls", () => {
+  it("normalizes valid search, filter, and sort values", () => {
+    expect(
+      parseCollectionControls({
+        q: "  blue note  ",
+        favorite: "1",
+        purchase: "used",
+        format: "lp",
+        condition: "near_mint",
+        sort: "artist",
+      }),
+    ).toEqual({
+      query: "blue note",
+      favorite: true,
+      purchaseState: "used",
+      format: "lp",
+      condition: "near_mint",
+      sort: "artist",
+      isActive: true,
+    });
+  });
+
+  it("ignores invalid and repeated values safely", () => {
+    expect(
+      parseCollectionControls({
+        q: ["Sade", "ignored"],
+        favorite: "yes",
+        purchase: "vintage",
+        format: "cassette",
+        condition: "perfect",
+        sort: "price",
+      }),
+    ).toEqual({
+      query: "Sade",
+      favorite: false,
+      purchaseState: "",
+      format: "",
+      condition: "",
+      sort: "newest",
+      isActive: true,
+    });
+  });
+
+  it("uses an inactive default state", () => {
+    expect(parseCollectionControls({})).toMatchObject({
+      query: "",
+      favorite: false,
+      sort: "newest",
+      isActive: false,
+    });
   });
 });

@@ -657,7 +657,9 @@ application, and cannot access another user's private data.
       purchase state, and Goldmine media/sleeve conditions
 - [x] Add reusable owner-scoped user tags with case-insensitive normalization,
       atomic record editing, RLS coverage, and responsive collection/detail display
-- [ ] Add search, filters, and sorting
+- [x] Add owner-scoped collection search across release metadata, tags, and private
+      notes, plus favorite, purchase-state, format, and condition filters and
+      newest-added, recently-acquired, artist, and title sorting
 - [ ] Add non-blocking duplicate detection
 - [ ] Add personal-copy photo upload
 - [ ] Verify collection journeys on target phones and desktop browsers
@@ -800,6 +802,7 @@ production environment.
 | 2026-09-10 | Delete a physical copy without deleting its shared release row        | Prevents removing edition metadata that another owned copy or future wishlist item may still reference      |
 | 2026-09-10 | Convert prices using the entered currency's standard fraction digits  | Preserves accurate minor units for two-, zero-, and three-decimal currencies without floating-point writes  |
 | 2026-09-10 | Normalize tags case-insensitively and limit each copy to 20 tags      | Reusable owner-scoped tags stay tidy and searchable while the comma-separated phone UI remains lightweight  |
+| 2026-09-10 | Keep collection discovery state in validated URL parameters           | Bookmarkable server-rendered controls pair with an owner-only search function for private fields            |
 
 ## 20. Progress log
 
@@ -820,6 +823,7 @@ in version control; this log records product-level progress and changes.
 | 2026-09-10 | 2         | Added owner-only physical-copy deletion with an explicit cancellable confirmation, non-destructive shared-release handling, failure and success messaging, RLS coverage, and authenticated desktop and mobile browser verification                                            | Add favorites, ratings, notes, acquisition data, and conditions        |
 | 2026-09-10 | 2         | Added atomic personal-copy editing for favorites, ratings, private notes, purchase state, Goldmine conditions, acquisition provenance, dates, and currency-aware prices; surfaced details and favorites across private detail/grid views and verified desktop/mobile journeys | Add user tags                                                          |
 | 2026-09-10 | 2         | Added reusable owner-scoped tags with normalized uniqueness, same-owner foreign keys, RLS, atomic edit/clear behavior, validation, collection/detail chips, generated types, and database, component, desktop Chrome, Android Chrome, and iPhone Safari coverage              | Add collection search, filters, and sorting                            |
+| 2026-09-10 | 2         | Added owner-scoped collection search across release metadata, tags, and private notes; combined filters, URL sorting, no-result recovery, indexes, and database/component/desktop/mobile browser coverage                                                                     | Add non-blocking duplicate detection                                   |
 
 ## 21. Hosted environment checklist
 

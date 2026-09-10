@@ -276,6 +276,35 @@ export type Database = {
         };
         Returns: string;
       };
+      search_collection_items: {
+        Args: {
+          p_condition?: Database["public"]["Enums"]["record_condition"];
+          p_favorite?: boolean;
+          p_format?: Database["public"]["Enums"]["release_format"];
+          p_purchase_state?: Database["public"]["Enums"]["purchase_state"];
+          p_query?: string;
+          p_sort?: string;
+        };
+        Returns: {
+          acquired_on: string;
+          artist_display: string;
+          catalog_number: string;
+          country: string;
+          created_at: string;
+          disc_count: number;
+          format: Database["public"]["Enums"]["release_format"];
+          id: string;
+          is_favorite: boolean;
+          label: string;
+          media_condition: Database["public"]["Enums"]["record_condition"];
+          original_year: number;
+          purchase_state: Database["public"]["Enums"]["purchase_state"];
+          release_year: number;
+          sleeve_condition: Database["public"]["Enums"]["record_condition"];
+          tags: string[];
+          title: string;
+        }[];
+      };
       update_collection_item_details: {
         Args: {
           p_acquired_from?: string;

@@ -8,7 +8,7 @@ test.describe("local passwordless authentication", () => {
     "Set RUN_LOCAL_AUTH_E2E=1 with the local Supabase stack running",
   );
 
-  test("signs in, completes onboarding, and adds, edits, and removes a manual record", async ({
+  test("signs in, completes onboarding, and maintains and searches a collection", async ({
     page,
     request,
   }, testInfo) => {
@@ -176,6 +176,78 @@ test.describe("local passwordless authentication", () => {
         .getByRole("article", { name: "Pastel Blues — Mono" })
         .getByLabel("Tags"),
     ).toHaveText("JazzSunday morning");
+
+    await page
+      .locator(".collection-toolbar")
+      .getByRole("link", { name: "Add a record" })
+      .click();
+    await expect(page).toHaveURL(/\/add\/manual$/);
+    await page.getByLabel("Artist").fill("Sade");
+    await page.getByLabel("Album or release title").fill("Diamond Life");
+    await page.getByLabel("Format").selectOption("lp");
+    await page.getByRole("button", { name: /add to my collection/i }).click();
+    await expect(page).toHaveURL(/\/collection\?added=[0-9a-f-]+$/);
+
+    await page.locator(".collection-filter-panel > summary").click();
+    await expect(page.locator(".collection-filter-panel")).toHaveAttribute(
+      "open",
+      "",
+    );
+    await page.getByLabel("Sort by").selectOption("artist");
+    await page.getByRole("button", { name: "Apply" }).click();
+    await expect(page).toHaveURL(/sort=artist/);
+    const sortedRecords = page
+      .getByRole("list", { name: "Records in your collection" })
+      .getByRole("article");
+    await expect(sortedRecords.nth(0)).toHaveAccessibleName(
+      "Pastel Blues — Mono",
+    );
+    await expect(sortedRecords.nth(1)).toHaveAccessibleName("Diamond Life");
+
+    await page.getByLabel("Search your collection").fill("Sunday morning");
+    await page.getByRole("button", { name: "Search" }).click();
+    await expect(page).toHaveURL(/q=Sunday\+morning/);
+    await expect(
+      page.getByRole("article", { name: "Pastel Blues — Mono" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("article", { name: "Diamond Life" }),
+    ).toHaveCount(0);
+
+    await page.getByLabel("Search your collection").fill("not in this crate");
+    await page.getByRole("button", { name: "Search" }).click();
+    await expect(
+      page.getByRole("heading", { name: "No records match" }),
+    ).toBeVisible();
+    await page.getByRole("link", { name: "Clear search and filters" }).click();
+    await expect(page).toHaveURL(/\/collection$/);
+    await page.locator(".collection-filter-panel > summary").click();
+    await expect(page.locator(".collection-filter-panel")).toHaveAttribute(
+      "open",
+      "",
+    );
+    await page.getByRole("checkbox", { name: /Favorites only/ }).check();
+    await page.getByRole("button", { name: "Apply" }).click();
+    await expect(page).toHaveURL(/favorite=1/);
+    await expect(
+      page.getByRole("article", { name: "Pastel Blues — Mono" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("article", { name: "Diamond Life" }),
+    ).toHaveCount(0);
+
+    await page.getByRole("link", { name: "Clear" }).click();
+    await expect(page).toHaveURL(/\/collection$/);
+    await page
+      .getByRole("article", { name: "Diamond Life" })
+      .getByRole("link")
+      .click();
+    await page.getByRole("button", { name: "Remove from collection" }).click();
+    await page.getByRole("button", { name: "Yes, remove this copy" }).click();
+    await expect(page).toHaveURL(/\/collection\?removed=1$/);
+    await expect(
+      page.getByRole("article", { name: "Pastel Blues — Mono" }),
+    ).toBeVisible();
 
     await page
       .getByRole("article", { name: "Pastel Blues — Mono" })

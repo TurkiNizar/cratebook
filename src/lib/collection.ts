@@ -11,6 +11,83 @@ const FORMAT_LABELS: Record<Enums<"release_format">, string> = {
   other: "Other format",
 };
 
+export const COLLECTION_SORT_OPTIONS = [
+  { value: "newest", label: "Newest added" },
+  { value: "acquired", label: "Recently acquired" },
+  { value: "artist", label: "Artist A–Z" },
+  { value: "title", label: "Title A–Z" },
+] as const;
+
+export type CollectionSort = (typeof COLLECTION_SORT_OPTIONS)[number]["value"];
+
+export type CollectionSearchParams = Record<
+  string,
+  string | string[] | undefined
+>;
+
+export type CollectionControls = {
+  query: string;
+  favorite: boolean;
+  purchaseState: Enums<"purchase_state"> | "";
+  format: Enums<"release_format"> | "";
+  condition: Enums<"record_condition"> | "";
+  sort: CollectionSort;
+  isActive: boolean;
+};
+
+const COLLECTION_SORTS = new Set<string>(
+  COLLECTION_SORT_OPTIONS.map(({ value }) => value),
+);
+const COLLECTION_FORMATS = new Set<string>(Object.keys(FORMAT_LABELS));
+const PURCHASE_STATES = new Set<string>(["new", "used", "unknown"]);
+const CONDITIONS = new Set<string>(
+  RECORD_CONDITION_OPTIONS.map(({ value }) => value),
+);
+
+function firstSearchParam(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+export function parseCollectionControls(
+  searchParams: CollectionSearchParams,
+): CollectionControls {
+  const query = (firstSearchParam(searchParams.q) ?? "").trim().slice(0, 200);
+  const rawPurchaseState = firstSearchParam(searchParams.purchase) ?? "";
+  const rawFormat = firstSearchParam(searchParams.format) ?? "";
+  const rawCondition = firstSearchParam(searchParams.condition) ?? "";
+  const rawSort = firstSearchParam(searchParams.sort) ?? "newest";
+  const purchaseState = PURCHASE_STATES.has(rawPurchaseState)
+    ? (rawPurchaseState as Enums<"purchase_state">)
+    : "";
+  const format = COLLECTION_FORMATS.has(rawFormat)
+    ? (rawFormat as Enums<"release_format">)
+    : "";
+  const condition = CONDITIONS.has(rawCondition)
+    ? (rawCondition as Enums<"record_condition">)
+    : "";
+  const sort = COLLECTION_SORTS.has(rawSort)
+    ? (rawSort as CollectionSort)
+    : "newest";
+  const favorite = firstSearchParam(searchParams.favorite) === "1";
+
+  return {
+    query,
+    favorite,
+    purchaseState,
+    format,
+    condition,
+    sort,
+    isActive: Boolean(
+      query ||
+      favorite ||
+      purchaseState ||
+      format ||
+      condition ||
+      sort !== "newest",
+    ),
+  };
+}
+
 export function getReleaseFormatLabel(format: Enums<"release_format">) {
   return FORMAT_LABELS[format];
 }

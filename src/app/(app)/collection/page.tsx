@@ -1,16 +1,21 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import {
+  type CollectionSearchParams,
+  parseCollectionControls,
+} from "@/lib/collection";
 import { createClient } from "@/lib/supabase/server";
 
 import { CollectionCard } from "./collection-card";
+import { CollectionControls } from "./collection-controls";
 
 export const metadata: Metadata = {
   title: "My collection",
 };
 
 type CollectionPageProps = {
-  searchParams: Promise<{ added?: string; removed?: string }>;
+  searchParams: Promise<CollectionSearchParams>;
 };
 
 const UUID_PATTERN =
@@ -19,14 +24,20 @@ const UUID_PATTERN =
 export default async function CollectionPage({
   searchParams,
 }: CollectionPageProps) {
-  const { added, removed } = await searchParams;
+  const params = await searchParams;
+  const { added, removed } = params;
+  const addedId = Array.isArray(added) ? added[0] : added;
+  const removedValue = Array.isArray(removed) ? removed[0] : removed;
+  const controls = parseCollectionControls(params);
   const supabase = await createClient();
-  const { data: items, error } = await supabase
-    .from("collection_items")
-    .select(
-      "id, created_at, is_favorite, collection_item_tags(tags(name)), releases(artist_display, title, format, disc_count, original_year, release_year, label, catalog_number, country)",
-    )
-    .order("created_at", { ascending: false });
+  const { data: items, error } = await supabase.rpc("search_collection_items", {
+    p_query: controls.query || undefined,
+    p_favorite: controls.favorite ? true : undefined,
+    p_purchase_state: controls.purchaseState || undefined,
+    p_format: controls.format || undefined,
+    p_condition: controls.condition || undefined,
+    p_sort: controls.sort,
+  });
 
   if (error) {
     console.error("Collection query failed", {
@@ -37,10 +48,9 @@ export default async function CollectionPage({
   }
 
   const addedItem =
-    added && UUID_PATTERN.test(added)
-      ? items.find((item) => item.id === added)
+    addedId && UUID_PATTERN.test(addedId)
+      ? items.find((item) => item.id === addedId)
       : undefined;
-  const addedRelease = addedItem?.releases;
 
   return (
     <main className="app-content">
@@ -50,23 +60,25 @@ export default async function CollectionPage({
         Every copy gets a place here, along with where it came from and why it
         matters.
       </p>
-      {addedRelease ? (
+      {addedItem ? (
         <div className="collection-notice" role="status">
           <span aria-hidden="true">✓</span>
           <p>
-            <strong>{addedRelease.title}</strong> by{" "}
-            {addedRelease.artist_display}
+            <strong>{addedItem.title}</strong> by {addedItem.artist_display}
             {" was added to your collection."}
           </p>
         </div>
       ) : null}
-      {removed === "1" ? (
+      {removedValue === "1" ? (
         <div className="collection-notice" role="status">
           <span aria-hidden="true">✓</span>
           <p>The copy was removed from your collection.</p>
         </div>
       ) : null}
-      {items.length === 0 ? (
+      {items.length > 0 || controls.isActive ? (
+        <CollectionControls controls={controls} />
+      ) : null}
+      {items.length === 0 && !controls.isActive ? (
         <section className="empty-crate">
           <div>
             <span className="empty-record" aria-hidden="true" />
@@ -80,11 +92,27 @@ export default async function CollectionPage({
             </Link>
           </div>
         </section>
+      ) : items.length === 0 ? (
+        <section className="empty-crate collection-no-results">
+          <div>
+            <span className="empty-record" aria-hidden="true" />
+            <h2>No records match</h2>
+            <p>Try a broader search or clear the active filters.</p>
+            <div className="collection-empty-actions">
+              <Link className="button" href="/collection">
+                Clear search and filters
+              </Link>
+              <Link className="secondary-button" href="/add/manual">
+                Add a record
+              </Link>
+            </div>
+          </div>
+        </section>
       ) : (
         <>
           <div className="collection-toolbar">
             <p aria-live="polite">
-              <strong>{items.length}</strong>{" "}
+              Showing <strong>{items.length}</strong>{" "}
               {items.length === 1 ? "record" : "records"}
             </p>
             <Link className="button button-small" href="/add/manual">
@@ -101,10 +129,18 @@ export default async function CollectionPage({
                   item={{
                     id: item.id,
                     isFavorite: item.is_favorite,
-                    tags: item.collection_item_tags
-                      .map(({ tags }) => tags.name)
-                      .sort((left, right) => left.localeCompare(right)),
-                    release: item.releases,
+                    tags: item.tags,
+                    release: {
+                      artist_display: item.artist_display,
+                      title: item.title,
+                      format: item.format,
+                      disc_count: item.disc_count,
+                      original_year: item.original_year,
+                      release_year: item.release_year,
+                      label: item.label,
+                      catalog_number: item.catalog_number,
+                      country: item.country,
+                    },
                   }}
                 />
               </li>
