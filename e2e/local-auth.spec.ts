@@ -23,7 +23,7 @@ test.describe("local passwordless authentication", () => {
     "Set RUN_LOCAL_AUTH_E2E=1 with the local Supabase stack running",
   );
 
-  test("signs in, completes onboarding, and maintains and searches a collection", async ({
+  test("signs in, completes onboarding, and maintains a collection and wishlist", async ({
     page,
     request,
   }, testInfo) => {
@@ -330,6 +330,99 @@ test.describe("local passwordless authentication", () => {
       page.getByRole("heading", { name: "Record not found" }),
     ).toBeVisible();
     await page.getByRole("link", { name: "Back to my collection" }).click();
+
+    await page.getByRole("link", { name: "Wishlist", exact: true }).click();
+    await expect(page).toHaveURL(/\/wishlist$/);
+    await expect(
+      page.getByRole("heading", { name: "Your want list is wide open" }),
+    ).toBeVisible();
+    await expectNoHorizontalOverflow(page);
+
+    await page.getByRole("link", { name: "Add your first wish" }).click();
+    await expect(page).toHaveURL(/\/wishlist\/add$/);
+    await expectNoHorizontalOverflow(page);
+    await page.getByLabel("Artist").fill("Alice Coltrane");
+    await page
+      .getByLabel("Album or release title")
+      .fill("Journey in Satchidananda");
+    await page.getByLabel("Priority").selectOption("must_have");
+    await page
+      .getByLabel("Preferred edition or pressing")
+      .fill("Impulse stereo pressing");
+    await page.getByLabel("Maximum price", { exact: true }).fill("75.00");
+    await page.getByLabel("Currency").fill("USD");
+    await page
+      .getByLabel("Private notes", { exact: true })
+      .fill("Check the sleeve.");
+    await page.getByRole("checkbox", { name: /Visible/ }).check();
+    await page.getByRole("button", { name: "Add to wishlist" }).click();
+
+    await expect(page).toHaveURL(/\/wishlist\?added=[0-9a-f-]+$/);
+    await expect(
+      page.getByText(
+        /journey in satchidananda.*alice coltrane.*added to your wishlist/i,
+      ),
+    ).toBeVisible();
+    const wishlistRecord = page.getByRole("article", {
+      name: "Journey in Satchidananda",
+    });
+    await expect(wishlistRecord.getByText("Must-have")).toBeVisible();
+    await expect(wishlistRecord.getByText("Up to $75.00")).toBeVisible();
+    await expectNoHorizontalOverflow(page);
+
+    await wishlistRecord.getByRole("link").click();
+    await expect(page).toHaveURL(/\/wishlist\/[0-9a-f-]+$/);
+    await expect(page.getByText("Check the sleeve.")).toBeVisible();
+    await expect(page.getByText("Visible on a public profile")).toBeVisible();
+    await expectNoHorizontalOverflow(page);
+    await page.getByRole("link", { name: "Edit wish" }).click();
+    await page
+      .getByLabel("Album or release title")
+      .fill("Journey in Satchidananda — Reissue");
+    await page.getByLabel("Priority").selectOption("wanted");
+    await page.getByLabel("Maximum price", { exact: true }).fill("60.00");
+    await page.getByRole("checkbox", { name: /Visible/ }).uncheck();
+    await page.getByRole("button", { name: "Save changes" }).click();
+
+    await expect(page).toHaveURL(/\/wishlist\/[0-9a-f-]+\?updated=1$/);
+    await expect(
+      page.getByText("Your wishlist changes were saved."),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("heading", {
+        name: "Journey in Satchidananda — Reissue",
+        level: 1,
+      }),
+    ).toBeVisible();
+    await expect(
+      page.getByText("Wanted", { exact: true }).first(),
+    ).toBeVisible();
+    await expect(page.getByText("$60.00")).toBeVisible();
+    await expect(page.getByText("Private", { exact: true })).toBeVisible();
+    await expectNoHorizontalOverflow(page);
+
+    await page.getByRole("button", { name: "Remove from wishlist" }).click();
+    await expect(
+      page.getByRole("group", {
+        name: "Remove Journey in Satchidananda — Reissue?",
+      }),
+    ).toBeVisible();
+    await page.getByRole("button", { name: "Keep wish" }).click();
+    await expect(
+      page.getByRole("heading", {
+        name: "Journey in Satchidananda — Reissue",
+        level: 1,
+      }),
+    ).toBeVisible();
+    await page.getByRole("button", { name: "Remove from wishlist" }).click();
+    await page.getByRole("button", { name: "Yes, remove this wish" }).click();
+    await expect(page).toHaveURL(/\/wishlist\?removed=1$/);
+    await expect(
+      page.getByText("The record was removed from your wishlist."),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Your want list is wide open" }),
+    ).toBeVisible();
 
     await page.getByRole("link", { name: /profile/i }).click();
     await page.getByLabel("Display name").fill("Local Crate Digger");

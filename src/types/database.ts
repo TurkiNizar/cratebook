@@ -254,6 +254,7 @@ export type Database = {
       wishlist_items: {
         Row: {
           created_at: string;
+          entry_key: string;
           id: string;
           is_public: boolean;
           max_price_minor: number | null;
@@ -267,6 +268,7 @@ export type Database = {
         };
         Insert: {
           created_at?: string;
+          entry_key?: string;
           id?: string;
           is_public?: boolean;
           max_price_minor?: number | null;
@@ -280,6 +282,7 @@ export type Database = {
         };
         Update: {
           created_at?: string;
+          entry_key?: string;
           id?: string;
           is_public?: boolean;
           max_price_minor?: number | null;
@@ -326,6 +329,21 @@ export type Database = {
         };
         Returns: string;
       };
+      create_manual_wishlist_item: {
+        Args: {
+          p_artist_display: string;
+          p_entry_key: string;
+          p_is_public?: boolean;
+          p_max_price_minor?: number;
+          p_notes?: string;
+          p_preferred_edition?: string;
+          p_price_currency?: string;
+          p_priority?: Database["public"]["Enums"]["wishlist_priority"];
+          p_title: string;
+        };
+        Returns: string;
+      };
+      delete_wishlist_item: { Args: { p_item_id: string }; Returns: boolean };
       find_collection_duplicates: {
         Args: { p_artist_display: string; p_title: string };
         Returns: {
@@ -393,6 +411,20 @@ export type Database = {
           p_tags?: string[];
           p_title: string;
           p_vinyl_color?: string;
+        };
+        Returns: boolean;
+      };
+      update_wishlist_item_details: {
+        Args: {
+          p_artist_display: string;
+          p_is_public?: boolean;
+          p_item_id: string;
+          p_max_price_minor?: number;
+          p_notes?: string;
+          p_preferred_edition?: string;
+          p_price_currency?: string;
+          p_priority: Database["public"]["Enums"]["wishlist_priority"];
+          p_title: string;
         };
         Returns: boolean;
       };

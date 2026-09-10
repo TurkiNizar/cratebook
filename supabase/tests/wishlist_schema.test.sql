@@ -1,6 +1,6 @@
 begin;
 
-select plan(24);
+select plan(26);
 
 select has_type('public', 'wishlist_priority', 'wishlist priority type exists');
 select has_table('public', 'wishlist_items', 'wishlist items table exists');
@@ -26,6 +26,7 @@ select col_not_null('public', 'wishlist_items', 'release_id', 'wishlist release 
 select col_not_null('public', 'wishlist_items', 'priority', 'wishlist priority is required');
 select col_not_null('public', 'wishlist_items', 'is_public', 'wishlist visibility is required');
 select col_has_default('public', 'wishlist_items', 'id', 'wishlist ids are generated');
+select col_has_default('public', 'wishlist_items', 'entry_key', 'wishlist entry keys are generated');
 select col_has_default('public', 'wishlist_items', 'priority', 'wishlist priority has a default');
 select col_has_default('public', 'wishlist_items', 'is_public', 'wishlist items are private by default');
 
@@ -34,6 +35,13 @@ select has_index(
   'wishlist_items',
   'wishlist_items_user_release_unique',
   'one active wishlist item is allowed per user and release'
+);
+
+select has_index(
+  'public',
+  'wishlist_items',
+  'wishlist_items_entry_key_unique',
+  'wishlist entry keys are unique per user'
 );
 
 select has_index(

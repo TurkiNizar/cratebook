@@ -27,8 +27,8 @@ npm run dev
 Open <http://localhost:3000>.
 
 The landing and sign-in screens work without backend configuration. Protected pages
-need Supabase; use the full setup below to test sign-in, onboarding, and manual record
-entry.
+need Supabase; use the full setup below to test sign-in, onboarding, collection entry,
+and wishlist management.
 
 ## Full local setup
 
@@ -71,6 +71,12 @@ Start the app with `npm run dev`, then:
     the newest-added, recently-acquired, artist, and title sort options.
 12. Choose **Remove from collection**, cancel once, then confirm removal. Remove the
     remaining test copy and verify the collection returns to its empty state.
+13. Open **Wishlist**, add an artist and title, then optionally set priority, preferred
+    edition, maximum price, notes, and visibility.
+14. Open the saved wish, edit its preferences, and confirm maximum price and private
+    notes remain clearly identified as private.
+15. Choose **Remove from wishlist**, cancel once, then confirm removal and verify the
+    wishlist returns to its empty state.
 
 Supabase Studio is available at <http://127.0.0.1:54323> if you want to inspect the
 local database. Stop the local services when finished:
@@ -200,8 +206,8 @@ supabase start
 npm run db:test
 ```
 
-Run the optional real magic-link, onboarding, manual-entry, personal-copy editing,
-deletion, search, and profile journey through Mailpit across the full browser matrix:
+Run the optional real magic-link, onboarding, collection maintenance, wishlist
+management, search, and profile journey through Mailpit across the full browser matrix:
 
 ```bash
 RUN_LOCAL_AUTH_E2E=1 npm run e2e

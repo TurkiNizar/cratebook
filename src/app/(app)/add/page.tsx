@@ -21,8 +21,16 @@ export default function AddPage() {
           </span>
           <span aria-hidden="true">→</span>
         </Link>
-        <div className="add-option add-option-disabled" aria-disabled="true">
+        <Link className="add-option" href="/wishlist/add">
           <span className="add-option-number">02</span>
+          <span>
+            <strong>Add to wishlist</strong>
+            <small>Save a record you hope to find.</small>
+          </span>
+          <span aria-hidden="true">→</span>
+        </Link>
+        <div className="add-option add-option-disabled" aria-disabled="true">
+          <span className="add-option-number">03</span>
           <span>
             <strong>Search the catalogue</strong>
             <small>Coming soon.</small>
