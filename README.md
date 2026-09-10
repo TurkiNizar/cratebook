@@ -3,6 +3,8 @@
 Cratebook is a mobile-first vinyl collection and wishlist companion. The product
 specification and progress tracker live in [MVP_PLAN.md](./MVP_PLAN.md).
 
+Production: [https://cratebook.vercel.app](https://cratebook.vercel.app)
+
 ## Quick UI preview
 
 Requirements:
@@ -62,16 +64,17 @@ local database. Stop the local services when finished:
 npx supabase stop
 ```
 
-## Hosted Supabase and Vercel preview
+## Hosted Supabase and Vercel
 
-The local application, database, and tests are complete for Milestone 1. “Hosted
-Supabase and Vercel preview remain deferred” means that the repository has not yet
-been connected to your Supabase and Vercel accounts, so there is no internet-accessible
-database or application URL. This account setup does not change the Milestone 2 code
-and can be completed now or before inviting testers.
+The Milestone 1 production environment is live at
+[cratebook.vercel.app](https://cratebook.vercel.app), backed by hosted Supabase. The
+homepage, passwordless authentication, onboarding, protected-route redirects,
+collection access, profile editing, PWA manifest, and installable icons have been
+smoke-tested in production.
 
 For the MVP, use one hosted Supabase project for both Vercel Preview and Production.
-A separate staging database or Supabase branching setup can be added later.
+A separate staging database or Supabase branching setup can be added later. The
+instructions below are retained as the recovery and environment-recreation guide.
 
 ### 1. Create the hosted Supabase project
 
@@ -143,6 +146,9 @@ callback exact. Supabase documents the same Vercel pattern in its
 4. Edit and save the profile at `/settings`.
 5. Create a small branch and pull request, then confirm Vercel posts a working Preview
    deployment and that its magic-link flow returns to the Preview URL.
+
+Steps 1–4 are verified in production. The pull-request Preview check in step 5 remains
+open and is tracked in `MVP_PLAN.md`.
 
 If a magic link returns to localhost or is rejected, recheck the Supabase Site URL,
 redirect allowlist, Vercel team/account slug, and redeploy after environment changes.
