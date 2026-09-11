@@ -1,0 +1,38 @@
+import { render, screen } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
+
+import { ReleaseCover } from "./release-cover";
+
+describe("ReleaseCover", () => {
+  it("renders trusted catalogue artwork with useful alternative text", () => {
+    render(
+      <ReleaseCover
+        coverUrl="https://coverartarchive.org/release/11111111-1111-4111-8111-111111111111/front-500"
+        title="Kind of Blue"
+        sizes="320px"
+        meaningful
+      />,
+    );
+
+    expect(screen.getByAltText("Kind of Blue cover")).toHaveAttribute(
+      "src",
+      "https://coverartarchive.org/release/11111111-1111-4111-8111-111111111111/front-500",
+    );
+  });
+
+  it("falls back safely when a cover URL is absent or untrusted", () => {
+    const { rerender } = render(
+      <ReleaseCover
+        coverUrl="https://example.com/untrusted.jpg"
+        title="Kind of Blue"
+        sizes="320px"
+      />,
+    );
+
+    expect(screen.queryByRole("img")).toBeNull();
+    expect(screen.getByText("K")).toBeVisible();
+
+    rerender(<ReleaseCover title="A Love Supreme" sizes="320px" />);
+    expect(screen.getByText("A")).toBeVisible();
+  });
+});

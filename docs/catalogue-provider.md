@@ -132,9 +132,11 @@ copy-specific condition, acquisition, price, rating, or notes.
 No provider account, API key, new environment variable, hosted-data mutation, or
 external-service authorization is required for the MusicBrainz read-only MVP
 integration. Catalogue search, result selection, review, attribution, optional cover
-display, form prefilling, and manual failure paths are implemented. The next task is
-to persist the selected release MBID, provider name, bounded source snapshot, and
-remote cover reference through the existing collection and wishlist mutations.
+display, form prefilling, and manual failure paths are implemented. Catalogue-backed
+collection and wishlist mutations re-resolve the selected MBID at the server boundary,
+store the provider name and bounded source snapshot, and retain the optional remote
+cover reference. An existing owner-scoped release with the same source identity is
+reused without silently overwriting user edits.
 
 ## Re-review triggers
 

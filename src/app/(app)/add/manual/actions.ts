@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { resolveCatalogueSelection } from "@/lib/catalogue/persistence";
 import {
   getDuplicateConfirmationValue,
   type ManualRecordActionState,
@@ -32,6 +33,7 @@ export async function createManualRecord(
   }
 
   const input = validation.data;
+  const catalogueId = String(formData.get("catalogueId") ?? "").trim();
   const confirmationValue = getDuplicateConfirmationValue(
     input.artist,
     input.title,
@@ -65,26 +67,58 @@ export async function createManualRecord(
     }
   }
 
-  const { data: collectionItemId, error } = await supabase.rpc(
-    "create_manual_collection_item",
-    {
-      p_artist_display: input.artist,
-      p_title: input.title,
-      p_entry_key: input.entryKey,
-      p_format: input.format ?? undefined,
-      p_disc_count: input.discCount ?? undefined,
-      p_original_year: input.originalYear ?? undefined,
-      p_release_year: input.releaseYear ?? undefined,
-      p_label: input.label ?? undefined,
-      p_catalog_number: input.catalogNumber ?? undefined,
-      p_country: input.country ?? undefined,
-      p_edition_description: input.editionDescription ?? undefined,
-      p_is_reissue: input.isReissue,
-      p_vinyl_color: input.vinylColor ?? undefined,
-      p_barcode: input.barcode ?? undefined,
-      p_matrix_runout: input.matrixRunout ?? undefined,
-    },
-  );
+  const catalogue = catalogueId
+    ? await resolveCatalogueSelection(catalogueId)
+    : null;
+  if (catalogue?.status === "unavailable") {
+    return {
+      message:
+        "We could not verify this catalogue release right now. Your details are still here—try again, or reopen manual entry to save without catalogue data.",
+      fieldErrors: {},
+    };
+  }
+
+  const release = catalogue?.status === "success" ? catalogue.release : null;
+  const rpc = release
+    ? supabase.rpc("create_catalogue_collection_item", {
+        p_artist_display: input.artist,
+        p_title: input.title,
+        p_entry_key: input.entryKey,
+        p_external_source: release.source,
+        p_external_id: release.externalId,
+        p_source_data: release.sourceData,
+        p_cover_url: release.coverUrl ?? undefined,
+        p_format: input.format ?? undefined,
+        p_disc_count: input.discCount ?? undefined,
+        p_original_year: input.originalYear ?? undefined,
+        p_release_year: input.releaseYear ?? undefined,
+        p_label: input.label ?? undefined,
+        p_catalog_number: input.catalogNumber ?? undefined,
+        p_country: input.country ?? undefined,
+        p_edition_description: input.editionDescription ?? undefined,
+        p_is_reissue: input.isReissue,
+        p_vinyl_color: input.vinylColor ?? undefined,
+        p_barcode: input.barcode ?? undefined,
+        p_matrix_runout: input.matrixRunout ?? undefined,
+      })
+    : supabase.rpc("create_manual_collection_item", {
+        p_artist_display: input.artist,
+        p_title: input.title,
+        p_entry_key: input.entryKey,
+        p_format: input.format ?? undefined,
+        p_disc_count: input.discCount ?? undefined,
+        p_original_year: input.originalYear ?? undefined,
+        p_release_year: input.releaseYear ?? undefined,
+        p_label: input.label ?? undefined,
+        p_catalog_number: input.catalogNumber ?? undefined,
+        p_country: input.country ?? undefined,
+        p_edition_description: input.editionDescription ?? undefined,
+        p_is_reissue: input.isReissue,
+        p_vinyl_color: input.vinylColor ?? undefined,
+        p_barcode: input.barcode ?? undefined,
+        p_matrix_runout: input.matrixRunout ?? undefined,
+      });
+  const { data: collectionItemId, error } = await rpc;
 
   if (error || !collectionItemId) {
     console.error("Manual record creation failed", {

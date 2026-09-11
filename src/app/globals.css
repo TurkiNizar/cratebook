@@ -1354,6 +1354,17 @@ a.add-option:hover {
   font-weight: 700;
 }
 
+.collection-cover.has-cover-art::before,
+.collection-cover.has-cover-art::after {
+  content: none;
+}
+
+.collection-cover-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .collection-card-copy {
   padding: 15px 2px 4px;
 }
@@ -1625,6 +1636,10 @@ a.add-option:hover {
   color: var(--muted);
   font-family: Georgia, "Times New Roman", serif;
   font-size: clamp(20px, 3vw, 28px);
+}
+
+.saved-catalogue-attribution {
+  margin-top: 16px;
 }
 
 .record-hero-kicker {

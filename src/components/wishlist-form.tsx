@@ -34,6 +34,7 @@ type WishlistFormProps = {
   ) => Promise<WishlistActionState>;
   variant: "create" | "edit";
   entryKey?: string;
+  catalogueId?: string;
   initialValues?: WishlistFormValues;
   cancelHref?: string;
 };
@@ -42,6 +43,7 @@ export function WishlistForm({
   action,
   variant,
   entryKey,
+  catalogueId,
   initialValues,
   cancelHref,
 }: WishlistFormProps) {
@@ -60,6 +62,9 @@ export function WishlistForm({
     <form className="manual-record-form wishlist-form" action={formAction}>
       {entryKey ? (
         <input type="hidden" name="entryKey" value={entryKey} />
+      ) : null}
+      {catalogueId ? (
+        <input type="hidden" name="catalogueId" value={catalogueId} />
       ) : null}
 
       <section

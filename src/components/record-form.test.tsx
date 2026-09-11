@@ -60,6 +60,23 @@ describe("RecordForm", () => {
     );
   });
 
+  it("submits only the selected catalogue identifier for server verification", () => {
+    const { container } = render(
+      <RecordForm
+        action={async () => ({ message: "", fieldErrors: {} })}
+        catalogueId="11111111-1111-4111-8111-111111111111"
+        entryKey="bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb"
+        initialValues={values}
+        variant="create"
+      />,
+    );
+
+    expect(container.querySelector('input[name="catalogueId"]')).toHaveValue(
+      "11111111-1111-4111-8111-111111111111",
+    );
+    expect(container.querySelector('input[name="sourceData"]')).toBeNull();
+  });
+
   it("shows a non-blocking duplicate warning and preserves entered values", async () => {
     const user = userEvent.setup();
 

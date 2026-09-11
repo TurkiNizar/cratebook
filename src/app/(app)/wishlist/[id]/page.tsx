@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { ReleaseCover } from "@/components/release-cover";
+import {
+  getCatalogueAttribution,
+  getCoverArtUrl,
+} from "@/lib/catalogue/provenance";
 import { formatCollectionDate, getRecordDetailRows } from "@/lib/collection";
 import { formatPriceMinor } from "@/lib/record";
 import { getWishlistPriorityLabel } from "@/lib/wishlist";
@@ -22,6 +27,11 @@ export default async function WishlistDetailPage({
   const item = await getWishlistItem(id);
   const release = item.releases;
   const detailRows = getRecordDetailRows(release);
+  const attribution = getCatalogueAttribution(
+    release.external_source,
+    release.external_id,
+  );
+  const coverUrl = getCoverArtUrl(release.cover_url);
   const deleteWithId = deleteWishlistItem.bind(null, item.id);
 
   return (
@@ -36,12 +46,13 @@ export default async function WishlistDetailPage({
         </div>
       ) : null}
       <article className="record-hero">
-        <div
-          className="collection-cover record-detail-cover wishlist-cover"
-          aria-hidden="true"
-        >
-          <span>{release.title.slice(0, 1).toUpperCase()}</span>
-        </div>
+        <ReleaseCover
+          className="record-detail-cover wishlist-cover"
+          coverUrl={coverUrl}
+          title={release.title}
+          sizes="(max-width: 720px) calc(100vw - 40px), 320px"
+          meaningful
+        />
         <div className="record-hero-copy">
           <div className="record-hero-kicker">
             <p className="app-kicker">On your wishlist</p>
@@ -60,6 +71,15 @@ export default async function WishlistDetailPage({
               Edit wish
             </Link>
           </div>
+          {attribution ? (
+            <p className="catalogue-attribution saved-catalogue-attribution">
+              Catalogue metadata from{" "}
+              <a href={attribution.url} rel="noreferrer" target="_blank">
+                {attribution.label}
+              </a>
+              {coverUrl ? ", artwork from Cover Art Archive" : ""}.
+            </p>
+          ) : null}
         </div>
       </article>
 

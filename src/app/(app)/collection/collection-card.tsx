@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { ReleaseCover } from "@/components/release-cover";
 import {
   getCollectionCardDetails,
   getCollectionCardEdition,
@@ -13,6 +14,7 @@ export type CollectionCardItem = {
   release: CollectionReleaseSummary & {
     artist_display: string;
     title: string;
+    cover_url?: string | null;
   };
 };
 
@@ -25,9 +27,11 @@ export function CollectionCard({ item }: { item: CollectionCardItem }) {
   return (
     <article className="collection-card" aria-labelledby={titleId}>
       <Link className="collection-card-link" href={`/collection/${item.id}`}>
-        <div className="collection-cover" aria-hidden="true">
-          <span>{release.title.slice(0, 1).toUpperCase()}</span>
-        </div>
+        <ReleaseCover
+          coverUrl={release.cover_url}
+          title={release.title}
+          sizes="(max-width: 720px) calc(50vw - 30px), 240px"
+        />
         {item.isFavorite ? (
           <span className="collection-favorite" aria-label="Favorite">
             ★

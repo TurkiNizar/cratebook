@@ -133,6 +133,7 @@ export default async function CollectionPage({
                     release: {
                       artist_display: item.artist_display,
                       title: item.title,
+                      cover_url: item.cover_url,
                       format: item.format,
                       disc_count: item.disc_count,
                       original_year: item.original_year,

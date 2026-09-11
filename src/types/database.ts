@@ -327,6 +327,57 @@ export type Database = {
         };
         Returns: string;
       };
+      create_catalogue_collection_item: {
+        Args: {
+          p_artist_display: string;
+          p_barcode?: string;
+          p_catalog_number?: string;
+          p_country?: string;
+          p_cover_url?: string;
+          p_disc_count?: number;
+          p_edition_description?: string;
+          p_entry_key: string;
+          p_external_id: string;
+          p_external_source: string;
+          p_format?: Database["public"]["Enums"]["release_format"];
+          p_is_reissue?: boolean;
+          p_label?: string;
+          p_matrix_runout?: string;
+          p_original_year?: number;
+          p_release_year?: number;
+          p_source_data: Json;
+          p_title: string;
+          p_vinyl_color?: string;
+        };
+        Returns: string;
+      };
+      create_catalogue_wishlist_item: {
+        Args: {
+          p_artist_display: string;
+          p_barcode?: string;
+          p_catalog_number?: string;
+          p_country?: string;
+          p_cover_url?: string;
+          p_disc_count?: number;
+          p_edition_description?: string;
+          p_entry_key: string;
+          p_external_id: string;
+          p_external_source: string;
+          p_format?: Database["public"]["Enums"]["release_format"];
+          p_is_public?: boolean;
+          p_label?: string;
+          p_max_price_minor?: number;
+          p_notes?: string;
+          p_original_year?: number;
+          p_preferred_edition?: string;
+          p_price_currency?: string;
+          p_priority?: Database["public"]["Enums"]["wishlist_priority"];
+          p_release_year?: number;
+          p_source_data: Json;
+          p_title: string;
+        };
+        Returns: string;
+      };
       create_manual_collection_item: {
         Args: {
           p_artist_display: string;
@@ -386,6 +437,7 @@ export type Database = {
           artist_display: string;
           catalog_number: string;
           country: string;
+          cover_url: string;
           created_at: string;
           disc_count: number;
           format: Database["public"]["Enums"]["release_format"];

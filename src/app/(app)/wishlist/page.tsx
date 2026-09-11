@@ -17,7 +17,7 @@ export default async function WishlistPage({
   const { data: items, error } = await supabase
     .from("wishlist_items")
     .select(
-      "id, priority, preferred_edition, max_price_minor, price_currency, is_public, releases(artist_display, title)",
+      "id, priority, preferred_edition, max_price_minor, price_currency, is_public, releases(artist_display, title, cover_url)",
     )
     .order("created_at", { ascending: false });
 

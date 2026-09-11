@@ -67,7 +67,8 @@ Start the app with `npm run dev`, then:
    continue to the collection or wishlist form. Confirm the known release metadata is
    prefilled and that copy-specific details remain empty.
 9. Return to **Add → Add manually**, enter an artist and title, and save the record.
-10. Confirm the saved record appears in the collection grid with its release details.
+10. Confirm the saved record appears in the collection grid with its release details
+    and, for a catalogue selection, its Cover Art Archive thumbnail.
 11. Open the record, choose **Edit record**, add a favorite, rating, condition,
     acquisition detail, price, private note, or comma-separated tags, and confirm the
     saved details appear on its detail page. Favorite records and tags also appear on
@@ -83,7 +84,8 @@ Start the app with `npm run dev`, then:
 15. Open **Wishlist**, add an artist and title, then optionally set priority, preferred
     edition, maximum price, notes, and visibility.
 16. Open the saved wish, edit its preferences, and confirm maximum price and private
-    notes remain clearly identified as private.
+    notes remain clearly identified as private. For a catalogue selection, confirm its
+    MusicBrainz source link and optional Cover Art Archive thumbnail are retained.
 17. Choose **Move to collection**, review the carried-over wishlist guidance, enter
     any copy-specific condition, acquisition, price, rating, favorite, note, or tag
     details, and complete the move.

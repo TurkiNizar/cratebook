@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { ReleaseCover } from "@/components/release-cover";
+import {
+  getCatalogueAttribution,
+  getCoverArtUrl,
+} from "@/lib/catalogue/provenance";
 import {
   formatCollectionDate,
   getCollectionCardDetails,
@@ -32,6 +37,11 @@ export default async function RecordDetailPage({
   const details = getCollectionCardDetails(release);
   const detailRows = getRecordDetailRows(release);
   const copyRows = getCopyDetailRows(item);
+  const attribution = getCatalogueAttribution(
+    release.external_source,
+    release.external_id,
+  );
+  const coverUrl = getCoverArtUrl(release.cover_url);
   const tags = item.collection_item_tags
     .map(({ tags }) => tags.name)
     .sort((left, right) => left.localeCompare(right));
@@ -56,12 +66,13 @@ export default async function RecordDetailPage({
       ) : null}
 
       <article className="record-hero">
-        <div
-          className="collection-cover record-detail-cover"
-          aria-hidden="true"
-        >
-          <span>{release.title.slice(0, 1).toUpperCase()}</span>
-        </div>
+        <ReleaseCover
+          className="record-detail-cover"
+          coverUrl={coverUrl}
+          title={release.title}
+          sizes="(max-width: 720px) calc(100vw - 40px), 320px"
+          meaningful
+        />
         <div className="record-hero-copy">
           <div className="record-hero-kicker">
             <p className="app-kicker">In your crate</p>
@@ -79,6 +90,15 @@ export default async function RecordDetailPage({
           <Link className="button" href={`/collection/${item.id}/edit`}>
             Edit record
           </Link>
+          {attribution ? (
+            <p className="catalogue-attribution saved-catalogue-attribution">
+              Catalogue metadata from{" "}
+              <a href={attribution.url} rel="noreferrer" target="_blank">
+                {attribution.label}
+              </a>
+              {coverUrl ? ", artwork from Cover Art Archive" : ""}.
+            </p>
+          ) : null}
         </div>
       </article>
 

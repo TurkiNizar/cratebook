@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { ReleaseCover } from "@/components/release-cover";
 import { formatPriceMinor } from "@/lib/record";
 import { getWishlistPriorityLabel } from "@/lib/wishlist";
 import type { Enums } from "@/types/database";
@@ -11,7 +12,11 @@ export type WishlistCardItem = {
   maxPriceMinor: number | null;
   priceCurrency: string | null;
   isPublic: boolean;
-  release: { artist_display: string; title: string };
+  release: {
+    artist_display: string;
+    title: string;
+    cover_url?: string | null;
+  };
 };
 
 export function WishlistCard({ item }: { item: WishlistCardItem }) {
@@ -23,9 +28,12 @@ export function WishlistCard({ item }: { item: WishlistCardItem }) {
       aria-labelledby={titleId}
     >
       <Link className="collection-card-link" href={`/wishlist/${item.id}`}>
-        <div className="collection-cover wishlist-cover" aria-hidden="true">
-          <span>{item.release.title.slice(0, 1).toUpperCase()}</span>
-        </div>
+        <ReleaseCover
+          className="wishlist-cover"
+          coverUrl={item.release.cover_url}
+          title={item.release.title}
+          sizes="(max-width: 720px) calc(50vw - 30px), 240px"
+        />
         <span
           className={`wishlist-priority wishlist-priority-${item.priority}`}
         >

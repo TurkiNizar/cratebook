@@ -51,6 +51,7 @@ export default async function ManualRecordPage({
       ) : null}
       <RecordForm
         action={createManualRecord}
+        catalogueId={initialValues ? catalogueId : undefined}
         entryKey={randomUUID()}
         initialValues={initialValues}
         variant="create"

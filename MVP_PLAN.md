@@ -690,7 +690,8 @@ Exit condition: users can reliably maintain and search a private collection usin
       review with optional artwork attribution, and safe collection/wishlist prefills
 - [x] Provide manual collection and wishlist fallbacks for missing results, invalid
       input, rate limits, malformed responses, upstream errors, and failed prefills
-- [ ] Store source identifiers and provenance
+- [x] Store server-verified source identifiers, bounded provenance, and optional remote
+      cover references while reusing owner-scoped releases without overwriting edits
 - [ ] Test ambiguous releases and external-service failure
 
 Exit condition: users can create a wishlist, find catalogue metadata, and convert a
@@ -827,6 +828,7 @@ production environment.
 | 2026-09-10 | Use MusicBrainz releases for catalogue metadata and Cover Art Archive for optional remotely referenced artwork            | MusicBrainz provides pressing-aware CC0 core metadata without user credentials; the companion archive uses the same release identifiers  |
 | 2026-09-10 | Persist bounded MusicBrainz provenance, credit its source, and keep catalogue search behind a rate-limited server adapter | Traceable user-owned records and a permanent manual path preserve usefulness without exposing an unrestricted proxy or provider coupling |
 | 2026-09-11 | Resolve the exact MusicBrainz release after selection and prefill only release-level facts                                | Avoids trusting stale search summaries and keeps condition, acquisition, price, rating, and personal notes explicit user-owned facts     |
+| 2026-09-11 | Reuse an owner-scoped release for repeated catalogue selections without overwriting its existing metadata                 | Preserves user edits, supports multiple physical copies, and lets collection and wishlist items share one traced MusicBrainz release     |
 
 ## 20. Progress log
 
@@ -856,6 +858,7 @@ in version control; this log records product-level progress and changes.
 | 2026-09-10 | 3         | Selected MusicBrainz releases with Cover Art Archive artwork after reviewing licensing, attribution, image handling, caching, rate limits, failure behavior, provenance, and Discogs tradeoffs; chose remote artwork references and documented the server-only integration contract                                                                          | Build the server-side provider adapter                                 |
 | 2026-09-10 | 3         | Built the provider-neutral, server-only MusicBrainz and Cover Art Archive adapter with validated normalized metadata, bounded provenance, safe Lucene queries, explicit cache lifetimes, in-flight coalescing, one-second request serialization, bounded retry/timeout behavior, typed failures, and focused automated coverage                              | Build catalogue search and result selection                            |
 | 2026-09-11 | 3         | Built responsive server-rendered catalogue search with pressing-aware MusicBrainz results, exact-release review, optional Cover Art Archive display and attribution, safe collection/wishlist form prefills, loading/error/not-found states, and permanent manual fallbacks without adding provider credentials                                              | Store source identifiers, provenance, and remote cover references      |
+| 2026-09-11 | 3         | Persisted server-verified MusicBrainz release IDs, bounded source snapshots, and optional Cover Art Archive references through atomic collection/wishlist mutations; reused matching owner-scoped releases without overwriting edits and surfaced safe artwork and source attribution in private browse/detail views                                         | Test ambiguous releases and external-service failure                   |
 
 ## 21. Hosted environment checklist
 

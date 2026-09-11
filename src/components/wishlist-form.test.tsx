@@ -39,4 +39,21 @@ describe("WishlistForm", () => {
       "/wishlist/item-id",
     );
   });
+
+  it("submits only the selected catalogue identifier for server verification", () => {
+    const { container } = render(
+      <WishlistForm
+        action={async () => ({ message: "", fieldErrors: {} })}
+        catalogueId="11111111-1111-4111-8111-111111111111"
+        entryKey="bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb"
+        initialValues={values}
+        variant="create"
+      />,
+    );
+
+    expect(container.querySelector('input[name="catalogueId"]')).toHaveValue(
+      "11111111-1111-4111-8111-111111111111",
+    );
+    expect(container.querySelector('input[name="sourceData"]')).toBeNull();
+  });
 });

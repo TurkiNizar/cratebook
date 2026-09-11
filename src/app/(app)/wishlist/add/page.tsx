@@ -52,6 +52,7 @@ export default async function AddWishlistPage({
       ) : null}
       <WishlistForm
         action={createWishlistItem}
+        catalogueId={initialValues ? catalogueId : undefined}
         entryKey={randomUUID()}
         initialValues={initialValues}
         variant="create"

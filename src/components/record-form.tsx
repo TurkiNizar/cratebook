@@ -68,6 +68,7 @@ type RecordFormProps = {
   variant: "create" | "edit" | "convert";
   initialValues?: RecordFormValues;
   entryKey?: string;
+  catalogueId?: string;
   cancelHref?: string;
 };
 
@@ -122,6 +123,7 @@ export function RecordForm({
   variant,
   initialValues,
   entryKey,
+  catalogueId,
   cancelHref,
 }: RecordFormProps) {
   const [actionState, formAction, isPending] = useActionState(
@@ -160,6 +162,9 @@ export function RecordForm({
     <form className="manual-record-form" action={formAction}>
       {entryKey ? (
         <input type="hidden" name="entryKey" value={entryKey} />
+      ) : null}
+      {catalogueId ? (
+        <input type="hidden" name="catalogueId" value={catalogueId} />
       ) : null}
       {duplicate ? (
         <input
