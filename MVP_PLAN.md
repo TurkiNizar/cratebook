@@ -2,7 +2,7 @@
 
 > Living product specification, technical reference, and development tracker.
 >
-> Last updated: 2026-09-10
+> Last updated: 2026-09-11
 > Overall status: **In development**
 > Current milestone: **Milestone 3 — Wishlist and catalogue discovery**
 
@@ -686,8 +686,10 @@ Exit condition: users can reliably maintain and search a private collection usin
 - [x] Build a provider-neutral, server-only MusicBrainz adapter with validated and
       normalized release/cover responses, caching, request coalescing, throttling,
       bounded retries and timeouts, safe query construction, and typed failure states
-- [ ] Build catalogue search and result selection
-- [ ] Provide manual fallback for errors and missing results
+- [x] Build responsive catalogue search, pressing-aware result cards, exact-release
+      review with optional artwork attribution, and safe collection/wishlist prefills
+- [x] Provide manual collection and wishlist fallbacks for missing results, invalid
+      input, rate limits, malformed responses, upstream errors, and failed prefills
 - [ ] Store source identifiers and provenance
 - [ ] Test ambiguous releases and external-service failure
 
@@ -824,6 +826,7 @@ production environment.
 | 2026-09-10 | Prefill wishlist notes during conversion, keep the new copy private, and do not infer price paid from the wishlist limit  | Preserves the user's context while keeping acquisition facts explicit and maintaining the established private default                    |
 | 2026-09-10 | Use MusicBrainz releases for catalogue metadata and Cover Art Archive for optional remotely referenced artwork            | MusicBrainz provides pressing-aware CC0 core metadata without user credentials; the companion archive uses the same release identifiers  |
 | 2026-09-10 | Persist bounded MusicBrainz provenance, credit its source, and keep catalogue search behind a rate-limited server adapter | Traceable user-owned records and a permanent manual path preserve usefulness without exposing an unrestricted proxy or provider coupling |
+| 2026-09-11 | Resolve the exact MusicBrainz release after selection and prefill only release-level facts                                | Avoids trusting stale search summaries and keeps condition, acquisition, price, rating, and personal notes explicit user-owned facts     |
 
 ## 20. Progress log
 
@@ -852,6 +855,7 @@ in version control; this log records product-level progress and changes.
 | 2026-09-10 | 3         | Added atomic, idempotent wishlist-to-collection conversion with release reuse, editable note carryover, private copy defaults, acquisition details, normalized tags, rollback and authorization coverage, generated types, and authenticated desktop/mobile browser verification                                                                             | Select and document the external catalogue provider                    |
 | 2026-09-10 | 3         | Selected MusicBrainz releases with Cover Art Archive artwork after reviewing licensing, attribution, image handling, caching, rate limits, failure behavior, provenance, and Discogs tradeoffs; chose remote artwork references and documented the server-only integration contract                                                                          | Build the server-side provider adapter                                 |
 | 2026-09-10 | 3         | Built the provider-neutral, server-only MusicBrainz and Cover Art Archive adapter with validated normalized metadata, bounded provenance, safe Lucene queries, explicit cache lifetimes, in-flight coalescing, one-second request serialization, bounded retry/timeout behavior, typed failures, and focused automated coverage                              | Build catalogue search and result selection                            |
+| 2026-09-11 | 3         | Built responsive server-rendered catalogue search with pressing-aware MusicBrainz results, exact-release review, optional Cover Art Archive display and attribution, safe collection/wishlist form prefills, loading/error/not-found states, and permanent manual fallbacks without adding provider credentials                                              | Store source identifiers, provenance, and remote cover references      |
 
 ## 21. Hosted environment checklist
 

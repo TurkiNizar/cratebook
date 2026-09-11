@@ -28,6 +28,14 @@ export type CatalogueSearchResult =
   | { status: "unavailable" }
   | { status: "malformed_response" };
 
+export type CatalogueLookupResult =
+  | { status: "success"; candidate: CatalogueReleaseCandidate }
+  | { status: "not_found" }
+  | { status: "invalid_id" }
+  | { status: "rate_limited"; retryAfterSeconds: number | null }
+  | { status: "unavailable" }
+  | { status: "malformed_response" };
+
 export type CatalogueCoverResult =
   | {
       status: "success";
@@ -43,5 +51,6 @@ export type CatalogueCoverResult =
 export interface CatalogueProvider {
   readonly source: CatalogueSource;
   search(query: string): Promise<CatalogueSearchResult>;
+  lookup(externalId: string): Promise<CatalogueLookupResult>;
   getCover(externalId: string): Promise<CatalogueCoverResult>;
 }

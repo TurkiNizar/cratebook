@@ -248,6 +248,51 @@ describe("MusicBrainz catalogue provider", () => {
       candidates: [{ format: "twelve_inch" }],
     });
   });
+
+  it("looks up a selected release by MBID with the same safe normalization", async () => {
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockResolvedValue(jsonResponse(release()));
+    const provider = createMusicBrainzProvider({
+      fetch: fetchMock,
+      minimumIntervalMs: 0,
+      retries: 0,
+    });
+
+    await expect(provider.lookup(releaseId)).resolves.toMatchObject({
+      status: "success",
+      candidate: {
+        externalId: releaseId,
+        artist: "Miles Davis",
+        title: "Kind of Blue",
+      },
+    });
+    const url = new URL(String(fetchMock.mock.calls[0][0]));
+    expect(url.pathname).toBe(`/ws/2/release/${releaseId}`);
+    expect(url.searchParams.get("inc")).toBe("artists+labels+release-groups");
+    expect(fetchMock.mock.calls[0][1]).toMatchObject({
+      next: { revalidate: 86400 },
+    });
+  });
+
+  it("rejects invalid lookup IDs and reports missing releases", async () => {
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockResolvedValue(new Response(null, { status: 404 }));
+    const provider = createMusicBrainzProvider({
+      fetch: fetchMock,
+      minimumIntervalMs: 0,
+      retries: 0,
+    });
+
+    await expect(provider.lookup("not-an-id")).resolves.toEqual({
+      status: "invalid_id",
+    });
+    await expect(provider.lookup(releaseId)).resolves.toEqual({
+      status: "not_found",
+    });
+    expect(fetchMock).toHaveBeenCalledOnce();
+  });
 });
 
 describe("Cover Art Archive adapter", () => {

@@ -1,6 +1,6 @@
 # Catalogue provider decision
 
-Last reviewed: 2026-09-10
+Last reviewed: 2026-09-11
 
 Cratebook will use the [MusicBrainz release API](https://musicbrainz.org/doc/MusicBrainz_API)
 as its first external catalogue provider. Cover artwork will come from the associated
@@ -121,16 +121,20 @@ Requests time out after six seconds. Cover Art Archive metadata is fetched separ
 with a seven-day cache so callers can resolve artwork only for candidates that need it
 instead of creating an upstream request for every search result.
 
-The adapter must not expose an unrestricted proxy or accept arbitrary upstream URLs.
-Queries are length-limited and encoded as data. Search should request vinyl releases
-when possible, while still showing ambiguous editions with enough label, catalogue,
-country, date, barcode, format, and disc-count context for the collector to choose.
+The adapter does not expose an unrestricted proxy or accept arbitrary upstream URLs.
+Queries are length-limited and encoded as data. Search requests vinyl releases while
+showing ambiguous editions with enough label, catalogue, country, date, barcode,
+format, and disc-count context for the collector to choose. Exact release lookup and
+cover retrieval happen only after selection. The review screen then prefills known
+release metadata into the existing collection or wishlist form without inferring
+copy-specific condition, acquisition, price, rating, or notes.
 
 No provider account, API key, new environment variable, hosted-data mutation, or
 external-service authorization is required for the MusicBrainz read-only MVP
-integration. The next task is to build the catalogue search and selection interface
-on this adapter and connect selected candidates to the existing collection and
-wishlist persistence flows.
+integration. Catalogue search, result selection, review, attribution, optional cover
+display, form prefilling, and manual failure paths are implemented. The next task is
+to persist the selected release MBID, provider name, bounded source snapshot, and
+remote cover reference through the existing collection and wishlist mutations.
 
 ## Re-review triggers
 

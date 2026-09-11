@@ -3,9 +3,9 @@
 Cratebook is a mobile-first vinyl collection and wishlist companion. The product
 specification and progress tracker live in [MVP_PLAN.md](./MVP_PLAN.md).
 
-The first catalogue integration will use MusicBrainz metadata with Cover Art Archive
-artwork. The reviewed provider, attribution, artwork, caching, and rate-limit policy
-is documented in [docs/catalogue-provider.md](./docs/catalogue-provider.md).
+Catalogue search uses MusicBrainz metadata with optional Cover Art Archive artwork.
+The reviewed provider, attribution, artwork, caching, and rate-limit policy is
+documented in [docs/catalogue-provider.md](./docs/catalogue-provider.md).
 
 Production: [https://cratebook.vercel.app](https://cratebook.vercel.app)
 
@@ -31,8 +31,8 @@ npm run dev
 Open <http://localhost:3000>.
 
 The landing and sign-in screens work without backend configuration. Protected pages
-need Supabase; use the full setup below to test sign-in, onboarding, collection entry,
-and wishlist management.
+need Supabase; use the full setup below to test sign-in, onboarding, catalogue-assisted
+or manual collection entry, and wishlist management.
 
 ## Full local setup
 
@@ -61,31 +61,40 @@ Start the app with `npm run dev`, then:
 4. Open the newest email and follow its sign-in link.
 5. Choose a username on the onboarding screen.
 6. Confirm that you arrive at the empty collection screen.
-7. Choose **Add → Add manually**, enter an artist and title, and save the record.
-8. Confirm the saved record appears in the collection grid with its release details.
-9. Open the record, choose **Edit record**, add a favorite, rating, condition,
-   acquisition detail, price, private note, or comma-separated tags, and confirm the
-   saved details appear on its detail page. Favorite records and tags also appear on
-   the collection card.
-10. Try adding the same artist and title again with different capitalization or spacing.
+7. Choose **Add → Search the catalogue**, search by artist, title, barcode, or
+   catalogue number, and compare the pressing details returned by MusicBrainz.
+8. Review a release, confirm any Cover Art Archive image and its attribution, then
+   continue to the collection or wishlist form. Confirm the known release metadata is
+   prefilled and that copy-specific details remain empty.
+9. Return to **Add → Add manually**, enter an artist and title, and save the record.
+10. Confirm the saved record appears in the collection grid with its release details.
+11. Open the record, choose **Edit record**, add a favorite, rating, condition,
+    acquisition detail, price, private note, or comma-separated tags, and confirm the
+    saved details appear on its detail page. Favorite records and tags also appear on
+    the collection card.
+12. Try adding the same artist and title again with different capitalization or spacing.
     Confirm the possible-duplicate warning offers the existing copy for review and
     still allows another physical copy to be added.
-11. Add a second record, then search by artist, title, label, catalog number, tag, or
+13. Add a second record, then search by artist, title, label, catalog number, tag, or
     private note. Try the favorite, purchase-state, format, and condition filters and
     the newest-added, recently-acquired, artist, and title sort options.
-12. Choose **Remove from collection**, cancel once, then confirm removal. Remove the
+14. Choose **Remove from collection**, cancel once, then confirm removal. Remove the
     remaining test copy and verify the collection returns to its empty state.
-13. Open **Wishlist**, add an artist and title, then optionally set priority, preferred
+15. Open **Wishlist**, add an artist and title, then optionally set priority, preferred
     edition, maximum price, notes, and visibility.
-14. Open the saved wish, edit its preferences, and confirm maximum price and private
+16. Open the saved wish, edit its preferences, and confirm maximum price and private
     notes remain clearly identified as private.
-15. Choose **Move to collection**, review the carried-over wishlist guidance, enter
+17. Choose **Move to collection**, review the carried-over wishlist guidance, enter
     any copy-specific condition, acquisition, price, rating, favorite, note, or tag
     details, and complete the move.
-16. Confirm the release metadata and edited notes appear on the new private collection
+18. Confirm the release metadata and edited notes appear on the new private collection
     copy and that the original wishlist item is gone.
-17. Add another wishlist item, choose **Remove from wishlist**, cancel once, then
+19. Add another wishlist item, choose **Remove from wishlist**, cancel once, then
     confirm removal and verify the wishlist returns to its empty state.
+
+Catalogue search needs no additional environment variable or provider account. If
+MusicBrainz has no suitable result or is unavailable, both manual collection and
+manual wishlist entry remain available.
 
 Supabase Studio is available at <http://127.0.0.1:54323> if you want to inspect the
 local database. Stop the local services when finished:

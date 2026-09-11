@@ -105,6 +105,17 @@ test.describe("local passwordless authentication", () => {
 
     await page.getByRole("link", { name: "Add a record", exact: true }).click();
     await expect(page).toHaveURL(/\/add$/);
+    await page.getByRole("link", { name: /search the catalogue/i }).click();
+    await expect(page).toHaveURL(/\/add\/catalogue$/);
+    await expect(
+      page.getByRole("heading", { name: "Find a release" }),
+    ).toBeVisible();
+    await expect(page.getByLabel("Artist, title, or identifier")).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "← Add options" }),
+    ).toBeVisible();
+    await expectNoHorizontalOverflow(page);
+    await page.getByRole("link", { name: "← Add options" }).click();
     await page.getByRole("link", { name: /add manually/i }).click();
     await expect(page).toHaveURL(/\/add\/manual$/);
     await expectNoHorizontalOverflow(page);

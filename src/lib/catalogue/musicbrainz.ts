@@ -4,6 +4,7 @@ import type { Enums, Json } from "@/types/database";
 
 import type {
   CatalogueCoverResult,
+  CatalogueLookupResult,
   CatalogueProvider,
   CatalogueReleaseCandidate,
   CatalogueSearchResult,
@@ -89,6 +90,13 @@ function createSearchUrl(query: string) {
   );
   url.searchParams.set("fmt", "json");
   url.searchParams.set("limit", String(DEFAULT_SEARCH_LIMIT));
+  return url.toString();
+}
+
+function createLookupUrl(externalId: string) {
+  const url = new URL(`${MUSICBRAINZ_API_URL}${externalId}`);
+  url.searchParams.set("fmt", "json");
+  url.searchParams.set("inc", "artists+labels+release-groups");
   return url.toString();
 }
 
@@ -453,6 +461,44 @@ export function createMusicBrainzProvider(
       return candidates.length > 0
         ? { status: "success", candidates }
         : { status: "no_results" };
+    },
+
+    async lookup(externalId: string): Promise<CatalogueLookupResult> {
+      if (!MUSICBRAINZ_ID_PATTERN.test(externalId)) {
+        return { status: "invalid_id" };
+      }
+
+      const upstream = await fetchWithTimeout(
+        createLookupUrl(externalId),
+        SEARCH_CACHE_SECONDS,
+        true,
+      );
+      if (upstream.status === "unavailable") {
+        return upstream;
+      }
+      if (upstream.statusCode === 404) {
+        return { status: "not_found" };
+      }
+      if (upstream.statusCode === 429 || upstream.statusCode === 503) {
+        return {
+          status: "rate_limited",
+          retryAfterSeconds: upstream.retryAfterSeconds,
+        };
+      }
+      if (!upstream.ok) {
+        return { status: "unavailable" };
+      }
+
+      let payload: unknown;
+      try {
+        payload = JSON.parse(upstream.body ?? "");
+      } catch {
+        return { status: "malformed_response" };
+      }
+      const candidate = normalizeCandidate(payload);
+      return candidate
+        ? { status: "success", candidate }
+        : { status: "malformed_response" };
     },
 
     async getCover(externalId: string): Promise<CatalogueCoverResult> {
