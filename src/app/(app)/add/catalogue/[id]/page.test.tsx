@@ -83,4 +83,33 @@ describe("CatalogueReleasePage", () => {
     ).toHaveAttribute("href", `/wishlist/add?catalogueId=${externalId}`);
     expect(screen.queryByRole("img")).toBeNull();
   });
+
+  it("carries displayed artwork into collection and wishlist creation", async () => {
+    const coverUrl = `https://coverartarchive.org/release/${externalId}/front-500`;
+    const originalUrl = `https://coverartarchive.org/release/${externalId}/front`;
+    lookup.mockResolvedValue({ status: "success", candidate });
+    getCover.mockResolvedValue({
+      status: "success",
+      coverUrl,
+      originalUrl,
+    });
+
+    render(
+      await CatalogueReleasePage({
+        params: Promise.resolve({ id: externalId }),
+      }),
+    );
+
+    const expectedQuery = new URLSearchParams({
+      catalogueId: externalId,
+      coverUrl,
+      coverOriginalUrl: originalUrl,
+    }).toString();
+    expect(
+      screen.getByRole("link", { name: "Add to collection" }),
+    ).toHaveAttribute("href", `/add/manual?${expectedQuery}`);
+    expect(
+      screen.getByRole("link", { name: "Add to wishlist" }),
+    ).toHaveAttribute("href", `/wishlist/add?${expectedQuery}`);
+  });
 });

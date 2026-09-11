@@ -6,6 +6,7 @@ import Link from "next/link";
 import { WishlistForm } from "@/components/wishlist-form";
 import { candidateToWishlistFormValues } from "@/lib/catalogue/forms";
 import { musicBrainzCatalogueProvider } from "@/lib/catalogue/musicbrainz";
+import { getCoverArtSelectionForRelease } from "@/lib/catalogue/provenance";
 
 import { createWishlistItem } from "./actions";
 
@@ -18,12 +19,29 @@ function firstValue(value: string | string[] | undefined) {
 export default async function AddWishlistPage({
   searchParams,
 }: {
-  searchParams: Promise<{ catalogueId?: string | string[] }>;
+  searchParams: Promise<{
+    catalogueId?: string | string[];
+    coverUrl?: string | string[];
+    coverOriginalUrl?: string | string[];
+  }>;
 }) {
-  const catalogueId = firstValue((await searchParams).catalogueId);
-  const lookup = catalogueId
-    ? await musicBrainzCatalogueProvider.lookup(catalogueId)
+  const query = await searchParams;
+  const catalogueId = firstValue(query.catalogueId);
+  const carriedCover = catalogueId
+    ? getCoverArtSelectionForRelease(
+        firstValue(query.coverUrl),
+        firstValue(query.coverOriginalUrl),
+        catalogueId,
+      )
     : null;
+  const [lookup, cover] = catalogueId
+    ? await Promise.all([
+        musicBrainzCatalogueProvider.lookup(catalogueId),
+        carriedCover
+          ? Promise.resolve({ status: "success" as const, ...carriedCover })
+          : musicBrainzCatalogueProvider.getCover(catalogueId),
+      ])
+    : [null, null];
   const initialValues =
     lookup?.status === "success"
       ? candidateToWishlistFormValues(lookup.candidate)
@@ -52,6 +70,7 @@ export default async function AddWishlistPage({
       ) : null}
       <WishlistForm
         action={createWishlistItem}
+        catalogueCover={cover?.status === "success" ? cover : undefined}
         catalogueId={initialValues ? catalogueId : undefined}
         entryKey={randomUUID()}
         initialValues={initialValues}

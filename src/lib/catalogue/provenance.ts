@@ -24,6 +24,34 @@ export function getCoverArtUrl(value: string | null) {
   }
 }
 
+export function getCoverArtUrlForRelease(value: string, externalId: string) {
+  const safeUrl = getCoverArtUrl(value);
+  if (!safeUrl || !MUSICBRAINZ_ID_PATTERN.test(externalId)) {
+    return null;
+  }
+
+  const url = new URL(safeUrl);
+  const releasePrefix = `/release/${externalId.toLocaleLowerCase("en")}/`;
+  return url.pathname.toLocaleLowerCase("en").startsWith(releasePrefix)
+    ? safeUrl
+    : null;
+}
+
+export function getCoverArtSelectionForRelease(
+  coverUrlValue: string | null | undefined,
+  originalUrlValue: string | null | undefined,
+  externalId: string,
+): CatalogueCoverSelection | null {
+  const coverUrl = coverUrlValue
+    ? getCoverArtUrlForRelease(coverUrlValue, externalId)
+    : null;
+  const originalUrl = originalUrlValue
+    ? getCoverArtUrlForRelease(originalUrlValue, externalId)
+    : null;
+
+  return coverUrl && originalUrl ? { coverUrl, originalUrl } : null;
+}
+
 export function getCatalogueAttribution(
   source: string | null,
   externalId: string | null,
@@ -41,3 +69,4 @@ export function getCatalogueAttribution(
     url: `https://musicbrainz.org/release/${externalId}`,
   };
 }
+import type { CatalogueCoverSelection } from "./types";

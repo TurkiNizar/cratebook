@@ -1,6 +1,6 @@
 begin;
 
-select plan(19);
+select plan(24);
 
 select has_function(
   'public',
@@ -134,6 +134,38 @@ select lives_ok(
     '{"provider":"musicbrainz"}'::jsonb
   ) $$,
   'another user can retain an owner-scoped copy of the same catalogue release'
+);
+select lives_ok(
+  $$ select public.create_catalogue_collection_item(
+    'Ignored artist edit',
+    'Ignored title edit',
+    '72727272-0000-4000-8000-000000000002',
+    'musicbrainz',
+    '11111111-1111-4111-8111-111111111111',
+    '{"provider":"musicbrainz","release":{"id":"11111111-1111-4111-8111-111111111111"},"coverArt":{"thumbnailUrl":"https://coverartarchive.org/release/11111111-1111-4111-8111-111111111111/front-500","originalUrl":"https://coverartarchive.org/release/11111111-1111-4111-8111-111111111111/front"}}'::jsonb,
+    'https://coverartarchive.org/release/11111111-1111-4111-8111-111111111111/front-500'
+  ) $$,
+  'reusing a catalogue release can supply artwork that was previously unavailable'
+);
+select is(
+  (select count(*) from public.collection_items),
+  2::bigint,
+  'artwork backfill still creates the requested additional physical copy'
+);
+select is(
+  (select cover_url from public.releases),
+  'https://coverartarchive.org/release/11111111-1111-4111-8111-111111111111/front-500'::text,
+  'reuse backfills a missing remote cover reference'
+);
+select is(
+  (select source_data #>> '{coverArt,thumbnailUrl}' from public.releases),
+  'https://coverartarchive.org/release/11111111-1111-4111-8111-111111111111/front-500'::text,
+  'reuse backfills matching cover provenance'
+);
+select results_eq(
+  $$ select artist_display, title from public.releases $$,
+  $$ values ('Miles Davis'::text, 'Kind of Blue'::text) $$,
+  'artwork backfill does not overwrite existing catalogue metadata'
 );
 reset role;
 select is(

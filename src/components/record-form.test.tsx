@@ -60,10 +60,17 @@ describe("RecordForm", () => {
     );
   });
 
-  it("submits only the selected catalogue identifier for server verification", () => {
+  it("submits the selected catalogue identifier and its verified cover references", () => {
+    const catalogueCover = {
+      coverUrl:
+        "https://coverartarchive.org/release/11111111-1111-4111-8111-111111111111/front-500",
+      originalUrl:
+        "https://coverartarchive.org/release/11111111-1111-4111-8111-111111111111/front",
+    };
     const { container } = render(
       <RecordForm
         action={async () => ({ message: "", fieldErrors: {} })}
+        catalogueCover={catalogueCover}
         catalogueId="11111111-1111-4111-8111-111111111111"
         entryKey="bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb"
         initialValues={values}
@@ -74,6 +81,12 @@ describe("RecordForm", () => {
     expect(container.querySelector('input[name="catalogueId"]')).toHaveValue(
       "11111111-1111-4111-8111-111111111111",
     );
+    expect(
+      container.querySelector('input[name="catalogueCoverUrl"]'),
+    ).toHaveValue(catalogueCover.coverUrl);
+    expect(
+      container.querySelector('input[name="catalogueCoverOriginalUrl"]'),
+    ).toHaveValue(catalogueCover.originalUrl);
     expect(container.querySelector('input[name="sourceData"]')).toBeNull();
   });
 

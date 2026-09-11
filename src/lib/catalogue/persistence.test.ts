@@ -53,7 +53,7 @@ describe("catalogue persistence", () => {
     });
 
     await expect(
-      resolveCatalogueSelection(externalId, catalogue),
+      resolveCatalogueSelection(externalId, { provider: catalogue }),
     ).resolves.toEqual({
       status: "success",
       release: expect.objectContaining({
@@ -71,7 +71,9 @@ describe("catalogue persistence", () => {
   });
 
   it("keeps artwork optional while preserving the source snapshot", async () => {
-    const result = await resolveCatalogueSelection(externalId, provider());
+    const result = await resolveCatalogueSelection(externalId, {
+      provider: provider(),
+    });
 
     expect(result).toMatchObject({
       status: "success",
@@ -90,7 +92,7 @@ describe("catalogue persistence", () => {
     });
 
     await expect(
-      resolveCatalogueSelection(externalId, catalogue),
+      resolveCatalogueSelection(externalId, { provider: catalogue }),
     ).resolves.toEqual({ status: "unavailable" });
   });
 
@@ -106,7 +108,49 @@ describe("catalogue persistence", () => {
     });
 
     await expect(
-      resolveCatalogueSelection(externalId, catalogue),
+      resolveCatalogueSelection(externalId, { provider: catalogue }),
     ).resolves.toEqual({ status: "unavailable" });
+  });
+
+  it("retains a previously verified cover without repeating the artwork request", async () => {
+    const catalogue = provider();
+    const coverUrl = `https://coverartarchive.org/release/${externalId}/front-500`;
+    const originalUrl = `https://coverartarchive.org/release/${externalId}/front`;
+
+    await expect(
+      resolveCatalogueSelection(externalId, {
+        provider: catalogue,
+        selectedCover: { coverUrl, originalUrl },
+      }),
+    ).resolves.toMatchObject({
+      status: "success",
+      release: {
+        coverUrl,
+        sourceData: {
+          coverArt: { thumbnailUrl: coverUrl, originalUrl },
+        },
+      },
+    });
+    expect(catalogue.getCover).not.toHaveBeenCalled();
+  });
+
+  it("rejects a carried cover for another release and safely refetches artwork", async () => {
+    const catalogue = provider();
+
+    await expect(
+      resolveCatalogueSelection(externalId, {
+        provider: catalogue,
+        selectedCover: {
+          coverUrl:
+            "https://coverartarchive.org/release/22222222-2222-4222-8222-222222222222/front-500",
+          originalUrl:
+            "https://coverartarchive.org/release/22222222-2222-4222-8222-222222222222/front",
+        },
+      }),
+    ).resolves.toMatchObject({
+      status: "success",
+      release: { coverUrl: null },
+    });
+    expect(catalogue.getCover).toHaveBeenCalledWith(externalId);
   });
 });

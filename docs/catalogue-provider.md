@@ -129,6 +129,13 @@ cover retrieval happen only after selection. The review screen then prefills kno
 release metadata into the existing collection or wishlist form without inferring
 copy-specific condition, acquisition, price, rating, or notes.
 
+When artwork is available on the exact-release review, its thumbnail and original
+Cover Art Archive references are carried into the add form and then revalidated
+against the selected MBID at the server boundary. This avoids depending on a second
+artwork request during submission. Invalid or mismatched references are discarded and
+the adapter may safely retry cover lookup; metadata selection and manual entry remain
+available either way.
+
 No provider account, API key, new environment variable, hosted-data mutation, or
 external-service authorization is required for the MusicBrainz read-only MVP
 integration. Catalogue search, result selection, review, attribution, optional cover
@@ -136,7 +143,9 @@ display, form prefilling, and manual failure paths are implemented. Catalogue-ba
 collection and wishlist mutations re-resolve the selected MBID at the server boundary,
 store the provider name and bounded source snapshot, and retain the optional remote
 cover reference. An existing owner-scoped release with the same source identity is
-reused without silently overwriting user edits.
+reused without silently overwriting user edits. If that release has no cover, a later
+verified selection may backfill its cover reference and matching cover provenance;
+an existing cover and all other release fields remain unchanged.
 
 Automated coverage keeps near-identical editions separately traceable through their
 MBIDs and pressing clues. It also verifies timeouts, rate limits, malformed responses,

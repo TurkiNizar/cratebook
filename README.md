@@ -65,7 +65,7 @@ Start the app with `npm run dev`, then:
    catalogue number, and compare the pressing details returned by MusicBrainz.
 8. Review a release, confirm any Cover Art Archive image and its attribution, then
    continue to the collection or wishlist form. Confirm the known release metadata is
-   prefilled and that copy-specific details remain empty.
+   prefilled, the selected artwork is retained, and copy-specific details remain empty.
 9. Return to **Add → Add manually**, enter an artist and title, and save the record.
 10. Confirm the saved record appears in the collection grid with its release details
     and, for a catalogue selection, its Cover Art Archive thumbnail.
@@ -86,6 +86,8 @@ Start the app with `npm run dev`, then:
 16. Open the saved wish, edit its preferences, and confirm maximum price and private
     notes remain clearly identified as private. For a catalogue selection, confirm its
     MusicBrainz source link and optional Cover Art Archive thumbnail are retained.
+    Reusing the same catalogue release should also restore verified artwork if its
+    owner-scoped release was previously saved without a cover.
 17. Choose **Move to collection**, review the carried-over wishlist guidance, enter
     any copy-specific condition, acquisition, price, rating, favorite, note, or tag
     details, and complete the move.

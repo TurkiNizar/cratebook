@@ -48,6 +48,11 @@ export type CatalogueCoverResult =
   | { status: "unavailable" }
   | { status: "malformed_response" };
 
+export type CatalogueCoverSelection = {
+  coverUrl: string;
+  originalUrl: string;
+};
+
 export interface CatalogueProvider {
   readonly source: CatalogueSource;
   search(query: string): Promise<CatalogueSearchResult>;

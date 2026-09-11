@@ -3,7 +3,13 @@ import "server-only";
 import type { Json } from "@/types/database";
 
 import { musicBrainzCatalogueProvider } from "./musicbrainz";
-import type { CatalogueProvider, CatalogueReleaseCandidate } from "./types";
+import { getCoverArtSelectionForRelease } from "./provenance";
+import type {
+  CatalogueCoverResult,
+  CatalogueCoverSelection,
+  CatalogueProvider,
+  CatalogueReleaseCandidate,
+} from "./types";
 
 export type CatalogueReleasePersistence = CatalogueReleaseCandidate & {
   coverUrl: string | null;
@@ -13,6 +19,27 @@ export type CatalogueReleasePersistence = CatalogueReleaseCandidate & {
 export type CatalogueSelectionResult =
   | { status: "success"; release: CatalogueReleasePersistence }
   | { status: "unavailable" };
+
+type ResolveCatalogueSelectionOptions = {
+  provider?: CatalogueProvider;
+  selectedCover?: CatalogueCoverSelection;
+};
+
+function validateSelectedCover(
+  externalId: string,
+  selectedCover: CatalogueCoverSelection | undefined,
+): CatalogueCoverResult | null {
+  if (!selectedCover) {
+    return null;
+  }
+
+  const cover = getCoverArtSelectionForRelease(
+    selectedCover.coverUrl,
+    selectedCover.originalUrl,
+    externalId,
+  );
+  return cover ? { status: "success", ...cover } : null;
+}
 
 function provenanceWithCover(
   candidate: CatalogueReleaseCandidate,
@@ -40,11 +67,16 @@ function provenanceWithCover(
 
 export async function resolveCatalogueSelection(
   externalId: string,
-  provider: CatalogueProvider = musicBrainzCatalogueProvider,
+  options: ResolveCatalogueSelectionOptions = {},
 ): Promise<CatalogueSelectionResult> {
+  const provider = options.provider ?? musicBrainzCatalogueProvider;
+  const selectedCover = validateSelectedCover(
+    externalId,
+    options.selectedCover,
+  );
   const [lookup, cover] = await Promise.all([
     provider.lookup(externalId),
-    provider.getCover(externalId),
+    selectedCover ?? provider.getCover(externalId),
   ]);
 
   if (

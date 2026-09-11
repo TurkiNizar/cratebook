@@ -30,8 +30,22 @@ export async function createWishlistItem(
 
   const input = validation.data;
   const catalogueId = String(formData.get("catalogueId") ?? "").trim();
+  const catalogueCoverUrl = String(
+    formData.get("catalogueCoverUrl") ?? "",
+  ).trim();
+  const catalogueCoverOriginalUrl = String(
+    formData.get("catalogueCoverOriginalUrl") ?? "",
+  ).trim();
   const catalogue = catalogueId
-    ? await resolveCatalogueSelection(catalogueId)
+    ? await resolveCatalogueSelection(catalogueId, {
+        selectedCover:
+          catalogueCoverUrl && catalogueCoverOriginalUrl
+            ? {
+                coverUrl: catalogueCoverUrl,
+                originalUrl: catalogueCoverOriginalUrl,
+              }
+            : undefined,
+      })
     : null;
   if (catalogue?.status === "unavailable") {
     return {

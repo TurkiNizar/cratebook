@@ -10,6 +10,7 @@ import {
   RECORD_CONDITION_OPTIONS,
   RELEASE_FORMAT_OPTIONS,
 } from "@/lib/record";
+import type { CatalogueCoverSelection } from "@/lib/catalogue/types";
 
 const INITIAL_ACTION_STATE: ManualRecordActionState = {
   message: "",
@@ -69,6 +70,7 @@ type RecordFormProps = {
   initialValues?: RecordFormValues;
   entryKey?: string;
   catalogueId?: string;
+  catalogueCover?: CatalogueCoverSelection;
   cancelHref?: string;
 };
 
@@ -124,6 +126,7 @@ export function RecordForm({
   initialValues,
   entryKey,
   catalogueId,
+  catalogueCover,
   cancelHref,
 }: RecordFormProps) {
   const [actionState, formAction, isPending] = useActionState(
@@ -165,6 +168,20 @@ export function RecordForm({
       ) : null}
       {catalogueId ? (
         <input type="hidden" name="catalogueId" value={catalogueId} />
+      ) : null}
+      {catalogueCover ? (
+        <>
+          <input
+            type="hidden"
+            name="catalogueCoverUrl"
+            value={catalogueCover.coverUrl}
+          />
+          <input
+            type="hidden"
+            name="catalogueCoverOriginalUrl"
+            value={catalogueCover.originalUrl}
+          />
+        </>
       ) : null}
       {duplicate ? (
         <input

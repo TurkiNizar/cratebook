@@ -50,6 +50,12 @@ export default async function CatalogueReleasePage({
   }
 
   const candidate = lookup.candidate;
+  const selectionParams = new URLSearchParams({ catalogueId: id });
+  if (cover.status === "success") {
+    selectionParams.set("coverUrl", cover.coverUrl);
+    selectionParams.set("coverOriginalUrl", cover.originalUrl);
+  }
+  const selectionQuery = selectionParams.toString();
   const details = [
     ["Edition year", candidate.releaseYear?.toString() ?? null],
     ["Original year", candidate.originalYear?.toString() ?? null],
@@ -102,12 +108,12 @@ export default async function CatalogueReleasePage({
             .
           </p>
           <div className="catalogue-selection-actions">
-            <Link className="button" href={"/add/manual?catalogueId=" + id}>
+            <Link className="button" href={"/add/manual?" + selectionQuery}>
               Add to collection
             </Link>
             <Link
               className="secondary-button"
-              href={"/wishlist/add?catalogueId=" + id}
+              href={"/wishlist/add?" + selectionQuery}
             >
               Add to wishlist
             </Link>

@@ -8,6 +8,7 @@ import {
   type WishlistField,
   WISHLIST_PRIORITY_OPTIONS,
 } from "@/lib/wishlist";
+import type { CatalogueCoverSelection } from "@/lib/catalogue/types";
 
 const INITIAL_STATE: WishlistActionState = { message: "", fieldErrors: {} };
 
@@ -35,6 +36,7 @@ type WishlistFormProps = {
   variant: "create" | "edit";
   entryKey?: string;
   catalogueId?: string;
+  catalogueCover?: CatalogueCoverSelection;
   initialValues?: WishlistFormValues;
   cancelHref?: string;
 };
@@ -44,6 +46,7 @@ export function WishlistForm({
   variant,
   entryKey,
   catalogueId,
+  catalogueCover,
   initialValues,
   cancelHref,
 }: WishlistFormProps) {
@@ -65,6 +68,20 @@ export function WishlistForm({
       ) : null}
       {catalogueId ? (
         <input type="hidden" name="catalogueId" value={catalogueId} />
+      ) : null}
+      {catalogueCover ? (
+        <>
+          <input
+            type="hidden"
+            name="catalogueCoverUrl"
+            value={catalogueCover.coverUrl}
+          />
+          <input
+            type="hidden"
+            name="catalogueCoverOriginalUrl"
+            value={catalogueCover.originalUrl}
+          />
+        </>
       ) : null}
 
       <section
