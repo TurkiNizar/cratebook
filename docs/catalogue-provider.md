@@ -138,6 +138,12 @@ store the provider name and bounded source snapshot, and retain the optional rem
 cover reference. An existing owner-scoped release with the same source identity is
 reused without silently overwriting user edits.
 
+Automated coverage keeps near-identical editions separately traceable through their
+MBIDs and pressing clues. It also verifies timeouts, rate limits, malformed responses,
+missing releases, failed exact-release review, and unavailable artwork while preserving
+manual collection and wishlist paths. The catalogue-provenance migration is applied to
+the production Supabase project.
+
 ## Re-review triggers
 
 Review this decision and the linked policies before any of the following:

@@ -249,6 +249,76 @@ describe("MusicBrainz catalogue provider", () => {
     });
   });
 
+  it("keeps ambiguous editions as separately traceable release candidates", async () => {
+    const secondReleaseId = "44444444-4444-4444-8444-444444444444";
+    const fetchMock = vi.fn<typeof fetch>().mockResolvedValue(
+      jsonResponse({
+        releases: [
+          release(),
+          release({
+            id: secondReleaseId,
+            date: "2013-11-29",
+            country: "EU",
+            disambiguation: "180 gram blue vinyl reissue",
+            "label-info": [
+              {
+                "catalog-number": "MOVLP 019",
+                label: { name: "Music On Vinyl" },
+              },
+            ],
+          }),
+        ],
+      }),
+    );
+    const provider = createMusicBrainzProvider({
+      fetch: fetchMock,
+      minimumIntervalMs: 0,
+      retries: 0,
+    });
+
+    await expect(provider.search("Kind of Blue")).resolves.toMatchObject({
+      status: "success",
+      candidates: [
+        {
+          externalId: releaseId,
+          releaseYear: 1959,
+          country: "US",
+          label: "Columbia",
+          catalogNumber: "CS 8163",
+          editionDescription: "Stereo edition",
+        },
+        {
+          externalId: secondReleaseId,
+          releaseYear: 2013,
+          country: "EU",
+          label: "Music On Vinyl",
+          catalogNumber: "MOVLP 019",
+          editionDescription: "180 gram blue vinyl reissue",
+        },
+      ],
+    });
+  });
+
+  it("turns an upstream timeout into an unavailable result", async () => {
+    const fetchMock = vi.fn<typeof fetch>((_input, init) => {
+      return new Promise<Response>((_resolve, reject) => {
+        init?.signal?.addEventListener("abort", () => {
+          reject(new DOMException("Timed out", "AbortError"));
+        });
+      });
+    });
+    const provider = createMusicBrainzProvider({
+      fetch: fetchMock,
+      minimumIntervalMs: 0,
+      timeoutMs: 1,
+      retries: 0,
+    });
+
+    await expect(provider.search("Kind of Blue")).resolves.toEqual({
+      status: "unavailable",
+    });
+  });
+
   it("looks up a selected release by MBID with the same safe normalization", async () => {
     const fetchMock = vi
       .fn<typeof fetch>()

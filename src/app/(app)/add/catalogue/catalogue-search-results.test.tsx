@@ -48,6 +48,42 @@ describe("CatalogueSearchResults", () => {
     );
   });
 
+  it("keeps ambiguous editions distinct with their pressing clues", () => {
+    const secondCandidate: CatalogueReleaseCandidate = {
+      ...candidate,
+      externalId: "44444444-4444-4444-8444-444444444444",
+      sourceUrl:
+        "https://musicbrainz.org/release/44444444-4444-4444-8444-444444444444",
+      releaseYear: 2013,
+      country: "EU",
+      label: "Music On Vinyl",
+      catalogNumber: "MOVLP 019",
+      editionDescription: "180 gram blue vinyl reissue",
+    };
+
+    render(
+      <CatalogueSearchResults
+        query="Kind of Blue"
+        result={{
+          status: "success",
+          candidates: [candidate, secondCandidate],
+        }}
+      />,
+    );
+
+    expect(screen.getByRole("heading", { name: "2 results" })).toBeVisible();
+    expect(
+      screen.getAllByRole("heading", { name: "Kind of Blue" }),
+    ).toHaveLength(2);
+    expect(screen.getByText("CS 8163")).toBeVisible();
+    expect(screen.getByText("MOVLP 019")).toBeVisible();
+    expect(screen.getByText("Stereo edition")).toBeVisible();
+    expect(screen.getByText("180 gram blue vinyl reissue")).toBeVisible();
+    expect(
+      screen.getAllByRole("link", { name: "Review release" }),
+    ).toHaveLength(2);
+  });
+
   it.each([
     [{ status: "no_results" } as const, "Nothing found for “Blue Train”"],
     [
