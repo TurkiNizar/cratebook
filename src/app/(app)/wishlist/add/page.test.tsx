@@ -1,15 +1,19 @@
 import { render } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import type { CatalogueReleaseCandidate } from "@/lib/catalogue/types";
+import type {
+  CatalogueAlbumCandidate,
+  CatalogueReleaseCandidate,
+} from "@/lib/catalogue/types";
 
-const { getCover, lookup } = vi.hoisted(() => ({
+const { getCover, lookup, lookupAlbum } = vi.hoisted(() => ({
   getCover: vi.fn(),
   lookup: vi.fn(),
+  lookupAlbum: vi.fn(),
 }));
 
 vi.mock("@/lib/catalogue/musicbrainz", () => ({
-  musicBrainzCatalogueProvider: { getCover, lookup },
+  musicBrainzCatalogueProvider: { getCover, lookup, lookupAlbum },
 }));
 vi.mock("./actions", () => ({
   createWishlistItem: vi.fn(),
@@ -38,6 +42,19 @@ const candidate: CatalogueReleaseCandidate = {
   barcode: "012345678905",
   sourceData: { provider: "musicbrainz" },
 };
+const albumCandidate: CatalogueAlbumCandidate = {
+  source: "musicbrainz",
+  entityType: "release_group",
+  externalId: "22222222-2222-4222-8222-222222222222",
+  sourceUrl:
+    "https://musicbrainz.org/release-group/22222222-2222-4222-8222-222222222222",
+  artist: "Miles Davis",
+  title: "Kind of Blue",
+  originalYear: 1959,
+  representativeCoverUrl:
+    "https://coverartarchive.org/release-group/22222222-2222-4222-8222-222222222222/front-500",
+  sourceData: { provider: "musicbrainz", entityType: "release_group" },
+};
 
 describe("AddWishlistPage", () => {
   it("carries validated review artwork into the wishlist form without refetching it", async () => {
@@ -60,5 +77,31 @@ describe("AddWishlistPage", () => {
       container.querySelector('input[name="catalogueCoverOriginalUrl"]'),
     ).toHaveValue(originalUrl);
     expect(getCover).not.toHaveBeenCalled();
+  });
+
+  it("prefills album identity without inventing a preferred edition", async () => {
+    lookupAlbum.mockResolvedValue({
+      status: "success",
+      candidate: albumCandidate,
+    });
+
+    const { container } = render(
+      await AddWishlistPage({
+        searchParams: Promise.resolve({
+          catalogueAlbumId: albumCandidate.externalId,
+        }),
+      }),
+    );
+
+    expect(container.querySelector('input[name="artist"]')).toHaveValue(
+      "Miles Davis",
+    );
+    expect(container.querySelector('input[name="title"]')).toHaveValue(
+      "Kind of Blue",
+    );
+    expect(
+      container.querySelector('textarea[name="preferredEdition"]'),
+    ).toHaveValue("");
+    expect(container.querySelector('input[name="catalogueId"]')).toBeNull();
   });
 });

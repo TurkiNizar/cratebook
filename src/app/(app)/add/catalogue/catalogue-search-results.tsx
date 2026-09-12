@@ -1,8 +1,8 @@
 import Link from "next/link";
 
-import type { CatalogueSearchResult } from "@/lib/catalogue/types";
+import type { CatalogueAlbumSearchResult } from "@/lib/catalogue/types";
 
-import { CatalogueResultCard } from "./catalogue-result-card";
+import { CatalogueAlbumCard } from "./catalogue-album-card";
 
 function ManualFallback({ query }: { query: string }) {
   return (
@@ -26,29 +26,59 @@ export function CatalogueSearchResults({
   result,
 }: {
   query: string;
-  result: CatalogueSearchResult;
+  result: CatalogueAlbumSearchResult;
 }) {
   if (result.status === "success") {
+    const resultLabel = `${result.pagination.totalResults} ${result.pagination.totalResults === 1 ? "album" : "albums"}`;
+    const pageHref = (page: number) => {
+      const parameters = new URLSearchParams({ q: query });
+      if (page > 1) parameters.set("page", String(page));
+      return `/add/catalogue?${parameters.toString()}`;
+    };
+
     return (
       <section className="catalogue-results" aria-labelledby="results-heading">
         <div className="catalogue-results-heading">
           <div>
-            <p className="app-kicker">Possible editions</p>
-            <h2 id="results-heading">
-              {result.candidates.length}{" "}
-              {result.candidates.length === 1 ? "result" : "results"}
-            </h2>
+            <p className="app-kicker">Album matches</p>
+            <h2 id="results-heading">{resultLabel}</h2>
           </div>
-          <p>Compare the pressing details before choosing.</p>
+          <p>One card per album. Artwork may represent a different edition.</p>
         </div>
-        <div className="catalogue-result-list">
+        <div className="catalogue-album-grid">
           {result.candidates.map((candidate) => (
-            <CatalogueResultCard
+            <CatalogueAlbumCard
               candidate={candidate}
               key={candidate.externalId}
             />
           ))}
         </div>
+        {result.pagination.page > 1 || result.pagination.hasNextPage ? (
+          <nav
+            className="catalogue-pagination"
+            aria-label="Album results pages"
+          >
+            {result.pagination.page > 1 ? (
+              <Link
+                className="secondary-button"
+                href={pageHref(result.pagination.page - 1)}
+              >
+                ← Previous
+              </Link>
+            ) : (
+              <span />
+            )}
+            <span>Page {result.pagination.page}</span>
+            {result.pagination.hasNextPage ? (
+              <Link
+                className="secondary-button"
+                href={pageHref(result.pagination.page + 1)}
+              >
+                Next →
+              </Link>
+            ) : null}
+          </nav>
+        ) : null}
       </section>
     );
   }
@@ -58,7 +88,7 @@ export function CatalogueSearchResults({
       ? {
           kicker: "No match yet",
           heading: "Nothing found for “" + query + "”",
-          body: "Try an artist, release title, barcode, or catalogue number—or keep moving with manual entry.",
+          body: "Try an artist, album title, barcode, or catalogue number—or keep moving with manual entry.",
         }
       : result.status === "invalid_query"
         ? {

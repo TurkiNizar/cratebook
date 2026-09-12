@@ -11,16 +11,25 @@ function firstValue(value: string | string[] | undefined) {
   return Array.isArray(value) ? (value[0] ?? "") : (value ?? "");
 }
 
+function positivePage(value: string | string[] | undefined) {
+  const candidate = Number(firstValue(value));
+  return Number.isInteger(candidate) && candidate > 0 ? candidate : 1;
+}
+
 export default async function CatalogueSearchPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string | string[] }>;
+  searchParams: Promise<{
+    q?: string | string[];
+    page?: string | string[];
+  }>;
 }) {
   const parameters = await searchParams;
   const submitted = parameters.q !== undefined;
   const query = firstValue(parameters.q).trim().replace(/\s+/g, " ");
+  const page = positivePage(parameters.page);
   const result = submitted
-    ? await musicBrainzCatalogueProvider.search(query)
+    ? await musicBrainzCatalogueProvider.searchAlbums(query, { page })
     : null;
 
   return (
@@ -29,10 +38,10 @@ export default async function CatalogueSearchPage({
         ← Add options
       </Link>
       <p className="app-kicker">MusicBrainz catalogue</p>
-      <h1>Find a release</h1>
+      <h1>Find an album</h1>
       <p className="app-description">
-        Search by artist, title, barcode, or catalogue number. You will review
-        the edition before anything is added.
+        Search by artist, album title, barcode, or catalogue number. Choose the
+        album first; exact pressing details can wait.
       </p>
 
       <form
@@ -58,7 +67,8 @@ export default async function CatalogueSearchPage({
           </button>
         </div>
         <p>
-          Results are supplied by MusicBrainz and limited to vinyl releases.
+          Album matches are supplied by MusicBrainz. Covers are representative
+          artwork from the Cover Art Archive.
         </p>
       </form>
 
@@ -68,11 +78,11 @@ export default async function CatalogueSearchPage({
         <section className="catalogue-search-intro">
           <span aria-hidden="true">01</span>
           <div>
-            <h2>Start broad, then compare editions</h2>
+            <h2>Start with the album you recognize</h2>
             <p>
-              A year, label, catalogue number, country, or barcode can help
-              distinguish similar pressings. If none fits, manual entry is
-              always available.
+              Artist and title are usually enough. A barcode or catalogue number
+              can also find the album without making an exact pressing claim. If
+              none fits, manual entry is always available.
             </p>
           </div>
         </section>

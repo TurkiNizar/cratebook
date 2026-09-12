@@ -35,4 +35,17 @@ describe("ReleaseCover", () => {
     rerender(<ReleaseCover title="A Love Supreme" sizes="320px" />);
     expect(screen.getByText("A")).toBeVisible();
   });
+
+  it("accepts representative release-group artwork", () => {
+    render(
+      <ReleaseCover
+        coverUrl="https://coverartarchive.org/release-group/22222222-2222-4222-8222-222222222222/front-500"
+        title="Journey in Satchidananda"
+        sizes="280px"
+        meaningful
+      />,
+    );
+
+    expect(screen.getByAltText("Journey in Satchidananda cover")).toBeVisible();
+  });
 });

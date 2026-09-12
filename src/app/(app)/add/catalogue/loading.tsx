@@ -8,13 +8,16 @@ export default function CatalogueSearchLoading() {
         <span className="skeleton-button" />
       </div>
       <div
-        className="catalogue-result-list"
+        className="catalogue-album-grid"
         aria-label="Loading catalogue results"
       >
         {Array.from({ length: 3 }, (_, index) => (
-          <article className="catalogue-result" key={index}>
-            <span className="skeleton-line" />
-            <span className="skeleton-line skeleton-line-short" />
+          <article className="catalogue-album-card" key={index}>
+            <span className="collection-cover skeleton-cover" />
+            <div className="catalogue-album-copy">
+              <span className="skeleton-line skeleton-line-short" />
+              <span className="skeleton-line" />
+            </div>
           </article>
         ))}
       </div>

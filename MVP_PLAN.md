@@ -720,7 +720,7 @@ an exact physical pressing remains optional advanced detail.
 - [x] Build provider-neutral album discovery with broader matching, pagination where
       supported, deterministic deduplication, typed failures, caching, throttling, and
       a permanent manual fallback
-- [ ] Replace the default pressing-heavy results with responsive, cover-first album
+- [x] Replace the default pressing-heavy results with responsive, cover-first album
       cards showing one recognizable result per album and clear collection/wishlist
       actions
 - [ ] Implement collection and wishlist quick-add using only artist, album title,
@@ -924,6 +924,7 @@ in version control; this log records product-level progress and changes.
 | 2026-09-12 | 3         | Compared album sources against the fixture: MusicBrainz release groups recalled 14/14 with representative Cover Art Archive fronts available for every match; Apple iTunes recalled 9/14 but failed identifiers and has incompatible promotional-artwork terms. Selected MusicBrainz release groups plus Cover Art Archive for integration                   | Define the album-level data and provenance contract                    |
 | 2026-09-12 | 3         | Defined, implemented, and deployed the album-level identity contract: catalogue rows now distinguish release groups from exact releases, provenance must match the declared entity and MBID, representative artwork is entity-scoped, and existing MusicBrainz rows are preserved as exact releases                                                          | Build provider-neutral album discovery                                 |
 | 2026-09-12 | 3         | Built provider-neutral album discovery with broad token-wise MusicBrainz release-group search, identifier-to-album resolution, bounded pagination, stable MBID deduplication, normalized provenance, representative artwork references, shared caching/throttling/retries, typed lookup and failure states, and permanent manual recovery boundaries         | Replace pressing-heavy results with cover-first album cards            |
+| 2026-09-12 | 3         | Replaced default pressing-heavy search with responsive, paginated cover-first album cards, explicit representative-artwork and pressing-not-selected guidance, clear collection/wishlist destinations, and server-validated album-level form prefills; verified component, desktop Chromium, and Android Chrome coverage                                     | Implement collection and wishlist album quick-add persistence          |
 
 ## 21. Hosted environment checklist
 

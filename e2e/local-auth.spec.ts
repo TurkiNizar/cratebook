@@ -108,17 +108,43 @@ test.describe("local passwordless authentication", () => {
     await page.getByRole("link", { name: /search the catalogue/i }).click();
     await expect(page).toHaveURL(/\/add\/catalogue$/);
     await expect(
-      page.getByRole("heading", { name: "Find a release" }),
+      page.getByRole("heading", { name: "Find an album" }),
     ).toBeVisible();
     await expect(page.getByLabel("Artist, title, or identifier")).toBeVisible();
     await expect(
       page.getByRole("link", { name: "← Add options" }),
     ).toBeVisible();
     await expectNoHorizontalOverflow(page);
-    await page.getByRole("link", { name: "← Add options" }).click();
-    await page.getByRole("link", { name: /add manually/i }).click();
-    await expect(page).toHaveURL(/\/add\/manual$/);
+
+    await page
+      .getByLabel("Artist, title, or identifier")
+      .fill("Miles Davis Kind of Blue");
+    await page.getByRole("button", { name: "Search" }).click();
+    const albumCard = page
+      .getByRole("article", { name: "Kind of Blue" })
+      .first();
+    await expect(albumCard.getByAltText("Kind of Blue cover")).toBeVisible();
+    await expect(
+      albumCard.getByText("Album match · pressing not selected"),
+    ).toBeVisible();
+    await expect(
+      albumCard.getByRole("link", { name: "Add to collection" }),
+    ).toBeVisible();
+    await expect(
+      albumCard.getByRole("link", { name: "Add to wishlist" }),
+    ).toBeVisible();
     await expectNoHorizontalOverflow(page);
+
+    await albumCard.getByRole("link", { name: "Add to collection" }).click();
+    await expect(page).toHaveURL(/\/add\/manual\?catalogueAlbumId=/);
+    await expect(page.getByLabel("Artist")).toHaveValue("Miles Davis");
+    await expect(page.getByLabel("Album or release title")).toHaveValue(
+      /kind of blue/i,
+    );
+    await expect(page.getByLabel("Format")).toHaveValue("");
+    await expectNoHorizontalOverflow(page);
+
+    await page.goto("/add/manual");
 
     await page.getByLabel("Artist").fill("Nina Simone");
     await page.getByLabel("Album or release title").fill("Pastel Blues");

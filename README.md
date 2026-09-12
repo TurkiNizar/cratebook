@@ -62,13 +62,17 @@ Start the app with `npm run dev`, then:
 5. Choose a username on the onboarding screen.
 6. Confirm that you arrive at the empty collection screen.
 7. Choose **Add → Search the catalogue**, search by artist, title, barcode, or
-   catalogue number, and compare the pressing details returned by MusicBrainz.
-8. Review a release, confirm any Cover Art Archive image and its attribution, then
-   continue to the collection or wishlist form. Confirm the known release metadata is
-   prefilled, the selected artwork is retained, and copy-specific details remain empty.
+   catalogue number, and compare the cover-first album matches returned by MusicBrainz.
+   Each card represents one album rather than one exact physical pressing; Cover Art
+   Archive images are representative and clearly identified as such.
+8. Choose **Add to collection** or **Add to wishlist** on an album card. Confirm that
+   the server-verified artist, album title, and known original year are prefilled while
+   format, pressing, copy, price, condition, and personal details remain optional and
+   empty.
 9. Return to **Add → Add manually**, enter an artist and title, and save the record.
-10. Confirm the saved record appears in the collection grid with its release details
-    and, for a catalogue selection, its Cover Art Archive thumbnail.
+10. Confirm the saved record appears in the collection grid with its release details.
+    Existing exact-release catalogue records continue to show their retained Cover Art
+    Archive thumbnails.
 11. Open the record, choose **Edit record**, add a favorite, rating, condition,
     acquisition detail, price, private note, or comma-separated tags, and confirm the
     saved details appear on its detail page. Favorite records and tags also appear on

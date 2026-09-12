@@ -1,65 +1,80 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import type { CatalogueReleaseCandidate } from "@/lib/catalogue/types";
+import type { CatalogueAlbumCandidate } from "@/lib/catalogue/types";
 
 import { CatalogueSearchResults } from "./catalogue-search-results";
 
-const candidate: CatalogueReleaseCandidate = {
+const candidate: CatalogueAlbumCandidate = {
   source: "musicbrainz",
-  entityType: "release",
+  entityType: "release_group",
   externalId: "11111111-1111-4111-8111-111111111111",
   sourceUrl:
-    "https://musicbrainz.org/release/11111111-1111-4111-8111-111111111111",
+    "https://musicbrainz.org/release-group/11111111-1111-4111-8111-111111111111",
   artist: "Miles Davis",
   title: "Kind of Blue",
-  format: "lp",
-  discCount: 1,
   originalYear: 1959,
-  releaseYear: 1959,
-  label: "Columbia",
-  catalogNumber: "CS 8163",
-  country: "US",
-  editionDescription: "Stereo edition",
-  barcode: "012345678905",
+  representativeCoverUrl:
+    "https://coverartarchive.org/release-group/11111111-1111-4111-8111-111111111111/front-500",
   sourceData: { provider: "musicbrainz" },
 };
 
 describe("CatalogueSearchResults", () => {
-  it("shows enough edition context and source attribution to select a release", () => {
+  it("shows a cover-first album with both add destinations and attribution", () => {
     render(
       <CatalogueSearchResults
         query="Miles Davis"
-        result={{ status: "success", candidates: [candidate] }}
+        result={{
+          status: "success",
+          candidates: [candidate],
+          pagination: {
+            page: 1,
+            pageSize: 12,
+            totalResults: 1,
+            hasNextPage: false,
+          },
+        }}
       />,
     );
 
-    expect(screen.getByRole("heading", { name: "1 result" })).toBeVisible();
+    expect(screen.getByRole("heading", { name: "1 album" })).toBeVisible();
     expect(screen.getByRole("heading", { name: "Kind of Blue" })).toBeVisible();
     expect(screen.getByText("Miles Davis")).toBeVisible();
-    expect(screen.getByText("Columbia")).toBeVisible();
-    expect(screen.getByText("CS 8163")).toBeVisible();
-    expect(screen.getByText("Stereo edition")).toBeVisible();
-    expect(
-      screen.getByRole("link", { name: "Review release" }),
-    ).toHaveAttribute("href", "/add/catalogue/" + candidate.externalId);
-    expect(screen.getByRole("link", { name: /View source/ })).toHaveAttribute(
-      "href",
-      candidate.sourceUrl,
+    expect(screen.getByAltText("Kind of Blue cover")).toHaveAttribute(
+      "src",
+      candidate.representativeCoverUrl,
     );
+    expect(screen.getByText("First released 1959")).toBeVisible();
+    expect(
+      screen.getByText("Album match · pressing not selected"),
+    ).toBeVisible();
+    expect(
+      screen.getByRole("link", { name: "Add to collection" }),
+    ).toHaveAttribute(
+      "href",
+      "/add/manual?catalogueAlbumId=" + candidate.externalId,
+    );
+    expect(
+      screen.getByRole("link", { name: "Add to wishlist" }),
+    ).toHaveAttribute(
+      "href",
+      "/wishlist/add?catalogueAlbumId=" + candidate.externalId,
+    );
+    expect(
+      screen.getByRole("link", { name: /View album source/ }),
+    ).toHaveAttribute("href", candidate.sourceUrl);
   });
 
-  it("keeps ambiguous editions distinct with their pressing clues", () => {
-    const secondCandidate: CatalogueReleaseCandidate = {
+  it("renders one card per album and exposes result pagination", () => {
+    const secondCandidate: CatalogueAlbumCandidate = {
       ...candidate,
       externalId: "44444444-4444-4444-8444-444444444444",
       sourceUrl:
-        "https://musicbrainz.org/release/44444444-4444-4444-8444-444444444444",
-      releaseYear: 2013,
-      country: "EU",
-      label: "Music On Vinyl",
-      catalogNumber: "MOVLP 019",
-      editionDescription: "180 gram blue vinyl reissue",
+        "https://musicbrainz.org/release-group/44444444-4444-4444-8444-444444444444",
+      title: "In a Silent Way",
+      originalYear: null,
+      representativeCoverUrl:
+        "https://coverartarchive.org/release-group/44444444-4444-4444-8444-444444444444/front-500",
     };
 
     render(
@@ -68,21 +83,32 @@ describe("CatalogueSearchResults", () => {
         result={{
           status: "success",
           candidates: [candidate, secondCandidate],
+          pagination: {
+            page: 2,
+            pageSize: 2,
+            totalResults: 5,
+            hasNextPage: true,
+          },
         }}
       />,
     );
 
-    expect(screen.getByRole("heading", { name: "2 results" })).toBeVisible();
+    expect(screen.getByRole("heading", { name: "5 albums" })).toBeVisible();
+    expect(screen.getAllByRole("article")).toHaveLength(2);
+    expect(screen.getByRole("heading", { name: "Kind of Blue" })).toBeVisible();
     expect(
-      screen.getAllByRole("heading", { name: "Kind of Blue" }),
-    ).toHaveLength(2);
-    expect(screen.getByText("CS 8163")).toBeVisible();
-    expect(screen.getByText("MOVLP 019")).toBeVisible();
-    expect(screen.getByText("Stereo edition")).toBeVisible();
-    expect(screen.getByText("180 gram blue vinyl reissue")).toBeVisible();
-    expect(
-      screen.getAllByRole("link", { name: "Review release" }),
-    ).toHaveLength(2);
+      screen.getByRole("heading", { name: "In a Silent Way" }),
+    ).toBeVisible();
+    expect(screen.getByText("Original year unknown")).toBeVisible();
+    expect(screen.getByText("Page 2")).toBeVisible();
+    expect(screen.getByRole("link", { name: "← Previous" })).toHaveAttribute(
+      "href",
+      "/add/catalogue?q=Kind+of+Blue",
+    );
+    expect(screen.getByRole("link", { name: "Next →" })).toHaveAttribute(
+      "href",
+      "/add/catalogue?q=Kind+of+Blue&page=3",
+    );
   });
 
   it.each([

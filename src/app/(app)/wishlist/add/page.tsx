@@ -4,7 +4,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { WishlistForm } from "@/components/wishlist-form";
-import { candidateToWishlistFormValues } from "@/lib/catalogue/forms";
+import {
+  albumCandidateToWishlistFormValues,
+  candidateToWishlistFormValues,
+} from "@/lib/catalogue/forms";
 import { musicBrainzCatalogueProvider } from "@/lib/catalogue/musicbrainz";
 import { getCoverArtSelectionForRelease } from "@/lib/catalogue/provenance";
 
@@ -21,12 +24,14 @@ export default async function AddWishlistPage({
 }: {
   searchParams: Promise<{
     catalogueId?: string | string[];
+    catalogueAlbumId?: string | string[];
     coverUrl?: string | string[];
     coverOriginalUrl?: string | string[];
   }>;
 }) {
   const query = await searchParams;
   const catalogueId = firstValue(query.catalogueId);
+  const catalogueAlbumId = firstValue(query.catalogueAlbumId);
   const carriedCover = catalogueId
     ? getCoverArtSelectionForRelease(
         firstValue(query.coverUrl),
@@ -42,10 +47,16 @@ export default async function AddWishlistPage({
           : musicBrainzCatalogueProvider.getCover(catalogueId),
       ])
     : [null, null];
+  const albumLookup =
+    !catalogueId && catalogueAlbumId
+      ? await musicBrainzCatalogueProvider.lookupAlbum(catalogueAlbumId)
+      : null;
   const initialValues =
     lookup?.status === "success"
       ? candidateToWishlistFormValues(lookup.candidate)
-      : undefined;
+      : albumLookup?.status === "success"
+        ? albumCandidateToWishlistFormValues(albumLookup.candidate)
+        : undefined;
 
   return (
     <main className="app-content manual-record-page">
@@ -56,7 +67,9 @@ export default async function AddWishlistPage({
       <h1>Add to wishlist</h1>
       <p className="app-description">
         {initialValues
-          ? "Review the catalogue details, then add your preferred edition or spending limit if they matter."
+          ? albumLookup?.status === "success"
+            ? "The album is ready. Add a preferred edition or spending limit only if it matters to you."
+            : "Review the catalogue details, then add your preferred edition or spending limit if they matter."
           : "Save what you are looking for now, then add pressing preferences or a spending limit if they matter."}
       </p>
       {catalogueId && !initialValues ? (
@@ -65,6 +78,15 @@ export default async function AddWishlistPage({
           <p>
             Catalogue details could not be loaded. Manual wishlist entry is
             still ready.
+          </p>
+        </div>
+      ) : null}
+      {catalogueAlbumId && !initialValues ? (
+        <div className="collection-notice" role="status">
+          <span aria-hidden="true">i</span>
+          <p>
+            Album details could not be loaded. Manual wishlist entry is still
+            ready.
           </p>
         </div>
       ) : null}
