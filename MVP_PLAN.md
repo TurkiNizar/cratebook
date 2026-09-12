@@ -768,111 +768,80 @@ Implementation decisions for this pass:
   It must not silently replace or promote the record's manual, release-group, or exact-
   release catalogue identity, and it must not overwrite unrelated user edits.
 
-##### 1. Standardize secondary pill controls
+- [ ] Standardize secondary pill controls across collection, wishlist, catalogue,
+      settings, forms, pagination, recovery states, and confirmation dialogs
+  - Inventory button- and link-backed `.secondary-button` uses, including intentional
+    responsive or full-width variants.
+  - Establish one shared `inline-flex` contract with both-axis centering, predictable
+    line height, consistent height/padding, centered wrapping, and phone-sized targets.
+  - Make hover, focus-visible, active, disabled, and pending states consistent; review
+    adjacent danger and primary controls without changing their semantic hierarchy.
+  - Remove redundant page-specific alignment overrides.
+  - Cover short and wrapped labels and representative actions such as **Add to
+    wishlist**, **Choose a specific edition**, **Cancel**, and **Edit wish** in automated
+    and desktop/mobile browser checks.
 
-- [ ] Inventory every `.secondary-button` use across collection, wishlist, catalogue,
-      settings, forms, pagination, loading/error recovery, and confirmation dialogs;
-      include both `<button>` and link-backed controls and note any intentional size
-      variants
-- [ ] Establish one shared secondary-control layout contract with `inline-flex`, both-
-      axis centering, predictable line height, consistent pill height/padding, and
-      centered wrapped text; preserve comfortable touch targets at phone widths
-- [ ] Make hover, focus-visible, active, disabled, and pending states consistent without
-      weakening contrast or keyboard visibility; review adjacent danger and primary
-      controls for baseline conformity without changing their semantic hierarchy
-- [ ] Remove page-specific alignment overrides made redundant by the shared contract,
-      while preserving intentional full-width and responsive layouts
-- [ ] Add component/style regression coverage for button- and link-backed pills, short
-      and wrapped labels, disabled/pending controls, and the representative actions
-      **Add to wishlist**, **Choose a specific edition**, **Cancel**, and **Edit wish**
-- [ ] Verify text centering, focus treatment, touch-target size, wrapping, and absence of
-      horizontal overflow on supported desktop and phone browser profiles
+- [ ] Replace the floating Add action with a clean, accessible four-item bottom
+      navigation
+  - Replace the asymmetric grid and negative vertical translation with four equal
+    destinations: Collection, Wishlist, Add, and Profile.
+  - Keep Add visually prominent with a compact filled plus icon and visible **Add** label
+    while aligning its full target with the other tabs.
+  - Add an accessible current-route treatment for all four destinations.
+  - Verify keyboard access, touch targets, safe-area handling, content clearance, equal
+    placement, and no overlap at narrow and desktop widths.
 
-##### 2. Clean up the bottom Add action
+- [ ] Remove the decorative-disc flash when navigating to catalogue search
+  - Reproduce the transition under normal and throttled loading and confirm the route
+    segment loading UI is the source.
+  - Replace the skeleton's `.collection-cover` combination with a neutral primitive
+    matching the final header, search form, and result-card geometry.
+  - Prevent misleading empty content, an oversized disc, layout jumps, duplicate
+    controls, and unwanted animation when reduced motion is requested.
+  - Add loading-state component coverage and a desktop/mobile browser transition
+    regression check from **Search the catalogue**.
 
-- [ ] Replace the asymmetric `1fr 1fr 72px 1fr` grid and negatively translated floating
-      Add button with four equal navigation destinations: Collection, Wishlist, Add,
-      and Profile
-- [ ] Give Add a compact highlighted plus icon and visible **Add** label within the bar;
-      keep its full link target aligned with the other tabs and clear of page controls,
-      safe-area insets, browser chrome, and the application content
-- [ ] Add an accessible current-route treatment for all four destinations and retain an
-      unambiguous navigation label for assistive technology
-- [ ] Update component and authenticated browser coverage for equal placement, active
-      state, keyboard access, phone safe areas, content clearance, and no overlap at
-      narrow and desktop widths
+- [ ] Improve wishlist and collection artwork delivery with responsive Next.js/Vercel
+      image optimization and caching
+  - Remove the shared `ReleaseCover` component's `unoptimized` bypass after confirming
+    the configured release and release-group Cover Art Archive URL patterns.
+  - Configure responsive sizes deliberately, lazy-load grid images, prioritize only
+    genuinely above-fold artwork, and retain fixed aspect ratios.
+  - Preserve safe URL validation, alternative-text behavior, and deterministic
+    missing/broken-image fallbacks.
+  - Cover optimized rendering, both catalogue entity URL shapes, failures, responsive
+    sizing, repeated-request caching, and throttled layout stability in automated and
+    browser checks.
+  - Update provider or setup documentation only if actual cache behavior changes it;
+    do not introduce managed Supabase artwork copies during this task without evidence
+    that the platform cache is insufficient.
 
-##### 3. Remove the catalogue-navigation flash
+- [ ] Add album-artwork finding, replacement, and removal to collection record editing
+  - Reuse the authenticated manual-entry artwork finder and initialize it from the
+    record's current safe cover without changing typed artist/title values.
+  - Define explicit keep, choose, replace, and remove states; never infer removal from a
+    failed request or stale client selection.
+  - Extend the owner-scoped atomic update boundary to validate and save `cover_url` and
+    bounded artwork attribution while preserving metadata, copy details, tags, and the
+    existing external source, entity type, external ID, and source identity.
+  - Keep manual records manual and exact releases exact when representative artwork is
+    chosen. If independent artwork attribution cannot satisfy existing constraints, add
+    the smallest typed migration needed instead of weakening catalogue identity.
+  - Test unsafe hosts, oversized provenance, cross-user access, atomic failure,
+    select/replace/remove/provider-failure behavior, route revalidation, and authenticated
+    desktop/mobile editing of a coverless item; regenerate database types after any
+    migration.
 
-- [ ] Reproduce navigation from **Search the catalogue** under normal and throttled
-      loading, and confirm the route segment's loading UI is the source of the flash
-- [ ] Stop combining the catalogue skeleton with the decorative `.collection-cover`
-      vinyl pseudo-elements; use a neutral skeleton primitive that matches the final
-      catalogue page's header, search form, and result-card geometry
-- [ ] Ensure loading does not present a misleading empty page, oversized disc, layout
-      jump, or duplicate interactive controls, and honor reduced-motion preferences
-- [ ] Add loading-state component coverage plus a browser transition regression check
-      that exercises the Add-to-catalogue navigation on desktop and phone viewports
-
-##### 4. Improve wishlist and collection artwork loading
-
-- [ ] Remove the `unoptimized` bypass from the shared `ReleaseCover` once the configured
-      Cover Art Archive remote patterns are confirmed against every accepted release and
-      release-group URL shape
-- [ ] Configure responsive image sizes and cache behavior deliberately, avoid eager
-      loading the entire grid, and prioritize only artwork that is genuinely above the
-      fold; keep fixed aspect ratios so late images cannot shift the layout
-- [ ] Preserve the safe URL validator, meaningful/decorative alternative-text behavior,
-      and deterministic fallback when an optimized image or upstream cover fails
-- [ ] Add automated coverage for optimized URL rendering, release and release-group
-      artwork, missing/broken images, and responsive sizing
-- [ ] Verify locally that covers are served through the Next.js image optimizer, that a
-      repeated request benefits from caching, and that wishlist/collection grids remain
-      stable on a throttled mobile connection; record any limitation that only Vercel
-      response headers can prove without changing production data
-- [ ] Update `docs/catalogue-provider.md` or README only if the implemented cache or
-      operational behavior changes the existing provider/setup guidance
-
-##### 5. Add album artwork finding to collection editing
-
-- [ ] Pass the existing authenticated `findAlbumArtwork` action and the record's current
-      safe artwork selection into the edit form, reusing the manual-entry finder UI and
-      preserving typed artist/title values
-- [ ] Define an explicit edit payload for keep current artwork, choose a validated
-      release-group suggestion, or remove artwork; do not infer a removal from a failed
-      request or stale client state
-- [ ] Extend the owner-scoped atomic collection update boundary to validate and persist
-      the chosen `cover_url` and bounded artwork attribution while preserving the
-      record's existing external source, entity type, external ID, source identity,
-      metadata, copy details, and tags
-- [ ] Preserve manual records as manual and exact releases as exact releases when a
-      representative album cover is selected. If the existing provenance constraint
-      cannot represent independent artwork attribution safely, add the smallest typed
-      migration needed to separate artwork provenance from catalogue identity rather
-      than weakening the identity constraint
-- [ ] Prevent cross-user artwork updates, unsafe/unapproved cover hosts, oversized
-      provenance, silent metadata replacement, and partial writes; regenerate database
-      types after any migration
-- [ ] Add database authorization/atomicity tests, server-action validation tests, form
-      tests for select/replace/remove/provider-failure behavior, and authenticated
-      desktop/mobile browser coverage for adding artwork to a coverless collection item
-- [ ] Revalidate the affected collection list and detail routes after a successful edit,
-      display the new cover without requiring a manual refresh, and retain the current
-      error behavior without losing entered form values
-
-##### Verification and closeout
-
-- [ ] Run formatting check, lint, type-check, focused and full unit/component tests,
-      production build, database reset/tests/type generation comparison when the schema
-      changes, and authenticated Playwright coverage on the supported desktop and mobile
-      projects
-- [ ] Perform focused browser checks for computed pill alignment, bottom-navigation
-      geometry, catalogue transition behavior, throttled artwork loading, console errors,
-      keyboard operation, reduced motion, and horizontal overflow
-- [ ] Update README only for actual setup or usage changes; update this plan's decisions,
-      checkboxes, and progress log only for work completed and verified
-- [ ] Commit and push the completed polish work without including unrelated local files
-      or modifying hosted production data
+- [ ] Complete and document the pre-Milestone 4 polish verification
+  - Run formatting, lint, type-check, focused and full unit/component tests, production
+    build, database reset/tests/type comparison when schema changes, and authenticated
+    Playwright coverage on supported desktop and mobile projects.
+  - Check computed pill alignment, navigation geometry, catalogue transitions, throttled
+    artwork loading, console errors, keyboard operation, reduced motion, and overflow.
+  - Update README only for actual setup or usage changes and update checkboxes and the
+    progress log only for completed, verified work.
+  - Commit and push completed work without including unrelated files or modifying hosted
+    production data.
 
 Polish exit condition: secondary controls are consistently aligned and accessible; the
 four bottom destinations do not overlap content; catalogue navigation has no decorative
