@@ -228,6 +228,17 @@ supabase start
 npm run db:test
 ```
 
+Run the live catalogue-quality fixture when evaluating a discovery provider or query
+change:
+
+```bash
+npm run catalogue:benchmark
+```
+
+This makes rate-limited, read-only requests to MusicBrainz and is intentionally not a
+CI check. The fixture, methodology, and recorded baseline are documented in
+[`catalogue-quality/README.md`](./catalogue-quality/README.md).
+
 Run the optional real magic-link, onboarding, collection maintenance, wishlist
 management, search, and profile journey through Mailpit across the full browser matrix:
 

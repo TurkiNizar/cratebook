@@ -1,0 +1,165 @@
+{
+  "schemaVersion": 1,
+  "fixtureVersion": 1,
+  "measuredAt": "2026-09-12T10:02:42.142Z",
+  "provider": "MusicBrainz release search",
+  "strategy": "Current Cratebook exact-release query with vinyl filter",
+  "resultLimit": 12,
+  "measurementNotes": "Successful responses collected during bounded runs from 2026-09-12T09:54:14Z through 2026-09-12T10:02:42Z; transient HTTP 503 attempts were discarded rather than counted as search misses.",
+  "summary": {
+    "total": 14,
+    "recalled": 4,
+    "recallPercent": 28.6,
+    "byCategory": {
+      "famous_artist": { "total": 4, "recalled": 3, "recallPercent": 75 },
+      "common_album": { "total": 4, "recalled": 3, "recallPercent": 75 },
+      "less_common_album": { "total": 2, "recalled": 0, "recallPercent": 0 },
+      "punctuation_diacritics": {
+        "total": 2,
+        "recalled": 1,
+        "recallPercent": 50
+      },
+      "partial_title": { "total": 2, "recalled": 0, "recallPercent": 0 },
+      "barcode": { "total": 2, "recalled": 0, "recallPercent": 0 },
+      "catalogue_number": { "total": 2, "recalled": 0, "recallPercent": 0 }
+    }
+  },
+  "results": [
+    {
+      "id": "famous-kind-of-blue",
+      "categories": ["famous_artist", "common_album"],
+      "query": "Miles Davis Kind of Blue",
+      "status": "recalled",
+      "returned": 12,
+      "match": {
+        "rank": 4,
+        "externalId": "d6a1f166-8a02-4608-849b-9d623912c3e5",
+        "sourceUrl": "https://musicbrainz.org/release/d6a1f166-8a02-4608-849b-9d623912c3e5",
+        "artist": "Miles Davis",
+        "title": "Kind of Blue"
+      }
+    },
+    {
+      "id": "famous-rumours",
+      "categories": ["famous_artist", "common_album"],
+      "query": "Fleetwood Mac Rumours",
+      "status": "missed",
+      "returned": 12,
+      "match": null
+    },
+    {
+      "id": "famous-random-access-memories",
+      "categories": ["famous_artist", "common_album"],
+      "query": "Daft Punk Random Access Memories",
+      "status": "recalled",
+      "returned": 12,
+      "match": {
+        "rank": 1,
+        "externalId": "4375c18f-f160-44d0-ae2b-795f1dd5870f",
+        "sourceUrl": "https://musicbrainz.org/release/4375c18f-f160-44d0-ae2b-795f1dd5870f",
+        "artist": "Daft Punk",
+        "title": "Random Access Memories"
+      }
+    },
+    {
+      "id": "famous-back-to-black",
+      "categories": ["famous_artist", "common_album"],
+      "query": "Amy Winehouse Back to Black",
+      "status": "recalled",
+      "returned": 12,
+      "match": {
+        "rank": 1,
+        "externalId": "3b14e1b4-c5c3-4f93-83a1-e478010be110",
+        "sourceUrl": "https://musicbrainz.org/release/3b14e1b4-c5c3-4f93-83a1-e478010be110",
+        "artist": "Amy Winehouse",
+        "title": "Back to Black"
+      }
+    },
+    {
+      "id": "less-common-felt",
+      "categories": ["less_common_album"],
+      "query": "Nils Frahm Felt",
+      "status": "missed",
+      "returned": 3,
+      "match": null
+    },
+    {
+      "id": "less-common-titanic-rising",
+      "categories": ["less_common_album"],
+      "query": "Weyes Blood Titanic Rising",
+      "status": "missed",
+      "returned": 12,
+      "match": null
+    },
+    {
+      "id": "diacritics-agaetis-byrjun",
+      "categories": ["punctuation_diacritics"],
+      "query": "Sigur Ros Agaetis Byrjun",
+      "status": "missed",
+      "returned": 2,
+      "match": null
+    },
+    {
+      "id": "punctuation-acdc",
+      "categories": ["punctuation_diacritics"],
+      "query": "AC/DC Back in Black",
+      "status": "recalled",
+      "returned": 12,
+      "match": {
+        "rank": 1,
+        "externalId": "bdae9ca6-255a-417d-b4f6-7c95d479636e",
+        "sourceUrl": "https://musicbrainz.org/release/bdae9ca6-255a-417d-b4f6-7c95d479636e",
+        "artist": "AC/DC",
+        "title": "Back in Black"
+      }
+    },
+    {
+      "id": "partial-miseducation",
+      "categories": ["partial_title"],
+      "query": "Lauryn Miseducation",
+      "status": "missed",
+      "returned": 0,
+      "match": null
+    },
+    {
+      "id": "partial-ziggy-stardust",
+      "categories": ["partial_title"],
+      "query": "Bowie Ziggy Stardust",
+      "status": "missed",
+      "returned": 12,
+      "match": null
+    },
+    {
+      "id": "barcode-random-access-memories",
+      "categories": ["barcode"],
+      "query": "888837168618",
+      "status": "missed",
+      "returned": 0,
+      "match": null
+    },
+    {
+      "id": "barcode-dark-side-of-the-moon",
+      "categories": ["barcode"],
+      "query": "888751842519",
+      "status": "missed",
+      "returned": 0,
+      "match": null
+    },
+    {
+      "id": "catalogue-kind-of-blue",
+      "categories": ["catalogue_number"],
+      "query": "CS 8163",
+      "status": "missed",
+      "returned": 1,
+      "match": null
+    },
+    {
+      "id": "catalogue-unknown-pleasures",
+      "categories": ["catalogue_number"],
+      "query": "FACT 10",
+      "status": "missed",
+      "returned": 12,
+      "match": null
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+{
+  "version": 1,
+  "description": "Stable album-search queries used to compare catalogue providers and discovery strategies.",
+  "cases": [
+    {
+      "id": "famous-kind-of-blue",
+      "categories": ["famous_artist", "common_album"],
+      "query": "Miles Davis Kind of Blue",
+      "expected": { "artists": ["Miles Davis"], "titles": ["Kind of Blue"] }
+    },
+    {
+      "id": "famous-rumours",
+      "categories": ["famous_artist", "common_album"],
+      "query": "Fleetwood Mac Rumours",
+      "expected": { "artists": ["Fleetwood Mac"], "titles": ["Rumours"] }
+    },
+    {
+      "id": "famous-random-access-memories",
+      "categories": ["famous_artist", "common_album"],
+      "query": "Daft Punk Random Access Memories",
+      "expected": {
+        "artists": ["Daft Punk"],
+        "titles": ["Random Access Memories"]
+      }
+    },
+    {
+      "id": "famous-back-to-black",
+      "categories": ["famous_artist", "common_album"],
+      "query": "Amy Winehouse Back to Black",
+      "expected": { "artists": ["Amy Winehouse"], "titles": ["Back to Black"] }
+    },
+    {
+      "id": "less-common-felt",
+      "categories": ["less_common_album"],
+      "query": "Nils Frahm Felt",
+      "expected": { "artists": ["Nils Frahm"], "titles": ["Felt"] }
+    },
+    {
+      "id": "less-common-titanic-rising",
+      "categories": ["less_common_album"],
+      "query": "Weyes Blood Titanic Rising",
+      "expected": { "artists": ["Weyes Blood"], "titles": ["Titanic Rising"] }
+    },
+    {
+      "id": "diacritics-agaetis-byrjun",
+      "categories": ["punctuation_diacritics"],
+      "query": "Sigur Ros Agaetis Byrjun",
+      "expected": { "artists": ["Sigur Rós"], "titles": ["Ágætis byrjun"] }
+    },
+    {
+      "id": "punctuation-acdc",
+      "categories": ["punctuation_diacritics"],
+      "query": "AC/DC Back in Black",
+      "expected": { "artists": ["AC/DC"], "titles": ["Back in Black"] }
+    },
+    {
+      "id": "partial-miseducation",
+      "categories": ["partial_title"],
+      "query": "Lauryn Miseducation",
+      "expected": {
+        "artists": ["Lauryn Hill"],
+        "titles": ["The Miseducation of Lauryn Hill"]
+      }
+    },
+    {
+      "id": "partial-ziggy-stardust",
+      "categories": ["partial_title"],
+      "query": "Bowie Ziggy Stardust",
+      "expected": {
+        "artists": ["David Bowie"],
+        "titles": [
+          "The Rise and Fall of Ziggy Stardust and the Spiders From Mars"
+        ]
+      }
+    },
+    {
+      "id": "barcode-random-access-memories",
+      "categories": ["barcode"],
+      "query": "888837168618",
+      "expected": {
+        "artists": ["Daft Punk"],
+        "titles": ["Random Access Memories"]
+      }
+    },
+    {
+      "id": "barcode-dark-side-of-the-moon",
+      "categories": ["barcode"],
+      "query": "888751842519",
+      "expected": {
+        "artists": ["Pink Floyd"],
+        "titles": ["The Dark Side of the Moon"]
+      }
+    },
+    {
+      "id": "catalogue-kind-of-blue",
+      "categories": ["catalogue_number"],
+      "query": "CS 8163",
+      "expected": { "artists": ["Miles Davis"], "titles": ["Kind of Blue"] }
+    },
+    {
+      "id": "catalogue-unknown-pleasures",
+      "categories": ["catalogue_number"],
+      "query": "FACT 10",
+      "expected": {
+        "artists": ["Joy Division"],
+        "titles": ["Unknown Pleasures"]
+      }
+    }
+  ]
+}

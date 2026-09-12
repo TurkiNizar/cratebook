@@ -703,9 +703,10 @@ Product direction: Cratebook is a fast personal collection and wishlist, not a D
 replacement. The default discovery flow identifies a recognizable album; identifying
 an exact physical pressing remains optional advanced detail.
 
-- [ ] Define a repeatable catalogue-quality fixture covering famous artists, common
+- [x] Define a repeatable catalogue-quality fixture covering famous artists, common
       albums, less-common albums, punctuation/diacritics, partial titles, barcodes, and
-      catalogue numbers; record current MusicBrainz search recall as the baseline
+      catalogue numbers; record current MusicBrainz release-search recall as the 4/14
+      (28.6%) baseline in `catalogue-quality/`
 - [ ] Evaluate MusicBrainz release-group search and at least one broader album/artwork
       source against that fixture, including API access, rate limits, attribution,
       durable metadata and image-reference rights, failure behavior, and future
@@ -913,6 +914,7 @@ in version control; this log records product-level progress and changes.
 | 2026-09-11 | 3         | Applied the catalogue-provenance migration to production and completed Milestone 3 with explicit coverage for near-identical release choices, upstream timeouts and failures, missing artwork, exact-release review recovery, and permanent manual paths                                                                                                     | Begin Milestone 4 with public-profile privacy controls                 |
 | 2026-09-11 | 3         | Fixed catalogue cover loss by carrying exact-release-validated Cover Art Archive references from review through collection and wishlist submission, avoiding repeat artwork fetches, and safely backfilling missing artwork when an owner-scoped catalogue release is reused; verified application and database coverage                                     | Begin Milestone 4 with public-profile privacy controls                 |
 | 2026-09-12 | 3         | Reopened catalogue discovery around an agreed album-first product direction: representative cover artwork is sufficient for browsing, exact pressing identification becomes optional, and rapid collection/wishlist capture takes priority over Discogs-style completeness                                                                                   | Benchmark current recall and select the broader album/artwork source   |
+| 2026-09-12 | 3         | Added a versioned 14-case catalogue-quality fixture, a rate-considerate repeatable benchmark runner, automated fixture/baseline validation, and the current exact-release MusicBrainz baseline: 4/14 albums recalled (28.6%), with no recall for less-common albums, partial titles, barcodes, or catalogue numbers                                          | Compare MusicBrainz release groups and a broader album/artwork source  |
 
 ## 21. Hosted environment checklist
 

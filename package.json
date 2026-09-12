@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build --webpack",
+    "catalogue:benchmark": "node scripts/catalogue-quality.mjs",
     "db:test": "supabase test db",
     "start": "next start",
     "lint": "eslint .",
