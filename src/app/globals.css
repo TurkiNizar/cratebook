@@ -2719,18 +2719,31 @@ a.add-option:hover {
 }
 
 .bottom-nav .add-nav {
+  background: color-mix(in srgb, var(--terracotta), transparent 94%);
   color: var(--terracotta-dark);
 }
 
-.bottom-nav-add-icon {
+.bottom-nav-icon {
   display: grid;
   width: 32px;
   height: 32px;
+  flex: none;
   place-items: center;
+}
+
+.bottom-nav-add-icon {
   border-radius: 50%;
   background: var(--terracotta);
   color: white;
   box-shadow: 0 5px 14px rgba(189, 75, 47, 0.24);
+}
+
+.bottom-nav .add-nav:hover {
+  background: color-mix(in srgb, var(--terracotta), transparent 90%);
+}
+
+.bottom-nav .add-nav[aria-current="page"] {
+  background: color-mix(in srgb, var(--terracotta), transparent 86%);
 }
 
 @media (max-width: 850px) {

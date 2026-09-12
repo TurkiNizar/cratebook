@@ -18,30 +18,34 @@ export function BottomNavigation() {
     {
       href: "/add",
       label: "Add",
-      icon: (
-        <span className="bottom-nav-add-icon">
-          <PlusIcon width={20} height={20} />
-        </span>
-      ),
-      className: "add-nav",
+      icon: <PlusIcon width={20} height={20} />,
     },
     { href: "/settings", label: "Profile", icon: <PersonIcon /> },
   ];
 
   return (
     <nav className="bottom-nav" aria-label="Primary navigation">
-      {destinations.map(({ className, href, icon, label }) => {
+      {destinations.map(({ href, icon, label }) => {
+        const isAdd = href === "/add";
         const isCurrent = pathname === href || pathname.startsWith(`${href}/`);
 
         return (
           <Link
-            className={className}
+            className={isAdd ? "add-nav" : undefined}
             href={href}
             aria-current={isCurrent ? "page" : undefined}
             key={href}
           >
-            {icon}
-            <span>{label}</span>
+            <span
+              className={
+                isAdd
+                  ? "bottom-nav-icon bottom-nav-add-icon"
+                  : "bottom-nav-icon"
+              }
+            >
+              {icon}
+            </span>
+            <span className="bottom-nav-label">{label}</span>
           </Link>
         );
       })}

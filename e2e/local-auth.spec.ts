@@ -44,10 +44,15 @@ async function expectBottomNavigation(
     const appPage = document.querySelector(".app-page");
     const linkRects = Array.from(nav.querySelectorAll("a"), (link) => {
       const rect = link.getBoundingClientRect();
+      const labelRect = link
+        .querySelector(".bottom-nav-label")
+        ?.getBoundingClientRect();
 
       return {
+        backgroundColor: window.getComputedStyle(link).backgroundColor,
         center: rect.left + rect.width / 2,
         height: rect.height,
+        labelTop: labelRect?.top ?? 0,
         tabIndex: link.tabIndex,
         top: rect.top,
         width: rect.width,
@@ -75,12 +80,17 @@ async function expectBottomNavigation(
 
   const widths = geometry.linkRects.map(({ width }) => width);
   expect(Math.max(...widths) - Math.min(...widths)).toBeLessThanOrEqual(1);
+  const labelTops = geometry.linkRects.map(({ labelTop }) => labelTop);
+  expect(Math.max(...labelTops) - Math.min(...labelTops)).toBeLessThanOrEqual(
+    1,
+  );
   const centerGaps = geometry.linkRects
     .slice(1)
     .map(({ center }, index) => center - geometry.linkRects[index].center);
   expect(Math.max(...centerGaps) - Math.min(...centerGaps)).toBeLessThanOrEqual(
     1,
   );
+  expect(geometry.linkRects[2].backgroundColor).not.toBe("rgba(0, 0, 0, 0)");
 
   for (let index = 0; verifyKeyboard && index < 4; index += 1) {
     const adjacentIndex = index === 0 ? 1 : index - 1;

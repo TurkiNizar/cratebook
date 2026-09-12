@@ -33,6 +33,12 @@ describe("BottomNavigation", () => {
       "href",
       "/add",
     );
+    expect(navigation.querySelectorAll(".bottom-nav-icon")).toHaveLength(4);
+    expect(
+      screen
+        .getByRole("link", { name: "Add" })
+        .querySelector(".bottom-nav-icon"),
+    ).toHaveClass("bottom-nav-add-icon");
   });
 
   it.each([
