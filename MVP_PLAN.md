@@ -733,7 +733,7 @@ an exact physical pressing remains optional advanced detail.
       attribution, and no requirement to select an exact release
 - [x] Preserve existing catalogue items and wishlist conversions across album-level and
       exact-release provenance, including duplicate warnings and cover behavior
-- [ ] Add provider, normalization, persistence, component, accessibility, and
+- [x] Add provider, normalization, persistence, component, accessibility, and
       authenticated desktop/mobile browser coverage for quick add, insufficient
       results, ambiguous albums, missing artwork, invalid artwork, provider failure,
       manual recovery, and optional exact-edition selection
@@ -932,6 +932,7 @@ in version control; this log records product-level progress and changes.
 | 2026-09-12 | 3         | Restored exact MusicBrainz release selection as an optional album-scoped path with paginated vinyl editions, pressing clues, contextual release review, album-level fallbacks for no results and provider failure, responsive desktop/mobile coverage, and unchanged provenance persistence boundaries                                                       | Add optional artwork finding to manual collection and wishlist entry   |
 | 2026-09-12 | 3         | Added optional manual-entry artwork finding for collection and wishlist forms with authenticated MusicBrainz album search, server-validated Cover Art Archive suggestions, explicit no-cover handling, source attribution, stale-selection clearing, and responsive automated coverage                                                                       | Verify provenance preservation across album and exact-release flows    |
 | 2026-09-12 | 3         | Preserved shared release identity, entity-scoped MusicBrainz provenance, representative/exact Cover Art Archive references, known album metadata, and private defaults through album-level and exact-release wishlist conversion; added a non-blocking owned-copy warning that retains entered copy details and verified the flow on desktop and mobile      | Complete album-first resilience and accessibility coverage             |
+| 2026-09-12 | 3         | Completed album-first resilience and accessibility coverage with WCAG A/AA browser gates, accessible ambiguous-album labels, broken-cover fallbacks, and verified failure/manual recovery across component, persistence, desktop, and mobile tests                                                                                                           | Update provider documentation and verify production end to end         |
 
 ## 21. Hosted environment checklist
 

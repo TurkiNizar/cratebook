@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { ReleaseCover } from "./release-cover";
@@ -47,5 +47,25 @@ describe("ReleaseCover", () => {
     );
 
     expect(screen.getByAltText("Journey in Satchidananda cover")).toBeVisible();
+  });
+
+  it("replaces missing remote artwork with an accessible placeholder", () => {
+    render(
+      <ReleaseCover
+        coverUrl="https://coverartarchive.org/release-group/22222222-2222-4222-8222-222222222222/front-500"
+        title="Journey in Satchidananda"
+        sizes="280px"
+        meaningful
+      />,
+    );
+
+    fireEvent.error(screen.getByAltText("Journey in Satchidananda cover"));
+
+    expect(
+      screen.getByRole("img", {
+        name: "Journey in Satchidananda cover not available",
+      }),
+    ).toBeVisible();
+    expect(screen.queryByAltText("Journey in Satchidananda cover")).toBeNull();
   });
 });

@@ -11,7 +11,10 @@ export function CatalogueAlbumCard({
   const albumParameter = `catalogueAlbumId=${encodeURIComponent(candidate.externalId)}`;
 
   return (
-    <article className="catalogue-album-card" aria-label={candidate.title}>
+    <article
+      className="catalogue-album-card"
+      aria-label={`${candidate.title} by ${candidate.artist}`}
+    >
       <ReleaseCover
         className="catalogue-album-cover"
         coverUrl={candidate.representativeCoverUrl}

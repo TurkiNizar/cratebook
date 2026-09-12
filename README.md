@@ -262,7 +262,9 @@ RUN_LOCAL_AUTH_E2E=1 npm run e2e
 
 The authenticated matrix runs serially because every browser shares one local Supabase
 stack and Mailpit inbox. Add `--project=mobile-chrome` (or another configured project)
-for a faster targeted run.
+for a faster targeted run. The catalogue portion also checks serious and critical
+WCAG A/AA violations with axe, including album search, no-result recovery, and
+cover-first results.
 
 Regenerate `src/types/database.ts` after a migration with:
 

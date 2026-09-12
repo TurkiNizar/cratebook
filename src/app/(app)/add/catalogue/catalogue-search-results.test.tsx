@@ -117,6 +117,45 @@ describe("CatalogueSearchResults", () => {
     );
   });
 
+  it("distinguishes ambiguous album names and safely rejects invalid artwork", () => {
+    const sameTitleByAnotherArtist: CatalogueAlbumCandidate = {
+      ...candidate,
+      externalId: "44444444-4444-4444-8444-444444444444",
+      sourceUrl:
+        "https://musicbrainz.org/release-group/44444444-4444-4444-8444-444444444444",
+      artist: "The Soundalikes",
+      representativeCoverUrl: "https://images.example.test/untrusted.jpg",
+    };
+
+    render(
+      <CatalogueSearchResults
+        query="Kind of Blue"
+        result={{
+          status: "success",
+          candidates: [candidate, sameTitleByAnotherArtist],
+          pagination: {
+            page: 1,
+            pageSize: 12,
+            totalResults: 2,
+            hasNextPage: false,
+          },
+        }}
+      />,
+    );
+
+    expect(
+      screen.getByRole("article", { name: "Kind of Blue by Miles Davis" }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole("article", {
+        name: "Kind of Blue by The Soundalikes",
+      }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole("img", { name: "Kind of Blue cover not available" }),
+    ).toBeVisible();
+  });
+
   it.each([
     [{ status: "no_results" } as const, "Nothing found for “Blue Train”"],
     [

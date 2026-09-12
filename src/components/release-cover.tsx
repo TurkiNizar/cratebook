@@ -1,4 +1,7 @@
+"use client";
+
 import Image from "next/image";
+import { useState } from "react";
 
 import { getCoverArtUrl } from "@/lib/catalogue/provenance";
 
@@ -18,24 +21,34 @@ export function ReleaseCover({
   meaningful = false,
 }: ReleaseCoverProps) {
   const safeCoverUrl = getCoverArtUrl(coverUrl ?? null);
+  const [failedCoverUrl, setFailedCoverUrl] = useState<string | null>(null);
+  const visibleCoverUrl =
+    safeCoverUrl && failedCoverUrl !== safeCoverUrl ? safeCoverUrl : null;
 
   return (
     <div
-      className={`collection-cover ${safeCoverUrl ? "has-cover-art" : ""} ${className}`.trim()}
+      className={`collection-cover ${visibleCoverUrl ? "has-cover-art" : ""} ${className}`.trim()}
       aria-hidden={meaningful ? undefined : true}
+      aria-label={
+        meaningful && !visibleCoverUrl
+          ? `${title} cover not available`
+          : undefined
+      }
+      role={meaningful && !visibleCoverUrl ? "img" : undefined}
     >
-      {safeCoverUrl ? (
+      {visibleCoverUrl ? (
         <Image
           className="collection-cover-image"
           alt={meaningful ? `${title} cover` : ""}
-          src={safeCoverUrl}
+          src={visibleCoverUrl}
           width={500}
           height={500}
           sizes={sizes}
           unoptimized
+          onError={() => setFailedCoverUrl(visibleCoverUrl)}
         />
       ) : (
-        <span>{title.slice(0, 1).toUpperCase()}</span>
+        <span aria-hidden="true">{title.slice(0, 1).toUpperCase()}</span>
       )}
     </div>
   );

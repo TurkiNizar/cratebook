@@ -1,3 +1,4 @@
+import AxeBuilder from "@axe-core/playwright";
 import { expect, type Page, test } from "@playwright/test";
 
 const runLocalAuth = process.env.RUN_LOCAL_AUTH_E2E === "1";
@@ -13,6 +14,17 @@ async function expectNoHorizontalOverflow(page: Page) {
   });
 
   expect(overflow).toBeLessThanOrEqual(1);
+}
+
+async function expectNoSeriousAccessibilityViolations(page: Page) {
+  const results = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
+    .analyze();
+  const seriousViolations = results.violations.filter(
+    ({ impact }) => impact === "serious" || impact === "critical",
+  );
+
+  expect(seriousViolations).toEqual([]);
 }
 
 test.describe("local passwordless authentication", () => {
@@ -115,13 +127,36 @@ test.describe("local passwordless authentication", () => {
       page.getByRole("link", { name: "← Add options" }),
     ).toBeVisible();
     await expectNoHorizontalOverflow(page);
+    await expectNoSeriousAccessibilityViolations(page);
+
+    await page
+      .getByLabel("Artist, title, or identifier")
+      .fill(`Zzqv nonexistent album ${unique}`);
+    await page.getByRole("button", { name: "Search" }).click();
+    await expect(
+      page.getByRole("heading", { name: /Nothing found for/ }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Add manually" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Add to wishlist manually" }),
+    ).toBeVisible();
+    await expectNoSeriousAccessibilityViolations(page);
+    await page.getByRole("link", { name: "Add manually" }).click();
+    await expect(page).toHaveURL(/\/add\/manual$/);
+    await expect(page.getByLabel("Artist")).toBeVisible();
+    await page.goto("/add/catalogue");
 
     await page
       .getByLabel("Artist, title, or identifier")
       .fill("Miles Davis Kind of Blue");
     await page.getByRole("button", { name: "Search" }).click();
     const albumCard = page
-      .getByRole("article", { name: "Kind of Blue", exact: true })
+      .getByRole("article", {
+        name: "Kind of Blue by Miles Davis",
+        exact: true,
+      })
       .filter({ hasText: "First released 1959" })
       .first();
     await expect(albumCard.getByAltText("Kind of Blue cover")).toBeVisible();
@@ -147,6 +182,7 @@ test.describe("local passwordless authentication", () => {
     expect(albumWishlistHref).toMatch(/^\/wishlist\/add\?catalogueAlbumId=/);
     expect(albumCollectionHref).toMatch(/^\/add\/manual\?catalogueAlbumId=/);
     await expectNoHorizontalOverflow(page);
+    await expectNoSeriousAccessibilityViolations(page);
 
     await page.goto(editionHref!);
     await expect(
