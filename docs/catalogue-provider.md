@@ -1,6 +1,6 @@
 # Catalogue provider decision
 
-Last reviewed: 2026-09-12
+Last reviewed: 2026-09-13
 
 Cratebook uses the [MusicBrainz release-group API](https://musicbrainz.org/doc/MusicBrainz_API)
 as its default album-discovery provider. Exact MusicBrainz releases remain available
@@ -113,6 +113,15 @@ selected entity's approved front image and prefer the 500-pixel thumbnail for ca
 and forms; it may retain the original Cover Art Archive URL as provenance. Album-level
 records use `/release-group/{mbid}/...` artwork and exact editions use
 `/release/{mbid}/...`; carried artwork must match both the entity type and MBID.
+
+Collection, wishlist, catalogue, and artwork-finder thumbnails are delivered through
+the built-in Next.js image optimizer rather than directly from Cover Art Archive. The
+optimizer allowlist is limited to HTTPS release and release-group paths without query
+strings on the Cover Art Archive host, generates responsive source sets, and keeps a
+seven-day minimum cache entry. Grid artwork remains lazy-loaded; only the above-fold
+collection and wishlist detail covers are preloaded. The square cover container and
+client-side broken-image fallback remain in place while the optimized image loads or
+when the remote image is unavailable.
 
 The [Cover Art Archive policy](https://musicbrainz.org/doc/Cover_Art_Archive) says the
 archive is public but that image use remains at the user's risk and should respect the

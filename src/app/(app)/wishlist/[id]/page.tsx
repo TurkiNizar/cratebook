@@ -53,6 +53,7 @@ export default async function WishlistDetailPage({
           title={release.title}
           sizes="(max-width: 720px) calc(100vw - 40px), 320px"
           meaningful
+          preload
         />
         <div className="record-hero-copy">
           <div className="record-hero-kicker">

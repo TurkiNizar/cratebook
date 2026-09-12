@@ -40,9 +40,11 @@ describe("CatalogueSearchResults", () => {
     expect(screen.getByRole("heading", { name: "1 album" })).toBeVisible();
     expect(screen.getByRole("heading", { name: "Kind of Blue" })).toBeVisible();
     expect(screen.getByText("Miles Davis")).toBeVisible();
-    expect(screen.getByAltText("Kind of Blue cover")).toHaveAttribute(
-      "src",
-      candidate.representativeCoverUrl,
+    const cover = screen.getByAltText("Kind of Blue cover");
+    expect(cover).toHaveAttribute("loading", "lazy");
+    expect(cover.getAttribute("src")).toContain("/_next/image?url=");
+    expect(cover.getAttribute("src")).toContain(
+      encodeURIComponent(candidate.representativeCoverUrl!),
     );
     expect(screen.getByText("First released 1959")).toBeVisible();
     expect(

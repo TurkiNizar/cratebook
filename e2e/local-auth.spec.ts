@@ -23,6 +23,45 @@ async function expectNoHorizontalOverflow(page: Page) {
   expect(overflow).toBeLessThanOrEqual(1);
 }
 
+async function expectOptimizedArtwork(
+  image: Locator,
+  loading: "lazy" | "preloaded",
+) {
+  await expect(image).toBeVisible();
+  await expect(image).toHaveAttribute("src", /\/_next\/image\?url=/);
+  await expect(image).toHaveAttribute("srcset", /\/_next\/image\?url=/);
+  await expect(image).toHaveAttribute("sizes", /.+/);
+
+  if (loading === "lazy") {
+    await expect(image).toHaveAttribute("loading", "lazy");
+  } else {
+    await expect(image).not.toHaveAttribute("loading");
+  }
+
+  const geometry = await image.evaluate((element) => {
+    const imageRect = element.getBoundingClientRect();
+    const coverRect = element.parentElement?.getBoundingClientRect();
+
+    return {
+      coverAspectRatio: element.parentElement
+        ? window.getComputedStyle(element.parentElement).aspectRatio
+        : "",
+      coverHeight: coverRect?.height ?? 0,
+      coverWidth: coverRect?.width ?? 0,
+      imageHeight: imageRect.height,
+      imageWidth: imageRect.width,
+    };
+  });
+
+  expect(geometry.coverAspectRatio).toBe("1 / 1");
+  expect(
+    Math.abs(geometry.coverWidth - geometry.coverHeight),
+  ).toBeLessThanOrEqual(1);
+  expect(
+    Math.abs(geometry.imageWidth - geometry.imageHeight),
+  ).toBeLessThanOrEqual(1);
+}
+
 async function expectBottomNavigation(
   page: Page,
   currentLabel: string,
@@ -510,7 +549,10 @@ test.describe("local passwordless authentication", () => {
       })
       .filter({ hasText: "First released 1959" })
       .first();
-    await expect(albumCard.getByAltText("Kind of Blue cover")).toBeVisible();
+    await expectOptimizedArtwork(
+      albumCard.getByAltText("Kind of Blue cover"),
+      "lazy",
+    );
     await expect(
       albumCard.getByText("Album match · pressing not selected"),
     ).toBeVisible();
@@ -577,8 +619,12 @@ test.describe("local passwordless authentication", () => {
       .getByRole("list", { name: "Records in your collection" })
       .getByRole("article", { name: /kind of blue/i });
     await expect(albumCollectionCard.getByText("Miles Davis")).toBeVisible();
+    await expectOptimizedArtwork(albumCollectionCard.locator("img"), "lazy");
     await albumCollectionCard.getByRole("link").click();
-    await expect(page.getByAltText(/kind of blue cover/i)).toBeVisible();
+    await expectOptimizedArtwork(
+      page.getByAltText(/kind of blue cover/i),
+      "preloaded",
+    );
     const collectionEditionDetails = page.getByRole("region", {
       name: "Edition details",
     });
@@ -607,8 +653,12 @@ test.describe("local passwordless authentication", () => {
       .getByRole("list", { name: "Records on your wishlist" })
       .getByRole("article", { name: /kind of blue/i });
     await expect(albumWishlistCard.getByText("Miles Davis")).toBeVisible();
+    await expectOptimizedArtwork(albumWishlistCard.locator("img"), "lazy");
     await albumWishlistCard.getByRole("link").click();
-    await expect(page.getByAltText(/kind of blue cover/i)).toBeVisible();
+    await expectOptimizedArtwork(
+      page.getByAltText(/kind of blue cover/i),
+      "preloaded",
+    );
     const wishlistEditionDetails = page.getByRole("complementary", {
       name: "Edition details",
     });

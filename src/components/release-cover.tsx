@@ -11,6 +11,7 @@ type ReleaseCoverProps = {
   className?: string;
   sizes: string;
   meaningful?: boolean;
+  preload?: boolean;
 };
 
 export function ReleaseCover({
@@ -19,6 +20,7 @@ export function ReleaseCover({
   className = "",
   sizes,
   meaningful = false,
+  preload = false,
 }: ReleaseCoverProps) {
   const safeCoverUrl = getCoverArtUrl(coverUrl ?? null);
   const [failedCoverUrl, setFailedCoverUrl] = useState<string | null>(null);
@@ -44,7 +46,8 @@ export function ReleaseCover({
           width={500}
           height={500}
           sizes={sizes}
-          unoptimized
+          preload={preload}
+          loading={preload ? undefined : "lazy"}
           onError={() => setFailedCoverUrl(visibleCoverUrl)}
         />
       ) : (

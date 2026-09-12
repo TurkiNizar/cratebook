@@ -2,7 +2,7 @@
 
 > Living product specification, technical reference, and development tracker.
 >
-> Last updated: 2026-09-12
+> Last updated: 2026-09-13
 > Overall status: **In development**
 > Current milestone: **Milestone 3 — Pre-Milestone 4 UI and catalogue polish**
 
@@ -801,7 +801,7 @@ Implementation decisions for this pass:
   - Add loading-state component coverage and a desktop/mobile browser transition
     regression check from **Search the catalogue**.
 
-- [ ] Improve wishlist and collection artwork delivery with responsive Next.js/Vercel
+- [x] Improve wishlist and collection artwork delivery with responsive Next.js/Vercel
       image optimization and caching
   - Remove the shared `ReleaseCover` component's `unoptimized` bypass after confirming
     the configured release and release-group Cover Art Archive URL patterns.
@@ -1054,6 +1054,7 @@ in version control; this log records product-level progress and changes.
 | 2026-09-12 | 3         | Standardized link- and button-backed secondary pill controls with shared centering, wrapped-label geometry, phone-sized targets, and consistent hover, focus, active, disabled, and pending states; removed redundant alignment overrides and verified representative catalogue, form, wishlist, recovery, and confirmation actions on desktop and mobile    | Replace the floating Add action with equal bottom navigation           |
 | 2026-09-12 | 3         | Replaced the floating Add control with four equal, labelled bottom-navigation destinations; added nested-route current states, a compact in-bar Add treatment, safe-area-aware content clearance, keyboard and touch coverage, and authenticated geometry/accessibility checks across desktop Chromium, Android Chrome, and iPhone Safari                    | Remove the decorative-disc flash during catalogue navigation           |
 | 2026-09-12 | 3         | Replaced the catalogue route's shared decorative record-cover skeleton with a neutral, inert loading layout matching the final header, search form, and album cards; added an announced busy state, reduced-motion behavior, component coverage, and throttled authenticated transition checks on desktop and Android Chrome                                 | Optimize wishlist and collection artwork delivery                      |
+| 2026-09-13 | 3         | Enabled the built-in Next.js optimizer for shared Cover Art Archive artwork with strict release and release-group allowlists, responsive source sets, lazy grid loading, detail-view preloads, fixed square geometry, resilient fallbacks, and a seven-day minimum cache; verified real miss-to-hit caching plus authenticated desktop and mobile journeys   | Add artwork replacement and removal to collection record editing       |
 
 ## 21. Hosted environment checklist
 
