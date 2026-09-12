@@ -2,9 +2,9 @@
 
 > Living product specification, technical reference, and development tracker.
 >
-> Last updated: 2026-09-11
+> Last updated: 2026-09-12
 > Overall status: **In development**
-> Current milestone: **Milestone 4 — Sharing, portability, and MVP release**
+> Current milestone: **Milestone 3 — Album-first catalogue revision**
 
 ## How to use this document
 
@@ -697,8 +697,48 @@ Exit condition: users can reliably maintain and search a private collection usin
 - [x] Test ambiguous releases and external-service failure across provider, persistence,
       result-selection, review, and manual-recovery boundaries
 
-Exit condition: users can create a wishlist, find catalogue metadata, and convert a
-wanted record into an owned copy without re-entering its information.
+#### Album-first catalogue revision
+
+Product direction: Cratebook is a fast personal collection and wishlist, not a Discogs
+replacement. The default discovery flow identifies a recognizable album; identifying
+an exact physical pressing remains optional advanced detail.
+
+- [ ] Define a repeatable catalogue-quality fixture covering famous artists, common
+      albums, less-common albums, punctuation/diacritics, partial titles, barcodes, and
+      catalogue numbers; record current MusicBrainz search recall as the baseline
+- [ ] Evaluate MusicBrainz release-group search and at least one broader album/artwork
+      source against that fixture, including API access, rate limits, attribution,
+      durable metadata and image-reference rights, failure behavior, and future
+      commercial use; document the provider decision before integration
+- [ ] Define the album-level data and provenance contract so a quick-added album never
+      claims to identify the user's exact pressing; preserve existing exact-release
+      records and determine whether a schema migration is required
+- [ ] Build provider-neutral album discovery with broader matching, pagination where
+      supported, deterministic deduplication, typed failures, caching, throttling, and
+      a permanent manual fallback
+- [ ] Replace the default pressing-heavy results with responsive, cover-first album
+      cards showing one recognizable result per album and clear collection/wishlist
+      actions
+- [ ] Implement collection and wishlist quick-add using only artist, album title,
+      representative artwork, and known original year; keep format, pressing, copy,
+      price, condition, and personal details optional and editable afterward
+- [ ] Retain exact MusicBrainz release selection as an optional **Choose a specific
+      edition** path rather than a prerequisite for catalogue-assisted entry
+- [ ] Add an optional **Find album artwork** action to manual collection and wishlist
+      entry, with validated suggestions, an explicit no-cover choice, clear source
+      attribution, and no requirement to select an exact release
+- [ ] Preserve existing catalogue items and wishlist conversions across album-level and
+      exact-release provenance, including duplicate warnings and cover behavior
+- [ ] Add provider, normalization, persistence, component, accessibility, and
+      authenticated desktop/mobile browser coverage for quick add, insufficient
+      results, ambiguous albums, missing artwork, invalid artwork, provider failure,
+      manual recovery, and optional exact-edition selection
+- [ ] Update README usage guidance and catalogue-provider documentation, deploy any
+      required migration, and verify the complete album-first journey in production
+
+Exit condition: users can find and add a recognizable album to their collection or
+wishlist in under 30 seconds without knowing its exact pressing; pressing details remain
+optional, manual entry always works, and wishlist conversion requires no re-entry.
 
 ### Milestone 4 — Sharing, portability, and MVP release
 
@@ -779,6 +819,12 @@ These items require a scope decision before being promoted into an MVP milestone
       Archive as the artwork companion.
 - [x] Reference Cover Art Archive thumbnails remotely for the MVP; do not copy them to
       Supabase Storage.
+- [x] Make the default discovery experience album-first and keep exact pressing
+      identification as an optional advanced path.
+- [x] Allow representative album artwork in collection and wishlist browsing without
+      claiming that it depicts the user's exact physical pressing.
+- [ ] Select the broader album-discovery and artwork source after comparing real search
+      coverage and confirming its persistence, attribution, and image-use terms.
 - [x] Defer photos of a user's physical copy until after the MVP.
 - [x] Accept uppercase ISO 4217-style currency codes and whole acquisition dates.
 - [ ] Decide whether public pages should be indexed by search engines by default.
@@ -833,6 +879,7 @@ production environment.
 | 2026-09-11 | Resolve the exact MusicBrainz release after selection and prefill only release-level facts                                | Avoids trusting stale search summaries and keeps condition, acquisition, price, rating, and personal notes explicit user-owned facts     |
 | 2026-09-11 | Reuse an owner-scoped release for repeated catalogue selections without overwriting its existing metadata                 | Preserves user edits, supports multiple physical copies, and lets collection and wishlist items share one traced MusicBrainz release     |
 | 2026-09-11 | Carry validated Cover Art Archive references through catalogue saves and backfill only missing artwork on release reuse   | Prevents transient repeat artwork requests from dropping a selected cover without overwriting an existing cover or other release edits   |
+| 2026-09-12 | Make catalogue discovery album-first, use representative artwork, and keep exact pressing selection optional              | Cratebook prioritizes quick, recognizable collection and wishlist entry over Discogs-style edition cataloguing                           |
 
 ## 20. Progress log
 
@@ -865,6 +912,7 @@ in version control; this log records product-level progress and changes.
 | 2026-09-11 | 3         | Persisted server-verified MusicBrainz release IDs, bounded source snapshots, and optional Cover Art Archive references through atomic collection/wishlist mutations; reused matching owner-scoped releases without overwriting edits and surfaced safe artwork and source attribution in private browse/detail views                                         | Test ambiguous releases and external-service failure                   |
 | 2026-09-11 | 3         | Applied the catalogue-provenance migration to production and completed Milestone 3 with explicit coverage for near-identical release choices, upstream timeouts and failures, missing artwork, exact-release review recovery, and permanent manual paths                                                                                                     | Begin Milestone 4 with public-profile privacy controls                 |
 | 2026-09-11 | 3         | Fixed catalogue cover loss by carrying exact-release-validated Cover Art Archive references from review through collection and wishlist submission, avoiding repeat artwork fetches, and safely backfilling missing artwork when an owner-scoped catalogue release is reused; verified application and database coverage                                     | Begin Milestone 4 with public-profile privacy controls                 |
+| 2026-09-12 | 3         | Reopened catalogue discovery around an agreed album-first product direction: representative cover artwork is sufficient for browsing, exact pressing identification becomes optional, and rapid collection/wishlist capture takes priority over Discogs-style completeness                                                                                   | Benchmark current recall and select the broader album/artwork source   |
 
 ## 21. Hosted environment checklist
 
