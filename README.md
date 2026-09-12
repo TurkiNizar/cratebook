@@ -74,7 +74,9 @@ Start the app with `npm run dev`, then:
    the album's vinyl releases, review one release, and confirm that its known edition
    metadata is prefilled. The album-level collection and wishlist actions remain
    available if no listed edition is suitable or MusicBrainz is temporarily unavailable.
-9. Return to **Add → Add manually**, enter an artist and title, and save the record.
+9. Return to **Add → Add manually**, enter an artist and title, and optionally choose
+   **Find album artwork**. Select a representative Cover Art Archive suggestion or
+   explicitly keep no cover, then save the record.
 10. Confirm the saved record appears in the collection grid with its release details.
     Existing exact-release catalogue records continue to show their retained Cover Art
     Archive thumbnails.
@@ -90,8 +92,9 @@ Start the app with `npm run dev`, then:
     the newest-added, recently-acquired, artist, and title sort options.
 14. Choose **Remove from collection**, cancel once, then confirm removal. Remove the
     remaining test copy and verify the collection returns to its empty state.
-15. Open **Wishlist**, add an artist and title, then optionally set priority, preferred
-    edition, maximum price, notes, and visibility.
+15. Open **Wishlist**, add an artist and title, optionally find representative album
+    artwork or keep no cover, then set priority, preferred edition, maximum price,
+    notes, and visibility if wanted.
 16. Open the saved wish, edit its preferences, and confirm maximum price and private
     notes remain clearly identified as private. For a catalogue selection, confirm its
     MusicBrainz source link and optional Cover Art Archive thumbnail are retained.

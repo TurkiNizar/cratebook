@@ -11,6 +11,7 @@ import {
 import { musicBrainzCatalogueProvider } from "@/lib/catalogue/musicbrainz";
 import { getCoverArtSelectionForRelease } from "@/lib/catalogue/provenance";
 
+import { findAlbumArtwork } from "../../artwork-actions";
 import { createManualRecord } from "./actions";
 
 export const metadata: Metadata = { title: "Add a record manually" };
@@ -91,6 +92,9 @@ export default async function ManualRecordPage({
       ) : null}
       <RecordForm
         action={createManualRecord}
+        artworkFinderAction={
+          !catalogueId && !catalogueAlbumId ? findAlbumArtwork : undefined
+        }
         catalogueCover={
           cover?.status === "success"
             ? cover

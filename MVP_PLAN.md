@@ -728,7 +728,7 @@ an exact physical pressing remains optional advanced detail.
       price, condition, and personal details optional and editable afterward
 - [x] Retain exact MusicBrainz release selection as an optional **Choose a specific
       edition** path rather than a prerequisite for catalogue-assisted entry
-- [ ] Add an optional **Find album artwork** action to manual collection and wishlist
+- [x] Add an optional **Find album artwork** action to manual collection and wishlist
       entry, with validated suggestions, an explicit no-cover choice, clear source
       attribution, and no requirement to select an exact release
 - [ ] Preserve existing catalogue items and wishlist conversions across album-level and
@@ -889,6 +889,7 @@ production environment.
 | 2026-09-12 | Persist catalogue identity as provider, entity type, and MBID; backfill existing MusicBrainz rows as exact releases                          | Release-group and release MBIDs belong to different namespaces, and explicit provenance prevents an album quick add from implying a specific pressing                                           |
 | 2026-09-12 | Scope catalogue release reuse by provider, entity type, and MBID while retaining the existing RPC signatures                                 | Deriving entity type from server-verified provenance prevents release-group/exact-release collisions without creating a breaking application/database deployment order                          |
 | 2026-09-12 | Scope optional exact-edition discovery to the selected album and keep album-level actions available throughout the path                      | Experienced collectors can compare pressing clues without turning exact identification into a prerequisite or losing the fast album-first fallback                                              |
+| 2026-09-12 | Let manual collection and wishlist entries optionally adopt validated release-group artwork without replacing user-entered names             | Representative art improves browsing without requiring edition identification; clearing stale selections and retaining an explicit no-cover path keeps manual entry authoritative               |
 
 ## 20. Progress log
 
@@ -929,6 +930,7 @@ in version control; this log records product-level progress and changes.
 | 2026-09-12 | 3         | Replaced default pressing-heavy search with responsive, paginated cover-first album cards, explicit representative-artwork and pressing-not-selected guidance, clear collection/wishlist destinations, and server-validated album-level form prefills; verified component, desktop Chromium, and Android Chrome coverage                                     | Implement collection and wishlist album quick-add persistence          |
 | 2026-09-12 | 3         | Implemented collection and wishlist album quick-add with server-reverified release-group identity, representative artwork, known original year, blank optional pressing/copy fields, entity-scoped owner reuse, and real Cover Art Archive response handling; verified database, component, desktop Chromium, and Android Chrome coverage                    | Retain exact-release selection as an optional specific-edition path    |
 | 2026-09-12 | 3         | Restored exact MusicBrainz release selection as an optional album-scoped path with paginated vinyl editions, pressing clues, contextual release review, album-level fallbacks for no results and provider failure, responsive desktop/mobile coverage, and unchanged provenance persistence boundaries                                                       | Add optional artwork finding to manual collection and wishlist entry   |
+| 2026-09-12 | 3         | Added optional manual-entry artwork finding for collection and wishlist forms with authenticated MusicBrainz album search, server-validated Cover Art Archive suggestions, explicit no-cover handling, source attribution, stale-selection clearing, and responsive automated coverage                                                                       | Verify provenance preservation across album and exact-release flows    |
 
 ## 21. Hosted environment checklist
 

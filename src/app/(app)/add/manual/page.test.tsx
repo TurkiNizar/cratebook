@@ -24,6 +24,9 @@ vi.mock("@/lib/catalogue/musicbrainz", () => ({
 vi.mock("./actions", () => ({
   createManualRecord: vi.fn(),
 }));
+vi.mock("../../artwork-actions", () => ({
+  findAlbumArtwork: vi.fn(),
+}));
 
 import ManualRecordPage from "./page";
 

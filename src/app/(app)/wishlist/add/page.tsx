@@ -11,6 +11,7 @@ import {
 import { musicBrainzCatalogueProvider } from "@/lib/catalogue/musicbrainz";
 import { getCoverArtSelectionForRelease } from "@/lib/catalogue/provenance";
 
+import { findAlbumArtwork } from "../../artwork-actions";
 import { createWishlistItem } from "./actions";
 
 export const metadata: Metadata = { title: "Add to wishlist" };
@@ -95,6 +96,9 @@ export default async function AddWishlistPage({
       ) : null}
       <WishlistForm
         action={createWishlistItem}
+        artworkFinderAction={
+          !catalogueId && !catalogueAlbumId ? findAlbumArtwork : undefined
+        }
         catalogueCover={
           cover?.status === "success"
             ? cover

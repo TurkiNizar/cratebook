@@ -181,6 +181,16 @@ cover retrieval happen only after selection. The review screen then prefills kno
 release metadata into the existing collection or wishlist form without inferring
 copy-specific condition, acquisition, price, rating, or notes.
 
+Manual collection and wishlist forms expose the same release-group boundary through an
+optional **Find album artwork** action. The authenticated server action searches from
+the form's artist and title, validates up to four approved Cover Art Archive fronts,
+and returns only entity-scoped URLs plus bounded display metadata. Choosing a suggestion
+persists release-group provenance while preserving the collector's typed artist and
+title; changing either field clears the stale artwork choice. The UI credits Cover Art
+Archive and links the matching MusicBrainz album. Choosing **Keep no cover**, receiving
+no usable art, or encountering any provider failure leaves the ordinary manual save
+path unchanged and does not persist a catalogue identity.
+
 The provider-neutral album boundary is also implemented alongside the exact-release
 methods. Ordinary searches use token-wise MusicBrainz release-group matching limited
 to albums. Barcode-shaped and short alphanumeric catalogue-number queries use release

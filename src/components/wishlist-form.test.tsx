@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import userEvent from "@testing-library/user-event";
+import { describe, expect, it, vi } from "vitest";
 
 import { WishlistForm, type WishlistFormValues } from "./wishlist-form";
 
@@ -15,6 +16,37 @@ const values: WishlistFormValues = {
 };
 
 describe("WishlistForm", () => {
+  it("offers optional representative artwork on manual wishlist entry", async () => {
+    const user = userEvent.setup();
+    const artworkFinderAction = vi.fn(async () => ({
+      status: "no_results" as const,
+      message:
+        "No matching albums were found. You can keep this record without a cover.",
+      suggestions: [],
+    }));
+    render(
+      <WishlistForm
+        action={async () => ({ message: "", fieldErrors: {} })}
+        artworkFinderAction={artworkFinderAction}
+        entryKey="bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb"
+        variant="create"
+      />,
+    );
+
+    await user.type(screen.getByLabelText("Artist"), "Unknown Artist");
+    await user.type(screen.getByLabelText("Album or release title"), "Unknown");
+    await user.click(
+      screen.getByRole("button", { name: "Find album artwork" }),
+    );
+
+    expect(await screen.findByRole("status")).toHaveTextContent(
+      "No matching albums were found",
+    );
+    expect(
+      screen.getByRole("button", { name: /Keep no cover/ }),
+    ).toHaveAttribute("aria-pressed", "true");
+  });
+
   it("preloads wishlist preferences and exposes safe visibility guidance", () => {
     render(
       <WishlistForm

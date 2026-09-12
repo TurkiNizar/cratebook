@@ -118,6 +118,26 @@ export type CatalogueCoverSelection = {
   originalUrl: string;
 };
 
+export type CatalogueArtworkSuggestion = CatalogueCoverSelection & {
+  externalId: string;
+  artist: string;
+  title: string;
+  originalYear: number | null;
+  sourceUrl: string;
+};
+
+export type CatalogueArtworkSearchState = {
+  status:
+    | "idle"
+    | "success"
+    | "invalid_query"
+    | "no_results"
+    | "no_art"
+    | "unavailable";
+  message: string;
+  suggestions: CatalogueArtworkSuggestion[];
+};
+
 export interface CatalogueProvider {
   readonly source: CatalogueSource;
   search(query: string): Promise<CatalogueSearchResult>;

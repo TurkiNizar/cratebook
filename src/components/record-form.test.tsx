@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { RecordForm, type RecordFormValues } from "./record-form";
 
@@ -33,6 +33,75 @@ const values: RecordFormValues = {
 };
 
 describe("RecordForm", () => {
+  it("finds representative album artwork, submits its album provenance, and supports no cover", async () => {
+    const user = userEvent.setup();
+    const artworkFinderAction = vi.fn(async (_state, formData: FormData) => {
+      expect(formData.get("artist")).toBe("Nina Simone");
+      expect(formData.get("title")).toBe("Pastel Blues");
+      return {
+        status: "success" as const,
+        message: "Choose artwork.",
+        suggestions: [
+          {
+            externalId: "22222222-2222-4222-8222-222222222222",
+            artist: "Nina Simone",
+            title: "Pastel Blues",
+            originalYear: 1965,
+            sourceUrl:
+              "https://musicbrainz.org/release-group/22222222-2222-4222-8222-222222222222",
+            coverUrl:
+              "https://coverartarchive.org/release-group/22222222-2222-4222-8222-222222222222/front-500",
+            originalUrl:
+              "https://coverartarchive.org/release-group/22222222-2222-4222-8222-222222222222/front",
+          },
+        ],
+      };
+    });
+    const { container } = render(
+      <RecordForm
+        action={async () => ({ message: "", fieldErrors: {} })}
+        artworkFinderAction={artworkFinderAction}
+        entryKey="bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb"
+        variant="create"
+      />,
+    );
+
+    await user.type(screen.getByLabelText("Artist"), "Nina Simone");
+    await user.type(
+      screen.getByLabelText("Album or release title"),
+      "Pastel Blues",
+    );
+    await user.click(
+      screen.getByRole("button", { name: "Find album artwork" }),
+    );
+    await user.click(
+      await screen.findByRole("button", {
+        name: "Use artwork for Pastel Blues by Nina Simone",
+      }),
+    );
+
+    expect(container.querySelector('input[name="catalogueId"]')).toHaveValue(
+      "22222222-2222-4222-8222-222222222222",
+    );
+    expect(
+      container.querySelector('input[name="catalogueEntityType"]'),
+    ).toHaveValue("release_group");
+    expect(screen.getByText(/Artwork from Cover Art Archive/)).toBeVisible();
+
+    await user.type(screen.getByLabelText("Artist"), " Jr.");
+    expect(container.querySelector('input[name="catalogueId"]')).toBeNull();
+    await user.click(
+      screen.getByRole("button", {
+        name: "Use artwork for Pastel Blues by Nina Simone",
+      }),
+    );
+    await user.click(screen.getByRole("button", { name: /Keep no cover/ }));
+    expect(container.querySelector('input[name="catalogueId"]')).toBeNull();
+    expect(
+      container.querySelector('input[name="catalogueCoverUrl"]'),
+    ).toBeNull();
+  });
+
   it("preloads an existing record and provides edit actions", () => {
     render(
       <RecordForm

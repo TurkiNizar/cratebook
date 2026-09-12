@@ -240,6 +240,19 @@ test.describe("local passwordless authentication", () => {
 
     await page.getByLabel("Artist").fill("Nina Simone");
     await page.getByLabel("Album or release title").fill("Pastel Blues");
+    await page.getByRole("button", { name: "Find album artwork" }).click();
+    const pastelBluesArtwork = page
+      .getByRole("button", {
+        name: /Use artwork for Pastel Blues by Nina Simone/i,
+      })
+      .first();
+    await expect(pastelBluesArtwork).toBeVisible();
+    await pastelBluesArtwork.click();
+    await expect(pastelBluesArtwork).toHaveAttribute("aria-pressed", "true");
+    await expect(
+      page.getByText(/Artwork from Cover Art Archive/).first(),
+    ).toBeVisible();
+    await expectNoHorizontalOverflow(page);
     await page.getByLabel("Format").selectOption("lp");
     await page.getByLabel("Number of discs").fill("1");
     await page.getByText("Edition details").click();
@@ -266,6 +279,10 @@ test.describe("local passwordless authentication", () => {
     await expect(
       page.getByRole("heading", { name: "Pastel Blues", level: 1 }),
     ).toBeVisible();
+    await expect(page.getByAltText("Pastel Blues cover")).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "MusicBrainz" }),
+    ).toHaveAttribute("href", /musicbrainz\.org\/release-group\//);
     await expect(page.getByText("Nina Simone", { exact: true })).toBeVisible();
     await page.getByRole("link", { name: "Edit record" }).click();
     await expect(page).toHaveURL(/\/collection\/[0-9a-f-]+\/edit$/);
@@ -474,6 +491,9 @@ test.describe("local passwordless authentication", () => {
     await page
       .getByLabel("Album or release title")
       .fill("Journey in Satchidananda");
+    await expect(
+      page.getByRole("button", { name: /Keep no cover/ }),
+    ).toHaveAttribute("aria-pressed", "true");
     await page.getByLabel("Priority").selectOption("must_have");
     await page
       .getByLabel("Preferred edition or pressing")

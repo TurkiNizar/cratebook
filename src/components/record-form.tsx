@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import Link from "next/link";
 
+import { AlbumArtworkFinder } from "@/components/album-artwork-finder";
 import {
   type ManualRecordActionState,
   type ManualRecordField,
@@ -11,6 +12,8 @@ import {
   RELEASE_FORMAT_OPTIONS,
 } from "@/lib/record";
 import type {
+  CatalogueArtworkSearchState,
+  CatalogueArtworkSuggestion,
   CatalogueCoverSelection,
   CatalogueEntityType,
 } from "@/lib/catalogue/types";
@@ -75,6 +78,10 @@ type RecordFormProps = {
   catalogueId?: string;
   catalogueEntityType?: CatalogueEntityType;
   catalogueCover?: CatalogueCoverSelection;
+  artworkFinderAction?: (
+    previousState: CatalogueArtworkSearchState,
+    formData: FormData,
+  ) => Promise<CatalogueArtworkSearchState>;
   cancelHref?: string;
 };
 
@@ -132,6 +139,7 @@ export function RecordForm({
   catalogueId,
   catalogueEntityType,
   catalogueCover,
+  artworkFinderAction,
   cancelHref,
 }: RecordFormProps) {
   const [actionState, formAction, isPending] = useActionState(
@@ -141,9 +149,40 @@ export function RecordForm({
   const [values, setValues] = useState(
     () => initialValues ?? EMPTY_RECORD_FORM_VALUES,
   );
+  const [artworkSelection, setArtworkSelection] = useState<{
+    catalogueId: string;
+    catalogueEntityType: CatalogueEntityType;
+    cover?: CatalogueCoverSelection;
+  } | null>(() =>
+    catalogueId
+      ? {
+          catalogueId,
+          catalogueEntityType: catalogueEntityType ?? "release",
+          cover: catalogueCover,
+        }
+      : null,
+  );
 
   function updateValue(field: keyof RecordFormValues, value: string | boolean) {
     setValues((current) => ({ ...current, [field]: value }));
+    if (artworkFinderAction && (field === "artist" || field === "title")) {
+      setArtworkSelection(null);
+    }
+  }
+
+  function selectArtwork(suggestion: CatalogueArtworkSuggestion | null) {
+    setArtworkSelection(
+      suggestion
+        ? {
+            catalogueId: suggestion.externalId,
+            catalogueEntityType: "release_group",
+            cover: {
+              coverUrl: suggestion.coverUrl,
+              originalUrl: suggestion.originalUrl,
+            },
+          }
+        : null,
+    );
   }
 
   const errors = actionState.fieldErrors;
@@ -171,27 +210,31 @@ export function RecordForm({
       {entryKey ? (
         <input type="hidden" name="entryKey" value={entryKey} />
       ) : null}
-      {catalogueId ? (
+      {artworkSelection ? (
         <>
-          <input type="hidden" name="catalogueId" value={catalogueId} />
+          <input
+            type="hidden"
+            name="catalogueId"
+            value={artworkSelection.catalogueId}
+          />
           <input
             type="hidden"
             name="catalogueEntityType"
-            value={catalogueEntityType ?? "release"}
+            value={artworkSelection.catalogueEntityType}
           />
         </>
       ) : null}
-      {catalogueCover ? (
+      {artworkSelection?.cover ? (
         <>
           <input
             type="hidden"
             name="catalogueCoverUrl"
-            value={catalogueCover.coverUrl}
+            value={artworkSelection.cover.coverUrl}
           />
           <input
             type="hidden"
             name="catalogueCoverOriginalUrl"
-            value={catalogueCover.originalUrl}
+            value={artworkSelection.cover.originalUrl}
           />
         </>
       ) : null}
@@ -276,6 +319,14 @@ export function RecordForm({
               onChange={updateValue}
             />
           </div>
+
+          {artworkFinderAction ? (
+            <AlbumArtworkFinder
+              action={artworkFinderAction}
+              selectedExternalId={artworkSelection?.catalogueId}
+              onSelect={selectArtwork}
+            />
+          ) : null}
         </section>
       ) : null}
 

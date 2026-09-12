@@ -3,12 +3,15 @@
 import Link from "next/link";
 import { useActionState, useState } from "react";
 
+import { AlbumArtworkFinder } from "@/components/album-artwork-finder";
 import {
   type WishlistActionState,
   type WishlistField,
   WISHLIST_PRIORITY_OPTIONS,
 } from "@/lib/wishlist";
 import type {
+  CatalogueArtworkSearchState,
+  CatalogueArtworkSuggestion,
   CatalogueCoverSelection,
   CatalogueEntityType,
 } from "@/lib/catalogue/types";
@@ -41,6 +44,10 @@ type WishlistFormProps = {
   catalogueId?: string;
   catalogueEntityType?: CatalogueEntityType;
   catalogueCover?: CatalogueCoverSelection;
+  artworkFinderAction?: (
+    previousState: CatalogueArtworkSearchState,
+    formData: FormData,
+  ) => Promise<CatalogueArtworkSearchState>;
   initialValues?: WishlistFormValues;
   cancelHref?: string;
 };
@@ -52,6 +59,7 @@ export function WishlistForm({
   catalogueId,
   catalogueEntityType,
   catalogueCover,
+  artworkFinderAction,
   initialValues,
   cancelHref,
 }: WishlistFormProps) {
@@ -59,11 +67,42 @@ export function WishlistForm({
   const [values, setValues] = useState(
     () => initialValues ?? EMPTY_WISHLIST_VALUES,
   );
+  const [artworkSelection, setArtworkSelection] = useState<{
+    catalogueId: string;
+    catalogueEntityType: CatalogueEntityType;
+    cover?: CatalogueCoverSelection;
+  } | null>(() =>
+    catalogueId
+      ? {
+          catalogueId,
+          catalogueEntityType: catalogueEntityType ?? "release",
+          cover: catalogueCover,
+        }
+      : null,
+  );
   const errors = state.fieldErrors;
   const isEditing = variant === "edit";
 
   function update(field: keyof WishlistFormValues, value: string | boolean) {
     setValues((current) => ({ ...current, [field]: value }));
+    if (artworkFinderAction && (field === "artist" || field === "title")) {
+      setArtworkSelection(null);
+    }
+  }
+
+  function selectArtwork(suggestion: CatalogueArtworkSuggestion | null) {
+    setArtworkSelection(
+      suggestion
+        ? {
+            catalogueId: suggestion.externalId,
+            catalogueEntityType: "release_group",
+            cover: {
+              coverUrl: suggestion.coverUrl,
+              originalUrl: suggestion.originalUrl,
+            },
+          }
+        : null,
+    );
   }
 
   return (
@@ -71,27 +110,31 @@ export function WishlistForm({
       {entryKey ? (
         <input type="hidden" name="entryKey" value={entryKey} />
       ) : null}
-      {catalogueId ? (
+      {artworkSelection ? (
         <>
-          <input type="hidden" name="catalogueId" value={catalogueId} />
+          <input
+            type="hidden"
+            name="catalogueId"
+            value={artworkSelection.catalogueId}
+          />
           <input
             type="hidden"
             name="catalogueEntityType"
-            value={catalogueEntityType ?? "release"}
+            value={artworkSelection.catalogueEntityType}
           />
         </>
       ) : null}
-      {catalogueCover ? (
+      {artworkSelection?.cover ? (
         <>
           <input
             type="hidden"
             name="catalogueCoverUrl"
-            value={catalogueCover.coverUrl}
+            value={artworkSelection.cover.coverUrl}
           />
           <input
             type="hidden"
             name="catalogueCoverOriginalUrl"
-            value={catalogueCover.originalUrl}
+            value={artworkSelection.cover.originalUrl}
           />
         </>
       ) : null}
@@ -145,6 +188,14 @@ export function WishlistForm({
             ) : null}
           </div>
         </div>
+
+        {artworkFinderAction ? (
+          <AlbumArtworkFinder
+            action={artworkFinderAction}
+            selectedExternalId={artworkSelection?.catalogueId}
+            onSelect={selectArtwork}
+          />
+        ) : null}
       </section>
 
       <section
