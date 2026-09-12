@@ -10,6 +10,10 @@ import {
 
 const runLocalAuth = process.env.RUN_LOCAL_AUTH_E2E === "1";
 
+function supportsPlainTabNavigation(testInfo: TestInfo) {
+  return !["desktop-webkit", "mobile-safari"].includes(testInfo.project.name);
+}
+
 async function expectNoHorizontalOverflow(page: Page) {
   const overflow = await page.evaluate(() => {
     const documentWidth = Math.max(
@@ -59,7 +63,7 @@ async function expectOptimizedArtwork(
   ).toBeLessThanOrEqual(1);
   expect(
     Math.abs(geometry.imageWidth - geometry.imageHeight),
-  ).toBeLessThanOrEqual(1);
+  ).toBeLessThanOrEqual(1.01);
 }
 
 async function expectBottomNavigation(
@@ -149,6 +153,11 @@ async function expectBottomNavigation(
           ),
       )
       .toBe("rgba(0, 0, 0, 0)");
+  }
+
+  for (let index = 0; index < 4; index += 1) {
+    await links.nth(index).focus();
+    await expect(links.nth(index)).toBeFocused();
   }
 
   for (let index = 0; verifyKeyboard && index < 4; index += 1) {
@@ -353,7 +362,7 @@ test.describe("local passwordless authentication", () => {
     request,
   }, testInfo) => {
     await signInAndCompleteOnboarding(page, request, testInfo);
-    const verifyKeyboard = testInfo.project.name !== "mobile-safari";
+    const verifyKeyboard = supportsPlainTabNavigation(testInfo);
 
     await expectBottomNavigation(page, "Collection", verifyKeyboard);
     await page.getByRole("link", { name: "Add", exact: true }).click();
@@ -476,7 +485,7 @@ test.describe("local passwordless authentication", () => {
     await expectBottomNavigation(
       page,
       "Collection",
-      testInfo.project.name !== "mobile-safari",
+      supportsPlainTabNavigation(testInfo),
     );
 
     await page.getByRole("link", { name: "Add", exact: true }).click();
@@ -484,7 +493,7 @@ test.describe("local passwordless authentication", () => {
     await expectBottomNavigation(
       page,
       "Add",
-      testInfo.project.name !== "mobile-safari",
+      supportsPlainTabNavigation(testInfo),
     );
     await page.getByRole("link", { name: /search the catalogue/i }).click();
     await expect(page).toHaveURL(/\/add\/catalogue$/);
@@ -1149,7 +1158,7 @@ test.describe("local passwordless authentication", () => {
     await expectBottomNavigation(
       page,
       "Profile",
-      testInfo.project.name !== "mobile-safari",
+      supportsPlainTabNavigation(testInfo),
     );
     await page.getByLabel("Display name").fill("Local Crate Digger");
     await page

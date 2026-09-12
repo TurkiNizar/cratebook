@@ -4,7 +4,7 @@
 >
 > Last updated: 2026-09-13
 > Overall status: **In development**
-> Current milestone: **Milestone 3 — Pre-Milestone 4 UI and catalogue polish**
+> Current milestone: **Milestone 4 — Sharing, portability, and MVP release**
 
 ## How to use this document
 
@@ -832,7 +832,7 @@ Implementation decisions for this pass:
     desktop/mobile editing of a coverless item; regenerate database types after any
     migration.
 
-- [ ] Complete and document the pre-Milestone 4 polish verification
+- [x] Complete and document the pre-Milestone 4 polish verification
   - Run formatting, lint, type-check, focused and full unit/component tests, production
     build, database reset/tests/type comparison when schema changes, and authenticated
     Playwright coverage on supported desktop and mobile projects.
@@ -1056,6 +1056,7 @@ in version control; this log records product-level progress and changes.
 | 2026-09-12 | 3         | Replaced the catalogue route's shared decorative record-cover skeleton with a neutral, inert loading layout matching the final header, search form, and album cards; added an announced busy state, reduced-motion behavior, component coverage, and throttled authenticated transition checks on desktop and Android Chrome                                 | Optimize wishlist and collection artwork delivery                      |
 | 2026-09-13 | 3         | Enabled the built-in Next.js optimizer for shared Cover Art Archive artwork with strict release and release-group allowlists, responsive source sets, lazy grid loading, detail-view preloads, fixed square geometry, resilient fallbacks, and a seven-day minimum cache; verified real miss-to-hit caching plus authenticated desktop and mobile journeys   | Add artwork replacement and removal to collection record editing       |
 | 2026-09-13 | 3         | Added explicit keep, verified replacement, and removal states to collection editing; stored bounded artwork provenance separately from catalogue identity; preserved unrelated edits atomically; and verified validation, authorization, rollback, component, database, desktop Chromium, Android Chrome, and iPhone Safari coverage                         | Complete and document the pre-Milestone 4 polish verification          |
+| 2026-09-13 | 3         | Closed the pre-Milestone 4 polish pass after correcting cross-browser geometry and keyboard-test assumptions; formatting, lint, type-check, 166 unit/component tests, production build, a clean 15-migration reset, 300 database assertions, generated-type parity, and the full authenticated five-project browser matrix all pass                          | Begin Milestone 4 with profile-level public/private control            |
 
 ## 21. Hosted environment checklist
 
