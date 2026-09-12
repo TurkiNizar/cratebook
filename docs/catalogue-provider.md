@@ -1,12 +1,48 @@
 # Catalogue provider decision
 
-Last reviewed: 2026-09-11
+Last reviewed: 2026-09-12
 
 Cratebook will use the [MusicBrainz release API](https://musicbrainz.org/doc/MusicBrainz_API)
 as its first external catalogue provider. Cover artwork will come from the associated
 [Cover Art Archive API](https://musicbrainz.org/doc/Cover_Art_Archive/API). The provider
 adapter must keep both services behind Cratebook's server boundary so manual entry and
 the rest of the collection remain available when either service is slow or unavailable.
+
+## Album-first provider evaluation
+
+The 2026-09-12 album-first comparison uses the versioned fixture and recorded results
+in `catalogue-quality/`. The current exact-release query recalled 4/14 expected albums
+(28.6%). A token-wise [MusicBrainz release-group search](https://musicbrainz.org/doc/MusicBrainz_API/Search#Release_Group)
+recalled 14/14 (100%), with the expected album at rank 1 in 12 cases, rank 2 in one,
+and rank 5 in one. Barcodes and catalogue numbers were resolved through MusicBrainz
+release search and then collapsed to their release-group identity. Cover Art Archive's
+curated [release-group front endpoint](https://musicbrainz.org/doc/Cover_Art_Archive/API#Release_Group)
+was available for all 14 matches.
+
+Apple's unauthenticated [iTunes Search API](https://developer.apple.com/library/archive/documentation/AudioVideo/Conceptual/iTuneSearchAPI/Searching.html)
+was evaluated as the broader commercial catalogue comparator using its US-store
+`music` / `album` search. It recalled 9/14 (64.3%) and supplied artwork for every
+recalled album, but missed one partial-title case plus every barcode and
+catalogue-number case. Results are storefront-specific. Apple documents an approximate
+limit of 20 calls per minute and recommends caching. The comparison treats non-success
+responses and malformed payloads as provider failures rather than missed albums; an
+integrated provider would still need bounded retries and the permanent manual fallback.
+
+Apple is not selected for integration. Its [Search API terms](https://developer.apple.com/library/archive/documentation/AudioVideo/Conceptual/iTuneSearchAPI/index.html)
+describe album artwork as promotional content: use must promote the Store content,
+appear near an approved badge linking to the Store, not promote other goods or
+services, and be removed on request. Those conditions do not fit durable artwork on a
+user's personal collection record, and the public documentation is archived rather
+than an actively versioned catalogue contract.
+
+Cratebook will therefore use MusicBrainz release groups as the default album identity
+and Cover Art Archive's release-group front image as optional representative artwork.
+Core MusicBrainz metadata remains suitable for durable storage under CC0. Cover images
+remain remote, optional, attributed, removable, and subject to the existing rights-risk
+policy. Exact MusicBrainz releases remain available for identifier lookup and the
+optional edition-selection path; an album-level match must never claim an exact
+pressing. Re-review Cover Art Archive image use before commercial launch as already
+required below.
 
 ## Why MusicBrainz
 

@@ -1,0 +1,255 @@
+{
+  "schemaVersion": 1,
+  "fixtureVersion": 1,
+  "measurementWindow": {
+    "startedAt": "2026-09-12T10:20:43.372Z",
+    "completedAt": "2026-09-12T10:33:25.603Z"
+  },
+  "measurementNotes": "Successful responses were accumulated across bounded read-only runs because MusicBrainz intermittently returned HTTP 503. Transport failures were discarded, never scored as misses.",
+  "results": [
+    {
+      "id": "musicbrainz_release_group",
+      "provider": "MusicBrainz release-group search with Cover Art Archive",
+      "strategy": "Token-wise artist/title album search with exact release lookup for barcodes and catalogue numbers",
+      "resultLimit": 12,
+      "summary": {
+        "total": 14,
+        "recalled": 14,
+        "recallPercent": 100,
+        "byCategory": {
+          "famous_artist": { "total": 4, "recalled": 4, "recallPercent": 100 },
+          "common_album": { "total": 4, "recalled": 4, "recallPercent": 100 },
+          "less_common_album": {
+            "total": 2,
+            "recalled": 2,
+            "recallPercent": 100
+          },
+          "punctuation_diacritics": {
+            "total": 2,
+            "recalled": 2,
+            "recallPercent": 100
+          },
+          "partial_title": { "total": 2, "recalled": 2, "recallPercent": 100 },
+          "barcode": { "total": 2, "recalled": 2, "recallPercent": 100 },
+          "catalogue_number": {
+            "total": 2,
+            "recalled": 2,
+            "recallPercent": 100
+          }
+        }
+      },
+      "artworkSummary": {
+        "available": 14,
+        "missing": 0,
+        "unavailable": 0,
+        "notRecalled": 0
+      },
+      "results": [
+        {
+          "id": "famous-kind-of-blue",
+          "status": "recalled",
+          "rank": 1,
+          "artworkStatus": "available"
+        },
+        {
+          "id": "famous-rumours",
+          "status": "recalled",
+          "rank": 2,
+          "artworkStatus": "available"
+        },
+        {
+          "id": "famous-random-access-memories",
+          "status": "recalled",
+          "rank": 1,
+          "artworkStatus": "available"
+        },
+        {
+          "id": "famous-back-to-black",
+          "status": "recalled",
+          "rank": 1,
+          "artworkStatus": "available"
+        },
+        {
+          "id": "less-common-felt",
+          "status": "recalled",
+          "rank": 1,
+          "artworkStatus": "available"
+        },
+        {
+          "id": "less-common-titanic-rising",
+          "status": "recalled",
+          "rank": 1,
+          "artworkStatus": "available"
+        },
+        {
+          "id": "diacritics-agaetis-byrjun",
+          "status": "recalled",
+          "rank": 1,
+          "artworkStatus": "available"
+        },
+        {
+          "id": "punctuation-acdc",
+          "status": "recalled",
+          "rank": 1,
+          "artworkStatus": "available"
+        },
+        {
+          "id": "partial-miseducation",
+          "status": "recalled",
+          "rank": 1,
+          "artworkStatus": "available"
+        },
+        {
+          "id": "partial-ziggy-stardust",
+          "status": "recalled",
+          "rank": 5,
+          "artworkStatus": "available"
+        },
+        {
+          "id": "barcode-random-access-memories",
+          "status": "recalled",
+          "rank": 1,
+          "artworkStatus": "available"
+        },
+        {
+          "id": "barcode-dark-side-of-the-moon",
+          "status": "recalled",
+          "rank": 1,
+          "artworkStatus": "available"
+        },
+        {
+          "id": "catalogue-kind-of-blue",
+          "status": "recalled",
+          "rank": 1,
+          "artworkStatus": "available"
+        },
+        {
+          "id": "catalogue-unknown-pleasures",
+          "status": "recalled",
+          "rank": 1,
+          "artworkStatus": "available"
+        }
+      ]
+    },
+    {
+      "id": "itunes_album",
+      "provider": "Apple iTunes Search API",
+      "strategy": "US-store music album search",
+      "resultLimit": 12,
+      "summary": {
+        "total": 14,
+        "recalled": 9,
+        "recallPercent": 64.3,
+        "byCategory": {
+          "famous_artist": { "total": 4, "recalled": 4, "recallPercent": 100 },
+          "common_album": { "total": 4, "recalled": 4, "recallPercent": 100 },
+          "less_common_album": {
+            "total": 2,
+            "recalled": 2,
+            "recallPercent": 100
+          },
+          "punctuation_diacritics": {
+            "total": 2,
+            "recalled": 2,
+            "recallPercent": 100
+          },
+          "partial_title": { "total": 2, "recalled": 1, "recallPercent": 50 },
+          "barcode": { "total": 2, "recalled": 0, "recallPercent": 0 },
+          "catalogue_number": { "total": 2, "recalled": 0, "recallPercent": 0 }
+        }
+      },
+      "artworkSummary": {
+        "available": 9,
+        "missing": 0,
+        "unavailable": 0,
+        "notRecalled": 5
+      },
+      "results": [
+        {
+          "id": "famous-kind-of-blue",
+          "status": "recalled",
+          "rank": 1,
+          "artworkStatus": "available"
+        },
+        {
+          "id": "famous-rumours",
+          "status": "recalled",
+          "rank": 1,
+          "artworkStatus": "available"
+        },
+        {
+          "id": "famous-random-access-memories",
+          "status": "recalled",
+          "rank": 1,
+          "artworkStatus": "available"
+        },
+        {
+          "id": "famous-back-to-black",
+          "status": "recalled",
+          "rank": 1,
+          "artworkStatus": "available"
+        },
+        {
+          "id": "less-common-felt",
+          "status": "recalled",
+          "rank": 1,
+          "artworkStatus": "available"
+        },
+        {
+          "id": "less-common-titanic-rising",
+          "status": "recalled",
+          "rank": 1,
+          "artworkStatus": "available"
+        },
+        {
+          "id": "diacritics-agaetis-byrjun",
+          "status": "recalled",
+          "rank": 1,
+          "artworkStatus": "available"
+        },
+        {
+          "id": "punctuation-acdc",
+          "status": "recalled",
+          "rank": 1,
+          "artworkStatus": "available"
+        },
+        {
+          "id": "partial-miseducation",
+          "status": "recalled",
+          "rank": 1,
+          "artworkStatus": "available"
+        },
+        {
+          "id": "partial-ziggy-stardust",
+          "status": "missed",
+          "rank": null,
+          "artworkStatus": "not_recalled"
+        },
+        {
+          "id": "barcode-random-access-memories",
+          "status": "missed",
+          "rank": null,
+          "artworkStatus": "not_recalled"
+        },
+        {
+          "id": "barcode-dark-side-of-the-moon",
+          "status": "missed",
+          "rank": null,
+          "artworkStatus": "not_recalled"
+        },
+        {
+          "id": "catalogue-kind-of-blue",
+          "status": "missed",
+          "rank": null,
+          "artworkStatus": "not_recalled"
+        },
+        {
+          "id": "catalogue-unknown-pleasures",
+          "status": "missed",
+          "rank": null,
+          "artworkStatus": "not_recalled"
+        }
+      ]
+    }
+  ]
+}

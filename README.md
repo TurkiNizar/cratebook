@@ -233,10 +233,12 @@ change:
 
 ```bash
 npm run catalogue:benchmark
+npm run catalogue:compare
 ```
 
-This makes rate-limited, read-only requests to MusicBrainz and is intentionally not a
-CI check. The fixture, methodology, and recorded baseline are documented in
+These make rate-limited, read-only requests to MusicBrainz and the evaluated comparison
+provider, and can optionally probe Cover Art Archive artwork; they are intentionally
+not CI checks. The fixture, methodology, baseline, and provider comparison are documented in
 [`catalogue-quality/README.md`](./catalogue-quality/README.md).
 
 Run the optional real magic-link, onboarding, collection maintenance, wishlist

@@ -39,3 +39,16 @@ When comparing another provider or strategy, keep `fixture.json` unchanged, comm
 separate result file, and explain any unavoidable unsupported query category. Change
 the fixture only when the product's representative search expectations change; bump
 its version and retain older result files so comparisons remain auditable.
+
+Run the album-source comparison with:
+
+```bash
+npm run catalogue:compare
+```
+
+Pass `-- --provider=musicbrainz_release_group --artwork` or
+`-- --provider=itunes_album` to isolate a provider. A comma-separated `--case=` list
+can repeat only cases affected by transient failures. The recorded comparison found
+14/14 albums through MusicBrainz release-group discovery with representative Cover Art
+Archive artwork available for every match. Apple iTunes album search found 9/14 with
+artwork for every match, but missed all barcode and catalogue-number cases.
