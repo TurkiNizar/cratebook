@@ -54,12 +54,18 @@ describe("CatalogueSearchResults", () => {
       "href",
       "/add/manual?catalogueAlbumId=" + candidate.externalId,
     );
+    expect(screen.getByRole("link", { name: "Add to wishlist" })).toHaveClass(
+      "secondary-button",
+    );
     expect(
       screen.getByRole("link", { name: "Add to wishlist" }),
     ).toHaveAttribute(
       "href",
       "/wishlist/add?catalogueAlbumId=" + candidate.externalId,
     );
+    expect(
+      screen.getByRole("link", { name: "Choose a specific edition" }),
+    ).toHaveClass("secondary-button");
     expect(
       screen.getByRole("link", { name: "Choose a specific edition" }),
     ).toHaveAttribute(

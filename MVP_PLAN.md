@@ -768,7 +768,7 @@ Implementation decisions for this pass:
   It must not silently replace or promote the record's manual, release-group, or exact-
   release catalogue identity, and it must not overwrite unrelated user edits.
 
-- [ ] Standardize secondary pill controls across collection, wishlist, catalogue,
+- [x] Standardize secondary pill controls across collection, wishlist, catalogue,
       settings, forms, pagination, recovery states, and confirmation dialogs
   - Inventory button- and link-backed `.secondary-button` uses, including intentional
     responsive or full-width variants.
@@ -1051,6 +1051,7 @@ in version control; this log records product-level progress and changes.
 | 2026-09-12 | 3         | Completed album-first resilience and accessibility coverage with WCAG A/AA browser gates, accessible ambiguous-album labels, broken-cover fallbacks, and verified failure/manual recovery across component, persistence, desktop, and mobile tests                                                                                                           | Update provider documentation and verify production end to end         |
 | 2026-09-12 | 3         | Closed the album-first revision with updated usage/provider guidance, all 14 hosted migrations confirmed, application/database checks passing, the complete authenticated local journey verified on desktop and mobile, and a public production smoke check; the owner deferred the authenticated production run and no hosted catalogue data was changed    | Begin Milestone 4 with profile-level privacy controls                  |
 | 2026-09-12 | 3         | Reopened Milestone 3 for a documented pre-Milestone 4 quality pass covering secondary-control alignment, a non-overlapping four-tab bottom navigation, catalogue loading-flash removal, optimized remote artwork delivery, and artwork selection during collection editing; implementation remains unchecked pending code and browser verification           | Standardize secondary controls and replace the floating Add action     |
+| 2026-09-12 | 3         | Standardized link- and button-backed secondary pill controls with shared centering, wrapped-label geometry, phone-sized targets, and consistent hover, focus, active, disabled, and pending states; removed redundant alignment overrides and verified representative catalogue, form, wishlist, recovery, and confirmation actions on desktop and mobile    | Replace the floating Add action with equal bottom navigation           |
 
 ## 21. Hosted environment checklist
 

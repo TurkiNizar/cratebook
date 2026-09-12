@@ -177,6 +177,10 @@ a {
   background: var(--terracotta-dark);
 }
 
+.button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
 .button:disabled {
   cursor: wait;
   opacity: 0.7;
@@ -1748,12 +1752,6 @@ a.add-option:hover {
   margin-top: 22px;
 }
 
-.collection-error-actions .secondary-button {
-  display: inline-flex;
-  min-height: 52px;
-  align-items: center;
-}
-
 @keyframes skeleton-shimmer {
   from {
     background-position: 100% 0;
@@ -1992,7 +1990,7 @@ a.add-option:hover {
   align-items: center;
   justify-content: center;
   flex: none;
-  padding: 0 19px;
+  padding: 10px 19px;
   border: 1px solid #9d321f;
   border-radius: 999px;
   background: transparent;
@@ -2000,14 +1998,21 @@ a.add-option:hover {
   cursor: pointer;
   font-size: 13px;
   font-weight: 800;
+  line-height: 1.25;
+  text-align: center;
   transition:
+    transform 160ms ease,
     background 160ms ease,
     color 160ms ease;
 }
 
-.danger-button:hover {
+.danger-button:hover:not(:disabled) {
   background: #9d321f;
   color: #fffaf0;
+}
+
+.danger-button:active:not(:disabled) {
+  transform: translateY(1px);
 }
 
 .danger-button:disabled {
@@ -2191,20 +2196,46 @@ a.add-option:hover {
 }
 
 .secondary-button {
-  min-height: 42px;
-  padding: 0 16px;
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
   border: 1px solid var(--line);
   border-radius: 999px;
   background: transparent;
   color: var(--ink);
   font-size: 12px;
   font-weight: 800;
+  line-height: 1.25;
+  text-align: center;
+  vertical-align: middle;
   cursor: pointer;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease,
+    color 160ms ease;
 }
 
-.secondary-button:hover {
+.secondary-button:hover:not(:disabled):not([aria-disabled="true"]) {
   border-color: var(--terracotta);
+  background: color-mix(in srgb, var(--terracotta), transparent 94%);
   color: var(--terracotta);
+}
+
+.secondary-button:active:not(:disabled):not([aria-disabled="true"]) {
+  transform: translateY(1px);
+  background: color-mix(in srgb, var(--terracotta), transparent 88%);
+}
+
+.secondary-button:disabled,
+.secondary-button[aria-disabled="true"],
+.secondary-button[data-pending="true"] {
+  cursor: wait;
+  opacity: 0.65;
+  transform: none;
 }
 
 .catalogue-search-page,
@@ -2625,12 +2656,6 @@ a.add-option:hover {
 
 .catalogue-selection-actions {
   margin-top: 28px;
-}
-
-.catalogue-selection-actions .secondary-button,
-.catalogue-fallback-actions .secondary-button {
-  display: inline-flex;
-  align-items: center;
 }
 
 .catalogue-review-details {

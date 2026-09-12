@@ -1,5 +1,5 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, type Page, test } from "@playwright/test";
+import { expect, type Locator, type Page, test } from "@playwright/test";
 
 const runLocalAuth = process.env.RUN_LOCAL_AUTH_E2E === "1";
 
@@ -25,6 +25,89 @@ async function expectNoSeriousAccessibilityViolations(page: Page) {
   );
 
   expect(seriousViolations).toEqual([]);
+}
+
+async function expectCenteredSecondaryControl(control: Locator) {
+  await expect(control).toBeVisible();
+
+  const geometry = await control.evaluate((element) => {
+    const styles = window.getComputedStyle(element);
+    const controlRect = element.getBoundingClientRect();
+    const textNode = Array.from(element.childNodes).find(
+      (node) => node.nodeType === Node.TEXT_NODE && node.textContent?.trim(),
+    );
+    const textRange = document.createRange();
+
+    if (textNode) {
+      textRange.selectNodeContents(textNode);
+    } else {
+      textRange.selectNodeContents(element);
+    }
+
+    const textRect = textRange.getBoundingClientRect();
+
+    return {
+      alignItems: styles.alignItems,
+      display: styles.display,
+      height: controlRect.height,
+      justifyContent: styles.justifyContent,
+      lineHeight: styles.lineHeight,
+      overflowX: element.scrollWidth - element.clientWidth,
+      textCenterDelta: Math.abs(
+        textRect.left +
+          textRect.width / 2 -
+          (controlRect.left + controlRect.width / 2),
+      ),
+      textAlign: styles.textAlign,
+    };
+  });
+
+  expect(geometry).toMatchObject({
+    alignItems: "center",
+    justifyContent: "center",
+    textAlign: "center",
+  });
+  expect(["flex", "inline-flex"]).toContain(geometry.display);
+  expect(geometry.height).toBeGreaterThanOrEqual(44);
+  expect(geometry.lineHeight).not.toBe("normal");
+  expect(geometry.overflowX).toBeLessThanOrEqual(1);
+  expect(geometry.textCenterDelta).toBeLessThanOrEqual(1);
+}
+
+async function expectSecondaryInteractionStates(control: Locator) {
+  const initialBorder = await control.evaluate(
+    (element) => window.getComputedStyle(element).borderColor,
+  );
+
+  await control.hover();
+  await expect
+    .poll(() =>
+      control.evaluate(
+        (element) => window.getComputedStyle(element).borderColor,
+      ),
+    )
+    .not.toBe(initialBorder);
+
+  await control.focus();
+  expect(
+    await control.evaluate(
+      (element) => window.getComputedStyle(element).outlineStyle,
+    ),
+  ).not.toBe("none");
+
+  const box = await control.boundingBox();
+  expect(box).not.toBeNull();
+  await control
+    .page()
+    .mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2);
+  await control.page().mouse.down();
+  await expect
+    .poll(() =>
+      control.evaluate((element) => window.getComputedStyle(element).transform),
+    )
+    .not.toBe("none");
+  await control.page().mouse.move(0, 0);
+  await control.page().mouse.up();
 }
 
 test.describe("local passwordless authentication", () => {
@@ -134,7 +217,9 @@ test.describe("local passwordless authentication", () => {
       .fill(`Zzqv nonexistent album ${unique}`);
     await page.getByRole("button", { name: "Search" }).click();
     await expect(
-      page.getByRole("heading", { name: /Nothing found for/ }),
+      page
+        .getByRole("heading", { name: /Nothing found for/ })
+        .or(page.getByRole("heading", { name: "MusicBrainz needs a moment" })),
     ).toBeVisible();
     await expect(
       page.getByRole("link", { name: "Add manually" }),
@@ -142,10 +227,29 @@ test.describe("local passwordless authentication", () => {
     await expect(
       page.getByRole("link", { name: "Add to wishlist manually" }),
     ).toBeVisible();
+    await expectCenteredSecondaryControl(
+      page.getByRole("link", { name: "Add to wishlist manually" }),
+    );
     await expectNoSeriousAccessibilityViolations(page);
     await page.getByRole("link", { name: "Add manually" }).click();
     await expect(page).toHaveURL(/\/add\/manual$/);
     await expect(page.getByLabel("Artist")).toBeVisible();
+    const findArtworkControl = page.getByRole("button", {
+      name: "Find album artwork",
+    });
+    await findArtworkControl.evaluate((button) => {
+      if (button instanceof HTMLButtonElement) button.disabled = true;
+    });
+    await expect(findArtworkControl).toBeDisabled();
+    expect(
+      await findArtworkControl.evaluate((button) => {
+        const styles = window.getComputedStyle(button);
+        return { cursor: styles.cursor, opacity: Number(styles.opacity) };
+      }),
+    ).toEqual({ cursor: "wait", opacity: 0.65 });
+    await findArtworkControl.evaluate((button) => {
+      if (button instanceof HTMLButtonElement) button.disabled = false;
+    });
     await page.goto("/add/catalogue");
 
     await page
@@ -169,6 +273,14 @@ test.describe("local passwordless authentication", () => {
     await expect(
       albumCard.getByRole("link", { name: "Add to wishlist" }),
     ).toBeVisible();
+    await expectCenteredSecondaryControl(
+      albumCard.getByRole("link", { name: "Add to wishlist" }),
+    );
+    const specificEditionControl = albumCard.getByRole("link", {
+      name: "Choose a specific edition",
+    });
+    await expectCenteredSecondaryControl(specificEditionControl);
+    await expectSecondaryInteractionStates(specificEditionControl);
     const editionHref = await albumCard
       .getByRole("link", { name: "Choose a specific edition" })
       .getAttribute("href");
@@ -581,7 +693,12 @@ test.describe("local passwordless authentication", () => {
     await expect(page.getByText("Check the sleeve.")).toBeVisible();
     await expect(page.getByText("Visible on a public profile")).toBeVisible();
     await expectNoHorizontalOverflow(page);
-    await page.getByRole("link", { name: "Edit wish" }).click();
+    const editWishControl = page.getByRole("link", { name: "Edit wish" });
+    await expectCenteredSecondaryControl(editWishControl);
+    await editWishControl.click();
+    await expectCenteredSecondaryControl(
+      page.getByRole("link", { name: "Cancel" }),
+    );
     await page
       .getByLabel("Album or release title")
       .fill("Journey in Satchidananda — Reissue");
