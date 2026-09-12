@@ -2,11 +2,13 @@
 
 Last reviewed: 2026-09-12
 
-Cratebook will use the [MusicBrainz release API](https://musicbrainz.org/doc/MusicBrainz_API)
-as its first external catalogue provider. Cover artwork will come from the associated
-[Cover Art Archive API](https://musicbrainz.org/doc/Cover_Art_Archive/API). The provider
-adapter must keep both services behind Cratebook's server boundary so manual entry and
-the rest of the collection remain available when either service is slow or unavailable.
+Cratebook uses the [MusicBrainz release-group API](https://musicbrainz.org/doc/MusicBrainz_API)
+as its default album-discovery provider. Exact MusicBrainz releases remain available
+for identifier resolution and optional edition selection. Cover artwork comes from the
+associated [Cover Art Archive API](https://musicbrainz.org/doc/Cover_Art_Archive/API).
+The provider adapter keeps both services behind Cratebook's server boundary so manual
+entry and the rest of the collection remain available when either service is slow or
+unavailable.
 
 ## Album-first provider evaluation
 
@@ -174,12 +176,13 @@ with a seven-day cache so callers can resolve artwork only for candidates that n
 instead of creating an upstream request for every search result.
 
 The adapter does not expose an unrestricted proxy or accept arbitrary upstream URLs.
-Queries are length-limited and encoded as data. Search requests vinyl releases while
-showing ambiguous editions with enough label, catalogue, country, date, barcode,
-format, and disc-count context for the collector to choose. Exact release lookup and
-cover retrieval happen only after selection. The review screen then prefills known
-release metadata into the existing collection or wishlist form without inferring
-copy-specific condition, acquisition, price, rating, or notes.
+Queries are length-limited and encoded as data. The default search requests album
+release groups. Only the optional edition path searches vinyl releases and shows label,
+catalogue, country, date, barcode, format, and disc-count context for the collector to
+compare. Exact release lookup and cover retrieval happen only after edition selection.
+The review screen then prefills known release metadata into the existing collection or
+wishlist form without inferring copy-specific condition, acquisition, price, rating,
+or notes.
 
 Manual collection and wishlist forms expose the same release-group boundary through an
 optional **Find album artwork** action. The authenticated server action searches from
@@ -237,8 +240,9 @@ an existing cover and all other release fields remain unchanged.
 Automated coverage keeps near-identical editions separately traceable through their
 MBIDs and pressing clues. It also verifies timeouts, rate limits, malformed responses,
 missing releases, failed exact-release review, and unavailable artwork while preserving
-manual collection and wishlist paths. The catalogue-provenance migration is applied to
-the production Supabase project.
+manual collection and wishlist paths. The album identity and entity-scoped RPC
+migrations (`20260912120000` and `20260912160000`) are applied to the production
+Supabase project.
 
 ## Re-review triggers
 

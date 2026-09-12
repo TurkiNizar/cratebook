@@ -4,7 +4,7 @@
 >
 > Last updated: 2026-09-12
 > Overall status: **In development**
-> Current milestone: **Milestone 3 — Album-first catalogue revision**
+> Current milestone: **Milestone 4 — Sharing, portability, and MVP release**
 
 ## How to use this document
 
@@ -737,8 +737,11 @@ an exact physical pressing remains optional advanced detail.
       authenticated desktop/mobile browser coverage for quick add, insufficient
       results, ambiguous albums, missing artwork, invalid artwork, provider failure,
       manual recovery, and optional exact-edition selection
-- [ ] Update README usage guidance and catalogue-provider documentation, deploy any
-      required migration, and verify the complete album-first journey in production
+- [x] Update README usage guidance and catalogue-provider documentation, and verify
+      that every required migration is deployed
+- [-] Verify the complete authenticated album-first journey in production — deferred
+  at the owner's direction after local desktop/mobile journey verification and a
+  public production smoke check; no hosted catalogue data was modified
 
 Exit condition: users can find and add a recognizable album to their collection or
 wishlist in under 30 seconds without knowing its exact pressing; pressing details remain
@@ -890,6 +893,7 @@ production environment.
 | 2026-09-12 | Scope catalogue release reuse by provider, entity type, and MBID while retaining the existing RPC signatures                                 | Deriving entity type from server-verified provenance prevents release-group/exact-release collisions without creating a breaking application/database deployment order                          |
 | 2026-09-12 | Scope optional exact-edition discovery to the selected album and keep album-level actions available throughout the path                      | Experienced collectors can compare pressing clues without turning exact identification into a prerequisite or losing the fast album-first fallback                                              |
 | 2026-09-12 | Let manual collection and wishlist entries optionally adopt validated release-group artwork without replacing user-entered names             | Representative art improves browsing without requiring edition identification; clearing stale selections and retaining an explicit no-cover path keeps manual entry authoritative               |
+| 2026-09-12 | Defer the authenticated production album-first journey after local verification and a public production smoke check                          | The owner requested that the live magic-link and data-mutation check be skipped; no hosted catalogue data or external configuration should be changed for this closeout                         |
 
 ## 20. Progress log
 
@@ -933,6 +937,7 @@ in version control; this log records product-level progress and changes.
 | 2026-09-12 | 3         | Added optional manual-entry artwork finding for collection and wishlist forms with authenticated MusicBrainz album search, server-validated Cover Art Archive suggestions, explicit no-cover handling, source attribution, stale-selection clearing, and responsive automated coverage                                                                       | Verify provenance preservation across album and exact-release flows    |
 | 2026-09-12 | 3         | Preserved shared release identity, entity-scoped MusicBrainz provenance, representative/exact Cover Art Archive references, known album metadata, and private defaults through album-level and exact-release wishlist conversion; added a non-blocking owned-copy warning that retains entered copy details and verified the flow on desktop and mobile      | Complete album-first resilience and accessibility coverage             |
 | 2026-09-12 | 3         | Completed album-first resilience and accessibility coverage with WCAG A/AA browser gates, accessible ambiguous-album labels, broken-cover fallbacks, and verified failure/manual recovery across component, persistence, desktop, and mobile tests                                                                                                           | Update provider documentation and verify production end to end         |
+| 2026-09-12 | 3         | Closed the album-first revision with updated usage/provider guidance, all 14 hosted migrations confirmed, application/database checks passing, the complete authenticated local journey verified on desktop and mobile, and a public production smoke check; the owner deferred the authenticated production run and no hosted catalogue data was changed    | Begin Milestone 4 with profile-level privacy controls                  |
 
 ## 21. Hosted environment checklist
 

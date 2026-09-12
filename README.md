@@ -3,9 +3,11 @@
 Cratebook is a mobile-first vinyl collection and wishlist companion. The product
 specification and progress tracker live in [MVP_PLAN.md](./MVP_PLAN.md).
 
-Catalogue search uses MusicBrainz metadata with optional Cover Art Archive artwork.
-The reviewed provider, attribution, artwork, caching, and rate-limit policy is
-documented in [docs/catalogue-provider.md](./docs/catalogue-provider.md).
+Catalogue search is album-first: it uses MusicBrainz release groups with optional
+representative Cover Art Archive artwork, while exact MusicBrainz releases remain an
+optional advanced path for collectors who want to identify a specific edition. The
+reviewed provider, attribution, artwork, caching, and rate-limit policy is documented
+in [docs/catalogue-provider.md](./docs/catalogue-provider.md).
 
 Production: [https://cratebook.vercel.app](https://cratebook.vercel.app)
 
@@ -201,6 +203,27 @@ callback exact. Supabase documents the same Vercel pattern in its
 4. Edit and save the profile at `/settings`.
 5. Create a small branch and pull request, then confirm Vercel posts a working Preview
    deployment and that its magic-link flow returns to the Preview URL.
+
+After catalogue or schema changes, also verify the album-first journey against the
+production deployment with a disposable test record:
+
+1. Confirm `npx supabase migration list --linked` shows every committed migration in
+   both the local and remote columns. Do not run `supabase db push` when the lists
+   already match.
+2. Sign in with an inbox you control and open **Add → Search the catalogue**.
+3. Search for a familiar album and confirm the default results show one cover-first
+   card per album with direct collection and wishlist actions.
+4. Quick-add the album to the collection and wishlist. Confirm only album-level facts
+   are prefilled, representative artwork is labelled, and pressing/copy details remain
+   optional.
+5. Open **Choose a specific edition**, confirm vinyl releases remain optional, and
+   return to the album-level action without losing the fast path.
+6. Move the test wish to the collection and confirm metadata and notes carry over.
+7. Remove every test item created during the check so production data remains tidy.
+
+Production verification requires an authenticated browser session and access to the
+magic-link inbox. Public smoke checks and migration-list parity do not by themselves
+verify the complete album-first journey.
 
 Steps 1–4 are verified in production. The pull-request Preview check in step 5 remains
 open and is tracked in `MVP_PLAN.md`.
