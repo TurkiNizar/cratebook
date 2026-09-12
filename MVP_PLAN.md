@@ -726,7 +726,7 @@ an exact physical pressing remains optional advanced detail.
 - [x] Implement collection and wishlist quick-add using only artist, album title,
       representative artwork, and known original year; keep format, pressing, copy,
       price, condition, and personal details optional and editable afterward
-- [ ] Retain exact MusicBrainz release selection as an optional **Choose a specific
+- [x] Retain exact MusicBrainz release selection as an optional **Choose a specific
       edition** path rather than a prerequisite for catalogue-assisted entry
 - [ ] Add an optional **Find album artwork** action to manual collection and wishlist
       entry, with validated suggestions, an explicit no-cover choice, clear source
@@ -888,6 +888,7 @@ production environment.
 | 2026-09-12 | Use MusicBrainz release groups with Cover Art Archive representative fronts for album-first discovery; do not integrate Apple iTunes artwork | Release groups recalled 14/14 fixture albums with artwork available for all matches, while Apple recalled 9/14 and its promotional-content terms do not fit durable personal collection artwork |
 | 2026-09-12 | Persist catalogue identity as provider, entity type, and MBID; backfill existing MusicBrainz rows as exact releases                          | Release-group and release MBIDs belong to different namespaces, and explicit provenance prevents an album quick add from implying a specific pressing                                           |
 | 2026-09-12 | Scope catalogue release reuse by provider, entity type, and MBID while retaining the existing RPC signatures                                 | Deriving entity type from server-verified provenance prevents release-group/exact-release collisions without creating a breaking application/database deployment order                          |
+| 2026-09-12 | Scope optional exact-edition discovery to the selected album and keep album-level actions available throughout the path                      | Experienced collectors can compare pressing clues without turning exact identification into a prerequisite or losing the fast album-first fallback                                              |
 
 ## 20. Progress log
 
@@ -927,6 +928,7 @@ in version control; this log records product-level progress and changes.
 | 2026-09-12 | 3         | Built provider-neutral album discovery with broad token-wise MusicBrainz release-group search, identifier-to-album resolution, bounded pagination, stable MBID deduplication, normalized provenance, representative artwork references, shared caching/throttling/retries, typed lookup and failure states, and permanent manual recovery boundaries         | Replace pressing-heavy results with cover-first album cards            |
 | 2026-09-12 | 3         | Replaced default pressing-heavy search with responsive, paginated cover-first album cards, explicit representative-artwork and pressing-not-selected guidance, clear collection/wishlist destinations, and server-validated album-level form prefills; verified component, desktop Chromium, and Android Chrome coverage                                     | Implement collection and wishlist album quick-add persistence          |
 | 2026-09-12 | 3         | Implemented collection and wishlist album quick-add with server-reverified release-group identity, representative artwork, known original year, blank optional pressing/copy fields, entity-scoped owner reuse, and real Cover Art Archive response handling; verified database, component, desktop Chromium, and Android Chrome coverage                    | Retain exact-release selection as an optional specific-edition path    |
+| 2026-09-12 | 3         | Restored exact MusicBrainz release selection as an optional album-scoped path with paginated vinyl editions, pressing clues, contextual release review, album-level fallbacks for no results and provider failure, responsive desktop/mobile coverage, and unchanged provenance persistence boundaries                                                       | Add optional artwork finding to manual collection and wishlist entry   |
 
 ## 21. Hosted environment checklist
 

@@ -61,6 +61,12 @@ describe("CatalogueSearchResults", () => {
       "/wishlist/add?catalogueAlbumId=" + candidate.externalId,
     );
     expect(
+      screen.getByRole("link", { name: "Choose a specific edition" }),
+    ).toHaveAttribute(
+      "href",
+      `/add/catalogue/${candidate.externalId}/editions`,
+    );
+    expect(
       screen.getByRole("link", { name: /View album source/ }),
     ).toHaveAttribute("href", candidate.sourceUrl);
   });

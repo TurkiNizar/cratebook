@@ -301,6 +301,63 @@ describe("MusicBrainz catalogue provider", () => {
     });
   });
 
+  it("lists paginated vinyl editions for a validated album identity", async () => {
+    const albumId = "22222222-2222-4222-8222-222222222222";
+    const fetchMock = vi.fn<typeof fetch>().mockResolvedValue(
+      jsonResponse({
+        count: 25,
+        releases: [release()],
+      }),
+    );
+    const provider = createMusicBrainzProvider({
+      fetch: fetchMock,
+      minimumIntervalMs: 0,
+      retries: 0,
+    });
+
+    await expect(
+      provider.searchAlbumEditions(albumId, { page: 2, pageSize: 12 }),
+    ).resolves.toMatchObject({
+      status: "success",
+      candidates: [
+        {
+          entityType: "release",
+          externalId: releaseId,
+          catalogNumber: "CS 8163",
+        },
+      ],
+      pagination: {
+        page: 2,
+        pageSize: 12,
+        totalResults: 25,
+        hasNextPage: true,
+      },
+    });
+
+    const url = new URL(String(fetchMock.mock.calls[0][0]));
+    expect(url.pathname).toBe("/ws/2/release/");
+    expect(url.searchParams.get("query")).toBe(
+      `rgid:${albumId} AND format:vinyl`,
+    );
+    expect(url.searchParams.get("limit")).toBe("12");
+    expect(url.searchParams.get("offset")).toBe("12");
+  });
+
+  it("rejects invalid album edition requests without an upstream call", async () => {
+    const fetchMock = vi.fn<typeof fetch>();
+    const provider = createMusicBrainzProvider({ fetch: fetchMock });
+
+    await expect(provider.searchAlbumEditions("not-an-id")).resolves.toEqual({
+      status: "invalid_id",
+    });
+    await expect(
+      provider.searchAlbumEditions("22222222-2222-4222-8222-222222222222", {
+        pageSize: 100,
+      }),
+    ).resolves.toMatchObject({ status: "invalid_request" });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it("turns an upstream timeout into an unavailable result", async () => {
     const fetchMock = vi.fn<typeof fetch>((_input, init) => {
       return new Promise<Response>((_resolve, reject) => {

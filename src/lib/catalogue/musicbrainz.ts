@@ -9,6 +9,9 @@ import type {
   CatalogueAlbumSearchOptions,
   CatalogueAlbumSearchResult,
   CatalogueCoverResult,
+  CatalogueEditionProvider,
+  CatalogueEditionSearchOptions,
+  CatalogueEditionSearchResult,
   CatalogueLookupResult,
   CatalogueProvider,
   CatalogueReleaseCandidate,
@@ -110,6 +113,19 @@ function createLookupUrl(externalId: string) {
   const url = new URL(`${MUSICBRAINZ_API_URL}${externalId}`);
   url.searchParams.set("fmt", "json");
   url.searchParams.set("inc", "artists+labels+release-groups");
+  return url.toString();
+}
+
+function createEditionSearchUrl(
+  albumExternalId: string,
+  page: number,
+  pageSize: number,
+) {
+  const url = new URL(MUSICBRAINZ_API_URL);
+  url.searchParams.set("query", `rgid:${albumExternalId} AND format:vinyl`);
+  url.searchParams.set("fmt", "json");
+  url.searchParams.set("limit", String(pageSize));
+  url.searchParams.set("offset", String((page - 1) * pageSize));
   return url.toString();
 }
 
@@ -438,6 +454,10 @@ function validAlbumSearchOptions(options: CatalogueAlbumSearchOptions) {
     : null;
 }
 
+function validEditionSearchOptions(options: CatalogueEditionSearchOptions) {
+  return validAlbumSearchOptions(options);
+}
+
 function retryAfterSeconds(response: Response) {
   const header = response.headers.get("retry-after");
   if (!header) {
@@ -508,7 +528,7 @@ function normalizeCoverResult(
 
 export function createMusicBrainzProvider(
   options: MusicBrainzProviderOptions = {},
-): CatalogueProvider & CatalogueAlbumProvider {
+): CatalogueProvider & CatalogueAlbumProvider & CatalogueEditionProvider {
   const fetchImplementation = options.fetch ?? fetch;
   const now = options.now ?? Date.now;
   const sleep =
@@ -770,6 +790,77 @@ export function createMusicBrainzProvider(
         return { status: "malformed_response" };
       }
       return normalizeCoverResult(payload, "release_group", externalId);
+    },
+
+    async searchAlbumEditions(
+      albumExternalId: string,
+      options: CatalogueEditionSearchOptions = {},
+    ): Promise<CatalogueEditionSearchResult> {
+      if (!MUSICBRAINZ_ID_PATTERN.test(albumExternalId)) {
+        return { status: "invalid_id" };
+      }
+      const pagination = validEditionSearchOptions(options);
+      if (!pagination) {
+        return {
+          status: "invalid_request",
+          message: `Choose a page size between 1 and ${MAX_ALBUM_PAGE_SIZE}.`,
+        };
+      }
+
+      const { page, pageSize } = pagination;
+      const upstream = await fetchWithTimeout(
+        createEditionSearchUrl(albumExternalId, page, pageSize),
+        SEARCH_CACHE_SECONDS,
+        true,
+      );
+      if (upstream.status === "unavailable") {
+        return upstream;
+      }
+      if (upstream.statusCode === 429 || upstream.statusCode === 503) {
+        return {
+          status: "rate_limited",
+          retryAfterSeconds: upstream.retryAfterSeconds,
+        };
+      }
+      if (!upstream.ok) {
+        return { status: "unavailable" };
+      }
+
+      let payload: unknown;
+      try {
+        payload = JSON.parse(upstream.body ?? "");
+      } catch {
+        return { status: "malformed_response" };
+      }
+      if (!isRecord(payload) || !Array.isArray(payload.releases)) {
+        return { status: "malformed_response" };
+      }
+      const totalResults = nonnegativeInteger(payload.count);
+      if (totalResults === null) {
+        return { status: "malformed_response" };
+      }
+
+      const candidates = payload.releases
+        .map(normalizeCandidate)
+        .filter(
+          (candidate): candidate is CatalogueReleaseCandidate =>
+            candidate !== null,
+        );
+      if (payload.releases.length > 0 && candidates.length === 0) {
+        return { status: "malformed_response" };
+      }
+      return candidates.length > 0
+        ? {
+            status: "success",
+            candidates,
+            pagination: {
+              page,
+              pageSize,
+              totalResults,
+              hasNextPage: page * pageSize < totalResults,
+            },
+          }
+        : { status: "no_results" };
     },
 
     async search(rawQuery: string): Promise<CatalogueSearchResult> {

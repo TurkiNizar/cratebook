@@ -4,8 +4,10 @@ import type { CatalogueReleaseCandidate } from "@/lib/catalogue/types";
 import { getReleaseFormatLabel } from "@/lib/collection";
 
 export function CatalogueResultCard({
+  albumExternalId,
   candidate,
 }: {
+  albumExternalId?: string;
   candidate: CatalogueReleaseCandidate;
 }) {
   const metadata = [
@@ -69,7 +71,13 @@ export function CatalogueResultCard({
         </a>
         <Link
           className="button"
-          href={"/add/catalogue/" + candidate.externalId}
+          href={
+            "/add/catalogue/" +
+            candidate.externalId +
+            (albumExternalId
+              ? `?albumId=${encodeURIComponent(albumExternalId)}`
+              : "")
+          }
         >
           Review release
         </Link>

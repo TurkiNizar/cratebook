@@ -194,8 +194,17 @@ Album lookup, representative cover lookup, invalid input, missing results, rate 
 timeouts, upstream errors, and malformed payloads all have typed outcomes. The album
 methods share the existing 24-hour public response cache, in-flight request coalescing,
 one-request-per-second MusicBrainz queue, bounded retry policy, and seven-day Cover Art
-Archive cache. This boundary is not wired into the default results page yet; the next
-album-first UI task will consume it while preserving the existing manual links.
+Archive cache. The default results page consumes this boundary through cover-first
+album cards with direct collection and wishlist actions while preserving the existing
+manual links.
+
+Collectors who need pressing detail can open an optional edition path from an album
+card. The adapter searches exact vinyl releases within that selected release-group MBID,
+preserves stable MusicBrainz ordering and bounded pagination, and returns the same typed
+failure states as ordinary catalogue search. Each result keeps its release MBID and
+pressing clues, then uses the existing server-verified exact-release review and prefill
+flow. Album-level collection and wishlist actions remain prominent on the edition page
+and available when edition search returns no results or the provider is unavailable.
 
 When artwork is available on the exact-release review, its thumbnail and original
 Cover Art Archive references are carried into the add form and then revalidated

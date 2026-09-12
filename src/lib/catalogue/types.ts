@@ -40,6 +40,8 @@ export type CatalogueAlbumSearchOptions = {
   pageSize?: number;
 };
 
+export type CatalogueEditionSearchOptions = CatalogueAlbumSearchOptions;
+
 export type CatalogueAlbumSearchResult =
   | {
       status: "success";
@@ -61,6 +63,24 @@ export type CatalogueAlbumLookupResult =
   | { status: "success"; candidate: CatalogueAlbumCandidate }
   | { status: "not_found" }
   | { status: "invalid_id" }
+  | { status: "rate_limited"; retryAfterSeconds: number | null }
+  | { status: "unavailable" }
+  | { status: "malformed_response" };
+
+export type CatalogueEditionSearchResult =
+  | {
+      status: "success";
+      candidates: CatalogueReleaseCandidate[];
+      pagination: {
+        page: number;
+        pageSize: number;
+        totalResults: number;
+        hasNextPage: boolean;
+      };
+    }
+  | { status: "no_results" }
+  | { status: "invalid_id" }
+  | { status: "invalid_request"; message: string }
   | { status: "rate_limited"; retryAfterSeconds: number | null }
   | { status: "unavailable" }
   | { status: "malformed_response" };
@@ -113,4 +133,11 @@ export interface CatalogueAlbumProvider {
   ): Promise<CatalogueAlbumSearchResult>;
   lookupAlbum(externalId: string): Promise<CatalogueAlbumLookupResult>;
   getAlbumCover(externalId: string): Promise<CatalogueCoverResult>;
+}
+
+export interface CatalogueEditionProvider {
+  searchAlbumEditions(
+    albumExternalId: string,
+    options?: CatalogueEditionSearchOptions,
+  ): Promise<CatalogueEditionSearchResult>;
 }

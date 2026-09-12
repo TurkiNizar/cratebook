@@ -2042,7 +2042,8 @@ a.add-option:hover {
 }
 
 .catalogue-search-page,
-.catalogue-review-page {
+.catalogue-review-page,
+.catalogue-editions-page {
   max-width: 980px;
 }
 
@@ -2229,6 +2230,42 @@ a.add-option:hover {
   font-size: 12px;
   font-weight: 800;
   text-align: center;
+}
+
+.catalogue-album-default {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 30px;
+  padding: clamp(20px, 4vw, 28px);
+  border: 1px dashed #c59b8f;
+  border-radius: 20px;
+}
+
+.catalogue-album-default h2,
+.catalogue-album-default p {
+  margin: 0;
+}
+
+.catalogue-album-default h2 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 23px;
+  font-weight: 500;
+}
+
+.catalogue-album-default p {
+  max-width: 480px;
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.catalogue-album-default > div:last-child {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 10px;
 }
 
 .catalogue-pagination {
@@ -2702,9 +2739,16 @@ a.add-option:hover {
   .catalogue-results-heading,
   .catalogue-result-actions,
   .catalogue-selection-actions,
-  .catalogue-fallback-actions {
+  .catalogue-fallback-actions,
+  .catalogue-album-default,
+  .catalogue-album-default > div:last-child {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .catalogue-album-default .button,
+  .catalogue-album-default .secondary-button {
+    width: 100%;
   }
 
   .catalogue-results-heading > p {

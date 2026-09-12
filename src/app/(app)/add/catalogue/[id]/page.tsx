@@ -8,12 +8,31 @@ import { getReleaseFormatLabel } from "@/lib/collection";
 
 export const metadata: Metadata = { title: "Review catalogue release" };
 
+const MUSICBRAINZ_ID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+function firstValue(value: string | string[] | undefined) {
+  return Array.isArray(value) ? (value[0] ?? "") : (value ?? "");
+}
+
 export default async function CatalogueReleasePage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams?: Promise<{ albumId?: string | string[] }>;
 }) {
-  const { id } = await params;
+  const [{ id }, query] = await Promise.all([
+    params,
+    searchParams ??
+      Promise.resolve<{ albumId?: string | string[] | undefined }>({}),
+  ]);
+  const albumId = firstValue(query.albumId);
+  const returnToEditions = MUSICBRAINZ_ID_PATTERN.test(albumId);
+  const backHref = returnToEditions
+    ? `/add/catalogue/${albumId}/editions`
+    : "/add/catalogue";
+  const contextQuery = returnToEditions ? `?albumId=${albumId}` : "";
   const [lookup, cover] = await Promise.all([
     musicBrainzCatalogueProvider.lookup(id),
     musicBrainzCatalogueProvider.getCover(id),
@@ -26,8 +45,8 @@ export default async function CatalogueReleasePage({
   if (lookup.status !== "success") {
     return (
       <main className="app-content">
-        <Link className="back-link" href="/add/catalogue">
-          ← Catalogue search
+        <Link className="back-link" href={backHref}>
+          ← {returnToEditions ? "Edition results" : "Catalogue search"}
         </Link>
         <section className="collection-error" role="alert">
           <div className="empty-record" aria-hidden="true" />
@@ -37,7 +56,10 @@ export default async function CatalogueReleasePage({
             with manual entry.
           </p>
           <div className="collection-error-actions">
-            <Link className="button" href={"/add/catalogue/" + id}>
+            <Link
+              className="button"
+              href={"/add/catalogue/" + id + contextQuery}
+            >
               Try again
             </Link>
             <Link className="secondary-button" href="/add/manual">
@@ -73,8 +95,8 @@ export default async function CatalogueReleasePage({
 
   return (
     <main className="app-content catalogue-review-page">
-      <Link className="back-link" href="/add/catalogue">
-        ← Catalogue results
+      <Link className="back-link" href={backHref}>
+        ← {returnToEditions ? "Edition results" : "Catalogue results"}
       </Link>
       <div className="catalogue-review">
         <div className="catalogue-review-cover">

@@ -113,4 +113,21 @@ describe("CatalogueReleasePage", () => {
       screen.getByRole("link", { name: "Add to wishlist" }),
     ).toHaveAttribute("href", `/wishlist/add?${expectedQuery}`);
   });
+
+  it("returns to the optional edition list when review came from an album", async () => {
+    const albumId = "22222222-2222-4222-8222-222222222222";
+    lookup.mockResolvedValue({ status: "success", candidate });
+    getCover.mockResolvedValue({ status: "no_art" });
+
+    render(
+      await CatalogueReleasePage({
+        params: Promise.resolve({ id: externalId }),
+        searchParams: Promise.resolve({ albumId }),
+      }),
+    );
+
+    expect(
+      screen.getByRole("link", { name: "← Edition results" }),
+    ).toHaveAttribute("href", `/add/catalogue/${albumId}/editions`);
+  });
 });

@@ -41,6 +41,12 @@ export function CatalogueAlbumCard({
         >
           Add to wishlist
         </Link>
+        <Link
+          className="secondary-button"
+          href={`/add/catalogue/${candidate.externalId}/editions`}
+        >
+          Choose a specific edition
+        </Link>
         <a href={candidate.sourceUrl} rel="noreferrer" target="_blank">
           View album source
           <span className="visually-hidden"> for {candidate.title}</span>

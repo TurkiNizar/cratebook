@@ -70,6 +70,10 @@ Start the app with `npm run dev`, then:
    format, pressing, copy, price, condition, and personal details remain optional and
    empty. Save the album and confirm its representative cover and MusicBrainz album
    source are retained; add or edit edition and personal details afterward if wanted.
+   If the exact pressing matters, choose **Choose a specific edition** instead, compare
+   the album's vinyl releases, review one release, and confirm that its known edition
+   metadata is prefilled. The album-level collection and wishlist actions remain
+   available if no listed edition is suitable or MusicBrainz is temporarily unavailable.
 9. Return to **Add → Add manually**, enter an artist and title, and save the record.
 10. Confirm the saved record appears in the collection grid with its release details.
     Existing exact-release catalogue records continue to show their retained Cover Art

@@ -134,13 +134,40 @@ test.describe("local passwordless authentication", () => {
     await expect(
       albumCard.getByRole("link", { name: "Add to wishlist" }),
     ).toBeVisible();
+    const editionHref = await albumCard
+      .getByRole("link", { name: "Choose a specific edition" })
+      .getAttribute("href");
+    expect(editionHref).toMatch(/^\/add\/catalogue\/[0-9a-f-]+\/editions$/);
     const albumWishlistHref = await albumCard
       .getByRole("link", { name: "Add to wishlist" })
       .getAttribute("href");
+    const albumCollectionHref = await albumCard
+      .getByRole("link", { name: "Add to collection" })
+      .getAttribute("href");
     expect(albumWishlistHref).toMatch(/^\/wishlist\/add\?catalogueAlbumId=/);
+    expect(albumCollectionHref).toMatch(/^\/add\/manual\?catalogueAlbumId=/);
     await expectNoHorizontalOverflow(page);
 
-    await albumCard.getByRole("link", { name: "Add to collection" }).click();
+    await page.goto(editionHref!);
+    await expect(
+      page.getByRole("heading", { name: "Choose a specific edition" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Add album to collection" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Add album to wishlist" }),
+    ).toBeVisible();
+    const reviewRelease = page
+      .getByRole("link", { name: "Review release" })
+      .first();
+    const editionFailure = page.getByRole("heading", {
+      name: "We could not load specific editions",
+    });
+    await expect(reviewRelease.or(editionFailure)).toBeVisible();
+    await expectNoHorizontalOverflow(page);
+
+    await page.goto(albumCollectionHref!);
     await expect(page).toHaveURL(/\/add\/manual\?catalogueAlbumId=/);
     await expect(page.getByLabel("Artist")).toHaveValue("Miles Davis");
     await expect(page.getByLabel("Album or release title")).toHaveValue(
