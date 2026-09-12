@@ -44,14 +44,18 @@ async function expectBottomNavigation(
     const appPage = document.querySelector(".app-page");
     const linkRects = Array.from(nav.querySelectorAll("a"), (link) => {
       const rect = link.getBoundingClientRect();
-      const labelRect = link
-        .querySelector(".bottom-nav-label")
-        ?.getBoundingClientRect();
+      const label = link.querySelector(".bottom-nav-label");
+      const labelRect = label?.getBoundingClientRect();
+      const icon = link.querySelector(".bottom-nav-icon");
 
       return {
         backgroundColor: window.getComputedStyle(link).backgroundColor,
         center: rect.left + rect.width / 2,
         height: rect.height,
+        iconBackgroundColor: icon
+          ? window.getComputedStyle(icon).backgroundColor
+          : "",
+        label: label?.textContent?.trim() ?? "",
         labelTop: labelRect?.top ?? 0,
         tabIndex: link.tabIndex,
         top: rect.top,
@@ -90,7 +94,23 @@ async function expectBottomNavigation(
   expect(Math.max(...centerGaps) - Math.min(...centerGaps)).toBeLessThanOrEqual(
     1,
   );
-  expect(geometry.linkRects[2].backgroundColor).not.toBe("rgba(0, 0, 0, 0)");
+  const addTab = geometry.linkRects.find(({ label }) => label === "Add");
+  const currentTab = geometry.linkRects.find(
+    ({ label }) => label === currentLabel,
+  );
+  expect(addTab?.iconBackgroundColor).not.toBe("rgba(0, 0, 0, 0)");
+  expect(currentTab?.backgroundColor).not.toBe("rgba(0, 0, 0, 0)");
+  if (currentLabel !== "Add") {
+    await expect
+      .poll(() =>
+        navigation
+          .getByRole("link", { name: "Add", exact: true })
+          .evaluate(
+            (element) => window.getComputedStyle(element).backgroundColor,
+          ),
+      )
+      .toBe("rgba(0, 0, 0, 0)");
+  }
 
   for (let index = 0; verifyKeyboard && index < 4; index += 1) {
     const adjacentIndex = index === 0 ? 1 : index - 1;
