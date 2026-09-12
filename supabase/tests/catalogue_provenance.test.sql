@@ -28,7 +28,7 @@ select lives_ok(
     '71717171-0000-4000-8000-000000000001',
     'musicbrainz',
     '11111111-1111-4111-8111-111111111111',
-    '{"provider":"musicbrainz","release":{"id":"11111111-1111-4111-8111-111111111111"},"coverArt":{"originalUrl":"https://coverartarchive.org/release/11111111-1111-4111-8111-111111111111/front"}}'::jsonb,
+    '{"provider":"musicbrainz","entityType":"release","release":{"id":"11111111-1111-4111-8111-111111111111"},"coverArt":{"originalUrl":"https://coverartarchive.org/release/11111111-1111-4111-8111-111111111111/front"}}'::jsonb,
     'https://coverartarchive.org/release/11111111-1111-4111-8111-111111111111/front-500',
     'lp',
     1::smallint,
@@ -58,7 +58,7 @@ select results_eq(
 select is(
   (select source_data ->> 'entityType' from public.releases),
   'release'::text,
-  'legacy exact-release RPC writes gain explicit entity provenance'
+  'exact-release RPC writes retain explicit entity provenance'
 );
 select col_type_is(
   'public',
@@ -85,7 +85,7 @@ select lives_ok(
     '71717171-0000-4000-8000-000000000002',
     'musicbrainz',
     '11111111-1111-4111-8111-111111111111',
-    '{"provider":"musicbrainz","release":{"id":"11111111-1111-4111-8111-111111111111"}}'::jsonb,
+    '{"provider":"musicbrainz","entityType":"release","release":{"id":"11111111-1111-4111-8111-111111111111"}}'::jsonb,
     null,
     null,
     null,
@@ -144,14 +144,14 @@ select lives_ok(
     '72727272-0000-4000-8000-000000000001',
     'musicbrainz',
     '11111111-1111-4111-8111-111111111111',
-    '{"provider":"musicbrainz"}'::jsonb
+    '{"provider":"musicbrainz","entityType":"release","release":{"id":"11111111-1111-4111-8111-111111111111"}}'::jsonb
   ) $$,
   'another user can retain an owner-scoped copy of the same catalogue release'
 );
 select is(
   (select source_data #>> '{release,id}' from public.releases),
   '11111111-1111-4111-8111-111111111111'::text,
-  'the compatibility path completes legacy exact-release identity provenance'
+  'the RPC stores exact-release identity provenance'
 );
 select lives_ok(
   $$ select public.create_catalogue_collection_item(
@@ -160,7 +160,7 @@ select lives_ok(
     '72727272-0000-4000-8000-000000000002',
     'musicbrainz',
     '11111111-1111-4111-8111-111111111111',
-    '{"provider":"musicbrainz","release":{"id":"11111111-1111-4111-8111-111111111111"},"coverArt":{"thumbnailUrl":"https://coverartarchive.org/release/11111111-1111-4111-8111-111111111111/front-500","originalUrl":"https://coverartarchive.org/release/11111111-1111-4111-8111-111111111111/front"}}'::jsonb,
+    '{"provider":"musicbrainz","entityType":"release","release":{"id":"11111111-1111-4111-8111-111111111111"},"coverArt":{"thumbnailUrl":"https://coverartarchive.org/release/11111111-1111-4111-8111-111111111111/front-500","originalUrl":"https://coverartarchive.org/release/11111111-1111-4111-8111-111111111111/front"}}'::jsonb,
     'https://coverartarchive.org/release/11111111-1111-4111-8111-111111111111/front-500'
   ) $$,
   'reusing a catalogue release can supply artwork that was previously unavailable'

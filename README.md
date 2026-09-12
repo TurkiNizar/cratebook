@@ -68,7 +68,8 @@ Start the app with `npm run dev`, then:
 8. Choose **Add to collection** or **Add to wishlist** on an album card. Confirm that
    the server-verified artist, album title, and known original year are prefilled while
    format, pressing, copy, price, condition, and personal details remain optional and
-   empty.
+   empty. Save the album and confirm its representative cover and MusicBrainz album
+   source are retained; add or edit edition and personal details afterward if wanted.
 9. Return to **Add → Add manually**, enter an artist and title, and save the record.
 10. Confirm the saved record appears in the collection grid with its release details.
     Existing exact-release catalogue records continue to show their retained Cover Art

@@ -82,6 +82,9 @@ describe("RecordForm", () => {
       "11111111-1111-4111-8111-111111111111",
     );
     expect(
+      container.querySelector('input[name="catalogueEntityType"]'),
+    ).toHaveValue("release");
+    expect(
       container.querySelector('input[name="catalogueCoverUrl"]'),
     ).toHaveValue(catalogueCover.coverUrl);
     expect(

@@ -212,16 +212,17 @@ describe("MusicBrainz album discovery", () => {
     expect(url.searchParams.get("inc")).toBe("artists");
   });
 
-  it("validates representative artwork against the release-group identity", async () => {
+  it("accepts the concrete release artwork returned for a release group", async () => {
+    const representativeReleaseId = "44444444-4444-4444-8444-444444444444";
     const fetchMock = vi.fn<typeof fetch>().mockResolvedValue(
       jsonResponse({
         images: [
           {
             front: true,
             approved: true,
-            image: `http://coverartarchive.org/release-group/${groupId}/front`,
+            image: `http://coverartarchive.org/release/${representativeReleaseId}/front`,
             thumbnails: {
-              "500": `http://coverartarchive.org/release-group/${groupId}/front-500`,
+              "500": `http://coverartarchive.org/release/${representativeReleaseId}/front-500`,
             },
           },
         ],
@@ -231,8 +232,8 @@ describe("MusicBrainz album discovery", () => {
 
     await expect(catalogue.getAlbumCover(groupId)).resolves.toEqual({
       status: "success",
-      coverUrl: `https://coverartarchive.org/release-group/${groupId}/front-500`,
-      originalUrl: `https://coverartarchive.org/release-group/${groupId}/front`,
+      coverUrl: `https://coverartarchive.org/release/${representativeReleaseId}/front-500`,
+      originalUrl: `https://coverartarchive.org/release/${representativeReleaseId}/front`,
     });
     expect(fetchMock).toHaveBeenCalledWith(
       `https://coverartarchive.org/release-group/${groupId}`,
@@ -245,9 +246,9 @@ describe("MusicBrainz album discovery", () => {
           {
             front: true,
             approved: true,
-            image: `https://coverartarchive.org/release/${groupId}/front`,
+            image: `https://images.example.test/release/${groupId}/front`,
             thumbnails: {
-              "500": `https://coverartarchive.org/release/${groupId}/front-500`,
+              "500": `https://images.example.test/release/${groupId}/front-500`,
             },
           },
         ],

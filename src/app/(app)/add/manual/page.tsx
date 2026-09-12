@@ -47,10 +47,13 @@ export default async function ManualRecordPage({
           : musicBrainzCatalogueProvider.getCover(catalogueId),
       ])
     : [null, null];
-  const albumLookup =
+  const [albumLookup, albumCover] =
     !catalogueId && catalogueAlbumId
-      ? await musicBrainzCatalogueProvider.lookupAlbum(catalogueAlbumId)
-      : null;
+      ? await Promise.all([
+          musicBrainzCatalogueProvider.lookupAlbum(catalogueAlbumId),
+          musicBrainzCatalogueProvider.getAlbumCover(catalogueAlbumId),
+        ])
+      : [null, null];
   const initialValues =
     lookup?.status === "success"
       ? candidateToRecordFormValues(lookup.candidate)
@@ -88,8 +91,27 @@ export default async function ManualRecordPage({
       ) : null}
       <RecordForm
         action={createManualRecord}
-        catalogueCover={cover?.status === "success" ? cover : undefined}
-        catalogueId={initialValues ? catalogueId : undefined}
+        catalogueCover={
+          cover?.status === "success"
+            ? cover
+            : albumCover?.status === "success"
+              ? albumCover
+              : undefined
+        }
+        catalogueEntityType={
+          lookup?.status === "success"
+            ? "release"
+            : albumLookup?.status === "success"
+              ? "release_group"
+              : undefined
+        }
+        catalogueId={
+          lookup?.status === "success"
+            ? catalogueId
+            : albumLookup?.status === "success"
+              ? catalogueAlbumId
+              : undefined
+        }
         entryKey={randomUUID()}
         initialValues={initialValues}
         variant="create"

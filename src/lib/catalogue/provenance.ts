@@ -46,6 +46,22 @@ export function getCoverArtSelectionForRelease(
   return coverUrl && originalUrl ? { coverUrl, originalUrl } : null;
 }
 
+export function getCoverArtSelectionForEntity(
+  coverUrlValue: string | null | undefined,
+  originalUrlValue: string | null | undefined,
+  entityType: CatalogueEntityType,
+  externalId: string,
+): CatalogueCoverSelection | null {
+  const coverUrl = coverUrlValue
+    ? getCoverArtUrlForEntity(coverUrlValue, entityType, externalId)
+    : null;
+  const originalUrl = originalUrlValue
+    ? getCoverArtUrlForEntity(originalUrlValue, entityType, externalId)
+    : null;
+
+  return coverUrl && originalUrl ? { coverUrl, originalUrl } : null;
+}
+
 export function getCatalogueAttribution(
   source: string | null,
   entityType: string | null,

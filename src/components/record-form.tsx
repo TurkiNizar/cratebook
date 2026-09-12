@@ -10,7 +10,10 @@ import {
   RECORD_CONDITION_OPTIONS,
   RELEASE_FORMAT_OPTIONS,
 } from "@/lib/record";
-import type { CatalogueCoverSelection } from "@/lib/catalogue/types";
+import type {
+  CatalogueCoverSelection,
+  CatalogueEntityType,
+} from "@/lib/catalogue/types";
 
 const INITIAL_ACTION_STATE: ManualRecordActionState = {
   message: "",
@@ -70,6 +73,7 @@ type RecordFormProps = {
   initialValues?: RecordFormValues;
   entryKey?: string;
   catalogueId?: string;
+  catalogueEntityType?: CatalogueEntityType;
   catalogueCover?: CatalogueCoverSelection;
   cancelHref?: string;
 };
@@ -126,6 +130,7 @@ export function RecordForm({
   initialValues,
   entryKey,
   catalogueId,
+  catalogueEntityType,
   catalogueCover,
   cancelHref,
 }: RecordFormProps) {
@@ -167,7 +172,14 @@ export function RecordForm({
         <input type="hidden" name="entryKey" value={entryKey} />
       ) : null}
       {catalogueId ? (
-        <input type="hidden" name="catalogueId" value={catalogueId} />
+        <>
+          <input type="hidden" name="catalogueId" value={catalogueId} />
+          <input
+            type="hidden"
+            name="catalogueEntityType"
+            value={catalogueEntityType ?? "release"}
+          />
+        </>
       ) : null}
       {catalogueCover ? (
         <>

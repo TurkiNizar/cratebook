@@ -3,7 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { resolveCatalogueSelection } from "@/lib/catalogue/persistence";
+import {
+  resolveCatalogueAlbumSelection,
+  resolveCatalogueSelection,
+} from "@/lib/catalogue/persistence";
 import { createClient } from "@/lib/supabase/server";
 import {
   type WishlistActionState,
@@ -30,27 +33,35 @@ export async function createWishlistItem(
 
   const input = validation.data;
   const catalogueId = String(formData.get("catalogueId") ?? "").trim();
+  const catalogueEntityType = String(
+    formData.get("catalogueEntityType") ?? "",
+  ).trim();
   const catalogueCoverUrl = String(
     formData.get("catalogueCoverUrl") ?? "",
   ).trim();
   const catalogueCoverOriginalUrl = String(
     formData.get("catalogueCoverOriginalUrl") ?? "",
   ).trim();
-  const catalogue = catalogueId
-    ? await resolveCatalogueSelection(catalogueId, {
-        selectedCover:
-          catalogueCoverUrl && catalogueCoverOriginalUrl
-            ? {
-                coverUrl: catalogueCoverUrl,
-                originalUrl: catalogueCoverOriginalUrl,
-              }
-            : undefined,
-      })
-    : null;
+  const catalogueOptions = {
+    selectedCover:
+      catalogueCoverUrl && catalogueCoverOriginalUrl
+        ? {
+            coverUrl: catalogueCoverUrl,
+            originalUrl: catalogueCoverOriginalUrl,
+          }
+        : undefined,
+  };
+  const catalogue = !catalogueId
+    ? null
+    : catalogueEntityType === "release"
+      ? await resolveCatalogueSelection(catalogueId, catalogueOptions)
+      : catalogueEntityType === "release_group"
+        ? await resolveCatalogueAlbumSelection(catalogueId, catalogueOptions)
+        : { status: "unavailable" as const };
   if (catalogue?.status === "unavailable") {
     return {
       message:
-        "We could not verify this catalogue release right now. Your details are still here—try again, or reopen manual entry to save without catalogue data.",
+        "We could not verify this catalogue selection right now. Your details are still here—try again, or reopen manual entry to save without catalogue data.",
       fieldErrors: {},
     };
   }

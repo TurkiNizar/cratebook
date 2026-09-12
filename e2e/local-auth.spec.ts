@@ -121,7 +121,8 @@ test.describe("local passwordless authentication", () => {
       .fill("Miles Davis Kind of Blue");
     await page.getByRole("button", { name: "Search" }).click();
     const albumCard = page
-      .getByRole("article", { name: "Kind of Blue" })
+      .getByRole("article", { name: "Kind of Blue", exact: true })
+      .filter({ hasText: "First released 1959" })
       .first();
     await expect(albumCard.getByAltText("Kind of Blue cover")).toBeVisible();
     await expect(
@@ -133,6 +134,10 @@ test.describe("local passwordless authentication", () => {
     await expect(
       albumCard.getByRole("link", { name: "Add to wishlist" }),
     ).toBeVisible();
+    const albumWishlistHref = await albumCard
+      .getByRole("link", { name: "Add to wishlist" })
+      .getAttribute("href");
+    expect(albumWishlistHref).toMatch(/^\/wishlist\/add\?catalogueAlbumId=/);
     await expectNoHorizontalOverflow(page);
 
     await albumCard.getByRole("link", { name: "Add to collection" }).click();
@@ -143,6 +148,66 @@ test.describe("local passwordless authentication", () => {
     );
     await expect(page.getByLabel("Format")).toHaveValue("");
     await expectNoHorizontalOverflow(page);
+
+    await page.getByRole("button", { name: "Add to my collection" }).click();
+    await expect(page).toHaveURL(/\/collection\?added=[0-9a-f-]+$/);
+    const albumCollectionCard = page
+      .getByRole("list", { name: "Records in your collection" })
+      .getByRole("article", { name: /kind of blue/i });
+    await expect(albumCollectionCard.getByText("Miles Davis")).toBeVisible();
+    await albumCollectionCard.getByRole("link").click();
+    await expect(page.getByAltText(/kind of blue cover/i)).toBeVisible();
+    const collectionEditionDetails = page.getByRole("region", {
+      name: "Edition details",
+    });
+    await expect(
+      collectionEditionDetails.getByText("Original release year"),
+    ).toBeVisible();
+    await expect(
+      collectionEditionDetails.getByText("1959", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      collectionEditionDetails.getByText("Format", { exact: true }),
+    ).toHaveCount(0);
+    await expect(
+      page.getByRole("link", { name: "MusicBrainz" }),
+    ).toHaveAttribute("href", /musicbrainz\.org\/release-group\//);
+    await page.getByRole("button", { name: "Remove from collection" }).click();
+    await page.getByRole("button", { name: "Yes, remove this copy" }).click();
+    await expect(page).toHaveURL(/\/collection\?removed=1$/);
+
+    await page.goto(albumWishlistHref!);
+    await expect(page).toHaveURL(/\/wishlist\/add\?catalogueAlbumId=/);
+    await expect(page.getByLabel("Artist")).toHaveValue("Miles Davis");
+    await expect(page.getByLabel("Album or release title")).toHaveValue(
+      /kind of blue/i,
+    );
+    await page.getByRole("button", { name: "Add to wishlist" }).click();
+    await expect(page).toHaveURL(/\/wishlist\?added=[0-9a-f-]+$/);
+    const albumWishlistCard = page
+      .getByRole("list", { name: "Records on your wishlist" })
+      .getByRole("article", { name: /kind of blue/i });
+    await expect(albumWishlistCard.getByText("Miles Davis")).toBeVisible();
+    await albumWishlistCard.getByRole("link").click();
+    await expect(page.getByAltText(/kind of blue cover/i)).toBeVisible();
+    const wishlistEditionDetails = page.getByRole("complementary", {
+      name: "Edition details",
+    });
+    await expect(
+      wishlistEditionDetails.getByText("Original release year"),
+    ).toBeVisible();
+    await expect(
+      wishlistEditionDetails.getByText("1959", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      wishlistEditionDetails.getByText("Format", { exact: true }),
+    ).toHaveCount(0);
+    await expect(
+      page.getByRole("link", { name: "MusicBrainz" }),
+    ).toHaveAttribute("href", /musicbrainz\.org\/release-group\//);
+    await page.getByRole("button", { name: "Remove from wishlist" }).click();
+    await page.getByRole("button", { name: "Yes, remove this wish" }).click();
+    await expect(page).toHaveURL(/\/wishlist\?removed=1$/);
 
     await page.goto("/add/manual");
 

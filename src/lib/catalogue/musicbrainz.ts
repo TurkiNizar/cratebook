@@ -14,7 +14,7 @@ import type {
   CatalogueReleaseCandidate,
   CatalogueSearchResult,
 } from "./types";
-import { getCoverArtUrlForEntity } from "./provenance";
+import { getCoverArtUrl, getCoverArtUrlForEntity } from "./provenance";
 
 const MUSICBRAINZ_API_URL = "https://musicbrainz.org/ws/2/release/";
 const MUSICBRAINZ_RELEASE_GROUP_API_URL =
@@ -495,12 +495,12 @@ function normalizeCoverResult(
   const thumbnails = isRecord(front.thumbnails) ? front.thumbnails : null;
   const rawCoverUrl = coverArtUrl(thumbnails?.["500"]);
   const rawOriginalUrl = coverArtUrl(front.image);
-  const coverUrl = rawCoverUrl
-    ? getCoverArtUrlForEntity(rawCoverUrl, entityType, externalId)
-    : null;
-  const originalUrl = rawOriginalUrl
-    ? getCoverArtUrlForEntity(rawOriginalUrl, entityType, externalId)
-    : null;
+  const validateUrl = (value: string) =>
+    entityType === "release_group"
+      ? getCoverArtUrl(value)
+      : getCoverArtUrlForEntity(value, entityType, externalId);
+  const coverUrl = rawCoverUrl ? validateUrl(rawCoverUrl) : null;
+  const originalUrl = rawOriginalUrl ? validateUrl(rawOriginalUrl) : null;
   return coverUrl && originalUrl
     ? { status: "success", coverUrl, originalUrl }
     : { status: "malformed_response" };

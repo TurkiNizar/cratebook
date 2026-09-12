@@ -6,14 +6,20 @@ import type {
   CatalogueReleaseCandidate,
 } from "@/lib/catalogue/types";
 
-const { getCover, lookup, lookupAlbum } = vi.hoisted(() => ({
+const { getAlbumCover, getCover, lookup, lookupAlbum } = vi.hoisted(() => ({
+  getAlbumCover: vi.fn(),
   getCover: vi.fn(),
   lookup: vi.fn(),
   lookupAlbum: vi.fn(),
 }));
 
 vi.mock("@/lib/catalogue/musicbrainz", () => ({
-  musicBrainzCatalogueProvider: { getCover, lookup, lookupAlbum },
+  musicBrainzCatalogueProvider: {
+    getAlbumCover,
+    getCover,
+    lookup,
+    lookupAlbum,
+  },
 }));
 vi.mock("./actions", () => ({
   createWishlistItem: vi.fn(),
@@ -80,10 +86,16 @@ describe("AddWishlistPage", () => {
   });
 
   it("prefills album identity without inventing a preferred edition", async () => {
+    const albumCover = {
+      status: "success" as const,
+      coverUrl: `${albumCandidate.representativeCoverUrl}`,
+      originalUrl: `https://coverartarchive.org/release-group/${albumCandidate.externalId}/front`,
+    };
     lookupAlbum.mockResolvedValue({
       status: "success",
       candidate: albumCandidate,
     });
+    getAlbumCover.mockResolvedValue(albumCover);
 
     const { container } = render(
       await AddWishlistPage({
@@ -102,6 +114,14 @@ describe("AddWishlistPage", () => {
     expect(
       container.querySelector('textarea[name="preferredEdition"]'),
     ).toHaveValue("");
-    expect(container.querySelector('input[name="catalogueId"]')).toBeNull();
+    expect(container.querySelector('input[name="catalogueId"]')).toHaveValue(
+      albumCandidate.externalId,
+    );
+    expect(
+      container.querySelector('input[name="catalogueEntityType"]'),
+    ).toHaveValue("release_group");
+    expect(
+      container.querySelector('input[name="catalogueCoverUrl"]'),
+    ).toHaveValue(albumCover.coverUrl);
   });
 });

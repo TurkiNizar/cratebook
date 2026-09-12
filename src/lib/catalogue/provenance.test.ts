@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   getCatalogueAttribution,
+  getCoverArtSelectionForEntity,
   getCoverArtUrlForEntity,
   getCoverArtSelectionForRelease,
   getCoverArtUrl,
@@ -96,5 +97,16 @@ describe("catalogue attribution", () => {
       groupCover,
     );
     expect(getCoverArtUrlForEntity(groupCover, "release", groupId)).toBeNull();
+    expect(
+      getCoverArtSelectionForEntity(
+        groupCover,
+        `https://coverartarchive.org/release-group/${groupId}/front`,
+        "release_group",
+        groupId,
+      ),
+    ).toEqual({
+      coverUrl: groupCover,
+      originalUrl: `https://coverartarchive.org/release-group/${groupId}/front`,
+    });
   });
 });

@@ -3,8 +3,16 @@ import { describe, expect, it, vi } from "vitest";
 vi.mock("server-only", () => ({}));
 vi.mock("./musicbrainz", () => ({ musicBrainzCatalogueProvider: {} }));
 
-import { resolveCatalogueSelection } from "./persistence";
-import type { CatalogueProvider, CatalogueReleaseCandidate } from "./types";
+import {
+  resolveCatalogueAlbumSelection,
+  resolveCatalogueSelection,
+} from "./persistence";
+import type {
+  CatalogueAlbumCandidate,
+  CatalogueAlbumProvider,
+  CatalogueProvider,
+  CatalogueReleaseCandidate,
+} from "./types";
 
 const externalId = "11111111-1111-4111-8111-111111111111";
 const candidate: CatalogueReleaseCandidate = {
@@ -25,6 +33,22 @@ const candidate: CatalogueReleaseCandidate = {
   barcode: "012345678905",
   sourceData: { provider: "musicbrainz", release: { id: externalId } },
 };
+const albumId = "22222222-2222-4222-8222-222222222222";
+const albumCandidate: CatalogueAlbumCandidate = {
+  source: "musicbrainz",
+  entityType: "release_group",
+  externalId: albumId,
+  sourceUrl: `https://musicbrainz.org/release-group/${albumId}`,
+  artist: "Miles Davis",
+  title: "Kind of Blue",
+  originalYear: 1959,
+  representativeCoverUrl: `https://coverartarchive.org/release-group/${albumId}/front-500`,
+  sourceData: {
+    provider: "musicbrainz",
+    entityType: "release_group",
+    releaseGroup: { id: albumId },
+  },
+};
 
 function provider(
   overrides: Partial<CatalogueProvider> = {},
@@ -37,6 +61,23 @@ function provider(
       candidate,
     })),
     getCover: vi.fn<CatalogueProvider["getCover"]>(async () => ({
+      status: "no_art",
+    })),
+    ...overrides,
+  };
+}
+
+function albumProvider(
+  overrides: Partial<CatalogueAlbumProvider> = {},
+): CatalogueAlbumProvider {
+  return {
+    source: "musicbrainz",
+    searchAlbums: vi.fn<CatalogueAlbumProvider["searchAlbums"]>(),
+    lookupAlbum: vi.fn<CatalogueAlbumProvider["lookupAlbum"]>(async () => ({
+      status: "success",
+      candidate: albumCandidate,
+    })),
+    getAlbumCover: vi.fn<CatalogueAlbumProvider["getAlbumCover"]>(async () => ({
       status: "no_art",
     })),
     ...overrides,
@@ -153,5 +194,58 @@ describe("catalogue persistence", () => {
       release: { coverUrl: null },
     });
     expect(catalogue.getCover).toHaveBeenCalledWith(externalId);
+  });
+
+  it("resolves album identity and representative artwork without inventing edition data", async () => {
+    const coverUrl = `https://coverartarchive.org/release-group/${albumId}/front-500`;
+    const originalUrl = `https://coverartarchive.org/release-group/${albumId}/front`;
+    const catalogue = albumProvider({
+      getAlbumCover: vi.fn<CatalogueAlbumProvider["getAlbumCover"]>(
+        async () => ({ status: "success", coverUrl, originalUrl }),
+      ),
+    });
+
+    await expect(
+      resolveCatalogueAlbumSelection(albumId, { provider: catalogue }),
+    ).resolves.toEqual({
+      status: "success",
+      release: expect.objectContaining({
+        entityType: "release_group",
+        externalId: albumId,
+        artist: "Miles Davis",
+        title: "Kind of Blue",
+        originalYear: 1959,
+        coverUrl,
+        format: null,
+        releaseYear: null,
+        editionDescription: null,
+        sourceData: expect.objectContaining({
+          provider: "musicbrainz",
+          entityType: "release_group",
+          releaseGroup: { id: albumId },
+          coverArt: { thumbnailUrl: coverUrl, originalUrl },
+        }),
+      }),
+    });
+  });
+
+  it("rejects mismatched album identity and carried exact-release artwork", async () => {
+    const catalogue = albumProvider({
+      lookupAlbum: vi.fn<CatalogueAlbumProvider["lookupAlbum"]>(async () => ({
+        status: "success",
+        candidate: { ...albumCandidate, externalId },
+      })),
+    });
+
+    await expect(
+      resolveCatalogueAlbumSelection(albumId, {
+        provider: catalogue,
+        selectedCover: {
+          coverUrl: `https://coverartarchive.org/release/${albumId}/front-500`,
+          originalUrl: `https://coverartarchive.org/release/${albumId}/front`,
+        },
+      }),
+    ).resolves.toEqual({ status: "unavailable" });
+    expect(catalogue.getAlbumCover).toHaveBeenCalledWith(albumId);
   });
 });
