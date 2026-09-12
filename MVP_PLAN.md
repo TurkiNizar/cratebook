@@ -4,7 +4,7 @@
 >
 > Last updated: 2026-09-12
 > Overall status: **In development**
-> Current milestone: **Milestone 4 — Sharing, portability, and MVP release**
+> Current milestone: **Milestone 3 — Pre-Milestone 4 UI and catalogue polish**
 
 ## How to use this document
 
@@ -747,6 +747,139 @@ Exit condition: users can find and add a recognizable album to their collection 
 wishlist in under 30 seconds without knowing its exact pressing; pressing details remain
 optional, manual entry always works, and wishlist conversion requires no re-entry.
 
+#### Pre-Milestone 4 UI and catalogue polish
+
+This quality pass resolves observed navigation, loading, artwork, and control problems
+before public sharing work begins. Preserve the album-first behavior and existing
+catalogue provenance guarantees. Do not modify hosted production data while verifying
+these changes; use local authenticated fixtures unless the owner separately authorizes
+a production mutation.
+
+Implementation decisions for this pass:
+
+- Treat Add as one of four equal bottom-navigation destinations. Keep it visually
+  prominent with a compact filled icon treatment and a visible **Add** label, but do not
+  float it above or overlap the navigation bar.
+- Use the built-in Next.js/Vercel image optimizer and its cache for remote Cover Art
+  Archive images before considering managed copies in Supabase Storage. Retain remote
+  source references and the existing broken-image fallback. Durable copied artwork is
+  outside this pass unless cache verification demonstrates that it is necessary.
+- Selecting artwork while editing changes the cover and its artwork attribution only.
+  It must not silently replace or promote the record's manual, release-group, or exact-
+  release catalogue identity, and it must not overwrite unrelated user edits.
+
+##### 1. Standardize secondary pill controls
+
+- [ ] Inventory every `.secondary-button` use across collection, wishlist, catalogue,
+      settings, forms, pagination, loading/error recovery, and confirmation dialogs;
+      include both `<button>` and link-backed controls and note any intentional size
+      variants
+- [ ] Establish one shared secondary-control layout contract with `inline-flex`, both-
+      axis centering, predictable line height, consistent pill height/padding, and
+      centered wrapped text; preserve comfortable touch targets at phone widths
+- [ ] Make hover, focus-visible, active, disabled, and pending states consistent without
+      weakening contrast or keyboard visibility; review adjacent danger and primary
+      controls for baseline conformity without changing their semantic hierarchy
+- [ ] Remove page-specific alignment overrides made redundant by the shared contract,
+      while preserving intentional full-width and responsive layouts
+- [ ] Add component/style regression coverage for button- and link-backed pills, short
+      and wrapped labels, disabled/pending controls, and the representative actions
+      **Add to wishlist**, **Choose a specific edition**, **Cancel**, and **Edit wish**
+- [ ] Verify text centering, focus treatment, touch-target size, wrapping, and absence of
+      horizontal overflow on supported desktop and phone browser profiles
+
+##### 2. Clean up the bottom Add action
+
+- [ ] Replace the asymmetric `1fr 1fr 72px 1fr` grid and negatively translated floating
+      Add button with four equal navigation destinations: Collection, Wishlist, Add,
+      and Profile
+- [ ] Give Add a compact highlighted plus icon and visible **Add** label within the bar;
+      keep its full link target aligned with the other tabs and clear of page controls,
+      safe-area insets, browser chrome, and the application content
+- [ ] Add an accessible current-route treatment for all four destinations and retain an
+      unambiguous navigation label for assistive technology
+- [ ] Update component and authenticated browser coverage for equal placement, active
+      state, keyboard access, phone safe areas, content clearance, and no overlap at
+      narrow and desktop widths
+
+##### 3. Remove the catalogue-navigation flash
+
+- [ ] Reproduce navigation from **Search the catalogue** under normal and throttled
+      loading, and confirm the route segment's loading UI is the source of the flash
+- [ ] Stop combining the catalogue skeleton with the decorative `.collection-cover`
+      vinyl pseudo-elements; use a neutral skeleton primitive that matches the final
+      catalogue page's header, search form, and result-card geometry
+- [ ] Ensure loading does not present a misleading empty page, oversized disc, layout
+      jump, or duplicate interactive controls, and honor reduced-motion preferences
+- [ ] Add loading-state component coverage plus a browser transition regression check
+      that exercises the Add-to-catalogue navigation on desktop and phone viewports
+
+##### 4. Improve wishlist and collection artwork loading
+
+- [ ] Remove the `unoptimized` bypass from the shared `ReleaseCover` once the configured
+      Cover Art Archive remote patterns are confirmed against every accepted release and
+      release-group URL shape
+- [ ] Configure responsive image sizes and cache behavior deliberately, avoid eager
+      loading the entire grid, and prioritize only artwork that is genuinely above the
+      fold; keep fixed aspect ratios so late images cannot shift the layout
+- [ ] Preserve the safe URL validator, meaningful/decorative alternative-text behavior,
+      and deterministic fallback when an optimized image or upstream cover fails
+- [ ] Add automated coverage for optimized URL rendering, release and release-group
+      artwork, missing/broken images, and responsive sizing
+- [ ] Verify locally that covers are served through the Next.js image optimizer, that a
+      repeated request benefits from caching, and that wishlist/collection grids remain
+      stable on a throttled mobile connection; record any limitation that only Vercel
+      response headers can prove without changing production data
+- [ ] Update `docs/catalogue-provider.md` or README only if the implemented cache or
+      operational behavior changes the existing provider/setup guidance
+
+##### 5. Add album artwork finding to collection editing
+
+- [ ] Pass the existing authenticated `findAlbumArtwork` action and the record's current
+      safe artwork selection into the edit form, reusing the manual-entry finder UI and
+      preserving typed artist/title values
+- [ ] Define an explicit edit payload for keep current artwork, choose a validated
+      release-group suggestion, or remove artwork; do not infer a removal from a failed
+      request or stale client state
+- [ ] Extend the owner-scoped atomic collection update boundary to validate and persist
+      the chosen `cover_url` and bounded artwork attribution while preserving the
+      record's existing external source, entity type, external ID, source identity,
+      metadata, copy details, and tags
+- [ ] Preserve manual records as manual and exact releases as exact releases when a
+      representative album cover is selected. If the existing provenance constraint
+      cannot represent independent artwork attribution safely, add the smallest typed
+      migration needed to separate artwork provenance from catalogue identity rather
+      than weakening the identity constraint
+- [ ] Prevent cross-user artwork updates, unsafe/unapproved cover hosts, oversized
+      provenance, silent metadata replacement, and partial writes; regenerate database
+      types after any migration
+- [ ] Add database authorization/atomicity tests, server-action validation tests, form
+      tests for select/replace/remove/provider-failure behavior, and authenticated
+      desktop/mobile browser coverage for adding artwork to a coverless collection item
+- [ ] Revalidate the affected collection list and detail routes after a successful edit,
+      display the new cover without requiring a manual refresh, and retain the current
+      error behavior without losing entered form values
+
+##### Verification and closeout
+
+- [ ] Run formatting check, lint, type-check, focused and full unit/component tests,
+      production build, database reset/tests/type generation comparison when the schema
+      changes, and authenticated Playwright coverage on the supported desktop and mobile
+      projects
+- [ ] Perform focused browser checks for computed pill alignment, bottom-navigation
+      geometry, catalogue transition behavior, throttled artwork loading, console errors,
+      keyboard operation, reduced motion, and horizontal overflow
+- [ ] Update README only for actual setup or usage changes; update this plan's decisions,
+      checkboxes, and progress log only for work completed and verified
+- [ ] Commit and push the completed polish work without including unrelated local files
+      or modifying hosted production data
+
+Polish exit condition: secondary controls are consistently aligned and accessible; the
+four bottom destinations do not overlap content; catalogue navigation has no decorative
+disc flash; remote cover art uses verified responsive caching and resilient fallbacks;
+and a user can add, replace, or remove collection artwork during editing without changing
+the record's catalogue identity.
+
 ### Milestone 4 — Sharing, portability, and MVP release
 
 - [ ] Implement profile-level public/private control
@@ -835,6 +968,12 @@ These items require a scope decision before being promoted into an MVP milestone
       terms.
 - [x] Defer photos of a user's physical copy until after the MVP.
 - [x] Accept uppercase ISO 4217-style currency codes and whole acquisition dates.
+- [x] Keep Add as a non-overlapping, labelled destination in the four-item bottom
+      navigation rather than a floating action that covers adjacent controls.
+- [x] Use Next.js/Vercel image optimization and caching for remote Cover Art Archive
+      references before introducing managed artwork copies in Supabase Storage.
+- [x] Allow collection artwork to be changed independently during editing without
+      changing the record's manual, album-level, or exact-release catalogue identity.
 - [ ] Decide whether public pages should be indexed by search engines by default.
 
 None of these decisions should block project scaffolding except where explicitly noted.
@@ -858,42 +997,46 @@ production environment.
 
 ## 19. Decision log
 
-| Date       | Decision                                                                                                                                     | Reason                                                                                                                                                                                          |
-| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-09-09 | Build a mobile-first web application and installable PWA first                                                                               | Most usage is on phones, while links and public profiles should work without installation                                                                                                       |
-| 2026-09-09 | Plan Capacitor as the route to native stores after validation                                                                                | Reuses the web codebase while allowing later access to native APIs                                                                                                                              |
-| 2026-09-09 | Use Next.js, TypeScript, Tailwind CSS, Supabase, and Vercel                                                                                  | One pragmatic stack covers UI, public pages, data, auth, storage, and deployment                                                                                                                |
-| 2026-09-09 | Keep manual record entry as a permanent capability                                                                                           | External catalogues cannot reliably contain or identify every physical release                                                                                                                  |
-| 2026-09-09 | Model a release separately from a user's physical copy                                                                                       | Supports copy-specific condition, provenance, privacy, and multiple pressings                                                                                                                   |
-| 2026-09-09 | Keep social-network features outside the MVP                                                                                                 | Sharing through a URL validates social value without feed and moderation complexity                                                                                                             |
-| 2026-09-09 | Use Cratebook and a warm analogue visual language provisionally                                                                              | Establishes a coherent foundation without making the branding irreversible                                                                                                                      |
-| 2026-09-09 | Use Next.js's webpack production builder initially                                                                                           | Turbopack cannot create its internal CSS worker process in the development environment                                                                                                          |
-| 2026-09-09 | Defer hosted preview deployment without blocking collection work                                                                             | Local integration was verified while hosted Supabase and Vercel required owner setup                                                                                                            |
-| 2026-09-09 | Use one hosted Supabase project for initial Vercel environments                                                                              | This keeps the MVP setup simple; isolated staging data or database branches can come later                                                                                                      |
-| 2026-09-10 | Use `https://cratebook.vercel.app` as the initial production URL                                                                             | Hosted Supabase, Vercel deployment, authentication, and primary foundation flows are live                                                                                                       |
-| 2026-09-10 | Use Goldmine condition grades and ISO-style currency codes                                                                                   | Familiar record grading supports collectors, while three-letter codes avoid prematurely limiting currencies                                                                                     |
-| 2026-09-10 | Keep release rows user-scoped and collection items private by default                                                                        | Prevents private metadata leaks while allowing multiple copies and later wishlist reuse                                                                                                         |
-| 2026-09-10 | Delete a physical copy without deleting its shared release row                                                                               | Prevents removing edition metadata that another owned copy or future wishlist item may still reference                                                                                          |
-| 2026-09-10 | Convert prices using the entered currency's standard fraction digits                                                                         | Preserves accurate minor units for two-, zero-, and three-decimal currencies without floating-point writes                                                                                      |
-| 2026-09-10 | Normalize tags case-insensitively and limit each copy to 20 tags                                                                             | Reusable owner-scoped tags stay tidy and searchable while the comma-separated phone UI remains lightweight                                                                                      |
-| 2026-09-10 | Keep collection discovery state in validated URL parameters                                                                                  | Bookmarkable server-rendered controls pair with an owner-only search function for private fields                                                                                                |
-| 2026-09-10 | Treat normalized artist and title matches as possible duplicates                                                                             | A private warning catches likely repeats while preserving intentional ownership of multiple physical copies                                                                                     |
-| 2026-09-10 | Defer personal-copy photos until after the MVP                                                                                               | Collection maintenance is complete without uploads, while storage lifecycle and account-deletion behavior can be designed together later                                                        |
-| 2026-09-10 | Reuse owner-scoped releases for one private-by-default wishlist item per user/release                                                        | Avoids duplicating metadata, preserves the existing privacy boundary, and prepares for atomic wishlist conversion                                                                               |
-| 2026-09-10 | Remove unreferenced release rows when a wishlist item is deleted                                                                             | Prevents orphaned metadata while preserving releases still referenced by a physical copy                                                                                                        |
-| 2026-09-10 | Prefill wishlist notes during conversion, keep the new copy private, and do not infer price paid from the wishlist limit                     | Preserves the user's context while keeping acquisition facts explicit and maintaining the established private default                                                                           |
-| 2026-09-10 | Use MusicBrainz releases for catalogue metadata and Cover Art Archive for optional remotely referenced artwork                               | MusicBrainz provides pressing-aware CC0 core metadata without user credentials; the companion archive uses the same release identifiers                                                         |
-| 2026-09-10 | Persist bounded MusicBrainz provenance, credit its source, and keep catalogue search behind a rate-limited server adapter                    | Traceable user-owned records and a permanent manual path preserve usefulness without exposing an unrestricted proxy or provider coupling                                                        |
-| 2026-09-11 | Resolve the exact MusicBrainz release after selection and prefill only release-level facts                                                   | Avoids trusting stale search summaries and keeps condition, acquisition, price, rating, and personal notes explicit user-owned facts                                                            |
-| 2026-09-11 | Reuse an owner-scoped release for repeated catalogue selections without overwriting its existing metadata                                    | Preserves user edits, supports multiple physical copies, and lets collection and wishlist items share one traced MusicBrainz release                                                            |
-| 2026-09-11 | Carry validated Cover Art Archive references through catalogue saves and backfill only missing artwork on release reuse                      | Prevents transient repeat artwork requests from dropping a selected cover without overwriting an existing cover or other release edits                                                          |
-| 2026-09-12 | Make catalogue discovery album-first, use representative artwork, and keep exact pressing selection optional                                 | Cratebook prioritizes quick, recognizable collection and wishlist entry over Discogs-style edition cataloguing                                                                                  |
-| 2026-09-12 | Use MusicBrainz release groups with Cover Art Archive representative fronts for album-first discovery; do not integrate Apple iTunes artwork | Release groups recalled 14/14 fixture albums with artwork available for all matches, while Apple recalled 9/14 and its promotional-content terms do not fit durable personal collection artwork |
-| 2026-09-12 | Persist catalogue identity as provider, entity type, and MBID; backfill existing MusicBrainz rows as exact releases                          | Release-group and release MBIDs belong to different namespaces, and explicit provenance prevents an album quick add from implying a specific pressing                                           |
-| 2026-09-12 | Scope catalogue release reuse by provider, entity type, and MBID while retaining the existing RPC signatures                                 | Deriving entity type from server-verified provenance prevents release-group/exact-release collisions without creating a breaking application/database deployment order                          |
-| 2026-09-12 | Scope optional exact-edition discovery to the selected album and keep album-level actions available throughout the path                      | Experienced collectors can compare pressing clues without turning exact identification into a prerequisite or losing the fast album-first fallback                                              |
-| 2026-09-12 | Let manual collection and wishlist entries optionally adopt validated release-group artwork without replacing user-entered names             | Representative art improves browsing without requiring edition identification; clearing stale selections and retaining an explicit no-cover path keeps manual entry authoritative               |
-| 2026-09-12 | Defer the authenticated production album-first journey after local verification and a public production smoke check                          | The owner requested that the live magic-link and data-mutation check be skipped; no hosted catalogue data or external configuration should be changed for this closeout                         |
+| Date       | Decision                                                                                                                                     | Reason                                                                                                                                                                                                            |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-09-09 | Build a mobile-first web application and installable PWA first                                                                               | Most usage is on phones, while links and public profiles should work without installation                                                                                                                         |
+| 2026-09-09 | Plan Capacitor as the route to native stores after validation                                                                                | Reuses the web codebase while allowing later access to native APIs                                                                                                                                                |
+| 2026-09-09 | Use Next.js, TypeScript, Tailwind CSS, Supabase, and Vercel                                                                                  | One pragmatic stack covers UI, public pages, data, auth, storage, and deployment                                                                                                                                  |
+| 2026-09-09 | Keep manual record entry as a permanent capability                                                                                           | External catalogues cannot reliably contain or identify every physical release                                                                                                                                    |
+| 2026-09-09 | Model a release separately from a user's physical copy                                                                                       | Supports copy-specific condition, provenance, privacy, and multiple pressings                                                                                                                                     |
+| 2026-09-09 | Keep social-network features outside the MVP                                                                                                 | Sharing through a URL validates social value without feed and moderation complexity                                                                                                                               |
+| 2026-09-09 | Use Cratebook and a warm analogue visual language provisionally                                                                              | Establishes a coherent foundation without making the branding irreversible                                                                                                                                        |
+| 2026-09-09 | Use Next.js's webpack production builder initially                                                                                           | Turbopack cannot create its internal CSS worker process in the development environment                                                                                                                            |
+| 2026-09-09 | Defer hosted preview deployment without blocking collection work                                                                             | Local integration was verified while hosted Supabase and Vercel required owner setup                                                                                                                              |
+| 2026-09-09 | Use one hosted Supabase project for initial Vercel environments                                                                              | This keeps the MVP setup simple; isolated staging data or database branches can come later                                                                                                                        |
+| 2026-09-10 | Use `https://cratebook.vercel.app` as the initial production URL                                                                             | Hosted Supabase, Vercel deployment, authentication, and primary foundation flows are live                                                                                                                         |
+| 2026-09-10 | Use Goldmine condition grades and ISO-style currency codes                                                                                   | Familiar record grading supports collectors, while three-letter codes avoid prematurely limiting currencies                                                                                                       |
+| 2026-09-10 | Keep release rows user-scoped and collection items private by default                                                                        | Prevents private metadata leaks while allowing multiple copies and later wishlist reuse                                                                                                                           |
+| 2026-09-10 | Delete a physical copy without deleting its shared release row                                                                               | Prevents removing edition metadata that another owned copy or future wishlist item may still reference                                                                                                            |
+| 2026-09-10 | Convert prices using the entered currency's standard fraction digits                                                                         | Preserves accurate minor units for two-, zero-, and three-decimal currencies without floating-point writes                                                                                                        |
+| 2026-09-10 | Normalize tags case-insensitively and limit each copy to 20 tags                                                                             | Reusable owner-scoped tags stay tidy and searchable while the comma-separated phone UI remains lightweight                                                                                                        |
+| 2026-09-10 | Keep collection discovery state in validated URL parameters                                                                                  | Bookmarkable server-rendered controls pair with an owner-only search function for private fields                                                                                                                  |
+| 2026-09-10 | Treat normalized artist and title matches as possible duplicates                                                                             | A private warning catches likely repeats while preserving intentional ownership of multiple physical copies                                                                                                       |
+| 2026-09-10 | Defer personal-copy photos until after the MVP                                                                                               | Collection maintenance is complete without uploads, while storage lifecycle and account-deletion behavior can be designed together later                                                                          |
+| 2026-09-10 | Reuse owner-scoped releases for one private-by-default wishlist item per user/release                                                        | Avoids duplicating metadata, preserves the existing privacy boundary, and prepares for atomic wishlist conversion                                                                                                 |
+| 2026-09-10 | Remove unreferenced release rows when a wishlist item is deleted                                                                             | Prevents orphaned metadata while preserving releases still referenced by a physical copy                                                                                                                          |
+| 2026-09-10 | Prefill wishlist notes during conversion, keep the new copy private, and do not infer price paid from the wishlist limit                     | Preserves the user's context while keeping acquisition facts explicit and maintaining the established private default                                                                                             |
+| 2026-09-10 | Use MusicBrainz releases for catalogue metadata and Cover Art Archive for optional remotely referenced artwork                               | MusicBrainz provides pressing-aware CC0 core metadata without user credentials; the companion archive uses the same release identifiers                                                                           |
+| 2026-09-10 | Persist bounded MusicBrainz provenance, credit its source, and keep catalogue search behind a rate-limited server adapter                    | Traceable user-owned records and a permanent manual path preserve usefulness without exposing an unrestricted proxy or provider coupling                                                                          |
+| 2026-09-11 | Resolve the exact MusicBrainz release after selection and prefill only release-level facts                                                   | Avoids trusting stale search summaries and keeps condition, acquisition, price, rating, and personal notes explicit user-owned facts                                                                              |
+| 2026-09-11 | Reuse an owner-scoped release for repeated catalogue selections without overwriting its existing metadata                                    | Preserves user edits, supports multiple physical copies, and lets collection and wishlist items share one traced MusicBrainz release                                                                              |
+| 2026-09-11 | Carry validated Cover Art Archive references through catalogue saves and backfill only missing artwork on release reuse                      | Prevents transient repeat artwork requests from dropping a selected cover without overwriting an existing cover or other release edits                                                                            |
+| 2026-09-12 | Make catalogue discovery album-first, use representative artwork, and keep exact pressing selection optional                                 | Cratebook prioritizes quick, recognizable collection and wishlist entry over Discogs-style edition cataloguing                                                                                                    |
+| 2026-09-12 | Use MusicBrainz release groups with Cover Art Archive representative fronts for album-first discovery; do not integrate Apple iTunes artwork | Release groups recalled 14/14 fixture albums with artwork available for all matches, while Apple recalled 9/14 and its promotional-content terms do not fit durable personal collection artwork                   |
+| 2026-09-12 | Persist catalogue identity as provider, entity type, and MBID; backfill existing MusicBrainz rows as exact releases                          | Release-group and release MBIDs belong to different namespaces, and explicit provenance prevents an album quick add from implying a specific pressing                                                             |
+| 2026-09-12 | Scope catalogue release reuse by provider, entity type, and MBID while retaining the existing RPC signatures                                 | Deriving entity type from server-verified provenance prevents release-group/exact-release collisions without creating a breaking application/database deployment order                                            |
+| 2026-09-12 | Scope optional exact-edition discovery to the selected album and keep album-level actions available throughout the path                      | Experienced collectors can compare pressing clues without turning exact identification into a prerequisite or losing the fast album-first fallback                                                                |
+| 2026-09-12 | Let manual collection and wishlist entries optionally adopt validated release-group artwork without replacing user-entered names             | Representative art improves browsing without requiring edition identification; clearing stale selections and retaining an explicit no-cover path keeps manual entry authoritative                                 |
+| 2026-09-12 | Defer the authenticated production album-first journey after local verification and a public production smoke check                          | The owner requested that the live magic-link and data-mutation check be skipped; no hosted catalogue data or external configuration should be changed for this closeout                                           |
+| 2026-09-12 | Complete a focused UI and catalogue polish pass before beginning Milestone 4                                                                 | Observed control alignment, navigation overlap, loading flash, cover latency, and artwork maintenance issues affect the existing private collection journeys and should be resolved before adding public surfaces |
+| 2026-09-12 | Make Add a labelled, non-overlapping fourth bottom-navigation tab                                                                            | Equal navigation destinations provide cleaner geometry, safe-area behavior, and accessibility than the negatively translated floating action                                                                      |
+| 2026-09-12 | Enable Next.js/Vercel optimization for remote Cover Art Archive images before considering managed copies                                     | The existing shared image component bypasses an already configured optimizer; using the platform cache improves delivery without adding storage lifecycle and image-deletion obligations                          |
+| 2026-09-12 | Keep editable artwork attribution separate from a record's catalogue identity                                                                | A representative cover can improve browsing, but selecting it must not turn a manual entry or exact pressing into a different catalogue entity                                                                    |
 
 ## 20. Progress log
 
@@ -938,6 +1081,7 @@ in version control; this log records product-level progress and changes.
 | 2026-09-12 | 3         | Preserved shared release identity, entity-scoped MusicBrainz provenance, representative/exact Cover Art Archive references, known album metadata, and private defaults through album-level and exact-release wishlist conversion; added a non-blocking owned-copy warning that retains entered copy details and verified the flow on desktop and mobile      | Complete album-first resilience and accessibility coverage             |
 | 2026-09-12 | 3         | Completed album-first resilience and accessibility coverage with WCAG A/AA browser gates, accessible ambiguous-album labels, broken-cover fallbacks, and verified failure/manual recovery across component, persistence, desktop, and mobile tests                                                                                                           | Update provider documentation and verify production end to end         |
 | 2026-09-12 | 3         | Closed the album-first revision with updated usage/provider guidance, all 14 hosted migrations confirmed, application/database checks passing, the complete authenticated local journey verified on desktop and mobile, and a public production smoke check; the owner deferred the authenticated production run and no hosted catalogue data was changed    | Begin Milestone 4 with profile-level privacy controls                  |
+| 2026-09-12 | 3         | Reopened Milestone 3 for a documented pre-Milestone 4 quality pass covering secondary-control alignment, a non-overlapping four-tab bottom navigation, catalogue loading-flash removal, optimized remote artwork delivery, and artwork selection during collection editing; implementation remains unchecked pending code and browser verification           | Standardize secondary controls and replace the floating Add action     |
 
 ## 21. Hosted environment checklist
 
