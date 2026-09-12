@@ -716,7 +716,7 @@ a {
 
 .app-page {
   min-height: 100vh;
-  padding: 28px 28px 110px;
+  padding: 28px 28px calc(110px + env(safe-area-inset-bottom));
   background: var(--paper-light);
 }
 
@@ -2685,7 +2685,7 @@ a.add-option:hover {
   left: 0;
   display: grid;
   height: calc(76px + env(safe-area-inset-bottom));
-  grid-template-columns: 1fr 1fr 72px 1fr;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   padding: 7px max(16px, calc((100vw - 600px) / 2)) env(safe-area-inset-bottom);
   border-top: 1px solid var(--line);
   background: rgba(250, 246, 236, 0.96);
@@ -2694,31 +2694,43 @@ a.add-option:hover {
 
 .bottom-nav a {
   display: flex;
-  min-width: 64px;
+  min-width: 0;
+  min-height: 62px;
   align-items: center;
   justify-content: center;
   flex-direction: column;
   gap: 3px;
-  border-radius: 12px;
+  border-radius: 14px;
   color: var(--muted);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
+  transition:
+    background 160ms ease,
+    color 160ms ease;
 }
 
 .bottom-nav a:hover {
   color: var(--terracotta);
 }
 
+.bottom-nav a[aria-current="page"] {
+  background: color-mix(in srgb, var(--terracotta), transparent 92%);
+  color: var(--terracotta-dark);
+}
+
 .bottom-nav .add-nav {
-  width: 58px;
-  height: 58px;
-  align-self: start;
-  justify-self: center;
+  color: var(--terracotta-dark);
+}
+
+.bottom-nav-add-icon {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
   border-radius: 50%;
   background: var(--terracotta);
   color: white;
-  box-shadow: 0 8px 22px rgba(189, 75, 47, 0.28);
-  transform: translateY(-19px);
+  box-shadow: 0 5px 14px rgba(189, 75, 47, 0.24);
 }
 
 @media (max-width: 850px) {
@@ -2854,7 +2866,7 @@ a.add-option:hover {
   }
 
   .app-page {
-    padding: 22px 18px 105px;
+    padding: 22px 18px calc(105px + env(safe-area-inset-bottom));
   }
 
   .app-content {

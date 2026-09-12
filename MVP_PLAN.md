@@ -781,7 +781,7 @@ Implementation decisions for this pass:
     wishlist**, **Choose a specific edition**, **Cancel**, and **Edit wish** in automated
     and desktop/mobile browser checks.
 
-- [ ] Replace the floating Add action with a clean, accessible four-item bottom
+- [x] Replace the floating Add action with a clean, accessible four-item bottom
       navigation
   - Replace the asymmetric grid and negative vertical translation with four equal
     destinations: Collection, Wishlist, Add, and Profile.
@@ -1052,6 +1052,7 @@ in version control; this log records product-level progress and changes.
 | 2026-09-12 | 3         | Closed the album-first revision with updated usage/provider guidance, all 14 hosted migrations confirmed, application/database checks passing, the complete authenticated local journey verified on desktop and mobile, and a public production smoke check; the owner deferred the authenticated production run and no hosted catalogue data was changed    | Begin Milestone 4 with profile-level privacy controls                  |
 | 2026-09-12 | 3         | Reopened Milestone 3 for a documented pre-Milestone 4 quality pass covering secondary-control alignment, a non-overlapping four-tab bottom navigation, catalogue loading-flash removal, optimized remote artwork delivery, and artwork selection during collection editing; implementation remains unchecked pending code and browser verification           | Standardize secondary controls and replace the floating Add action     |
 | 2026-09-12 | 3         | Standardized link- and button-backed secondary pill controls with shared centering, wrapped-label geometry, phone-sized targets, and consistent hover, focus, active, disabled, and pending states; removed redundant alignment overrides and verified representative catalogue, form, wishlist, recovery, and confirmation actions on desktop and mobile    | Replace the floating Add action with equal bottom navigation           |
+| 2026-09-12 | 3         | Replaced the floating Add control with four equal, labelled bottom-navigation destinations; added nested-route current states, a compact in-bar Add treatment, safe-area-aware content clearance, keyboard and touch coverage, and authenticated geometry/accessibility checks across desktop Chromium, Android Chrome, and iPhone Safari                    | Remove the decorative-disc flash during catalogue navigation           |
 
 ## 21. Hosted environment checklist
 

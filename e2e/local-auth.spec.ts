@@ -1,5 +1,12 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, type Locator, type Page, test } from "@playwright/test";
+import {
+  expect,
+  type APIRequestContext,
+  type Locator,
+  type Page,
+  test,
+  type TestInfo,
+} from "@playwright/test";
 
 const runLocalAuth = process.env.RUN_LOCAL_AUTH_E2E === "1";
 
@@ -16,10 +23,91 @@ async function expectNoHorizontalOverflow(page: Page) {
   expect(overflow).toBeLessThanOrEqual(1);
 }
 
-async function expectNoSeriousAccessibilityViolations(page: Page) {
-  const results = await new AxeBuilder({ page })
-    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
-    .analyze();
+async function expectBottomNavigation(
+  page: Page,
+  currentLabel: string,
+  verifyKeyboard = true,
+) {
+  const navigation = page.getByRole("navigation", {
+    name: "Primary navigation",
+  });
+  const links = navigation.getByRole("link");
+
+  await expect(links).toHaveCount(4);
+  await expect(links).toHaveText(["Collection", "Wishlist", "Add", "Profile"]);
+  await expect(
+    navigation.getByRole("link", { name: currentLabel, exact: true }),
+  ).toHaveAttribute("aria-current", "page");
+
+  const geometry = await navigation.evaluate((nav) => {
+    const navRect = nav.getBoundingClientRect();
+    const appPage = document.querySelector(".app-page");
+    const linkRects = Array.from(nav.querySelectorAll("a"), (link) => {
+      const rect = link.getBoundingClientRect();
+
+      return {
+        center: rect.left + rect.width / 2,
+        height: rect.height,
+        tabIndex: link.tabIndex,
+        top: rect.top,
+        width: rect.width,
+      };
+    });
+
+    return {
+      appPaddingBottom: appPage
+        ? Number.parseFloat(window.getComputedStyle(appPage).paddingBottom)
+        : 0,
+      linkRects,
+      navBottom: window.innerHeight - navRect.bottom,
+      navHeight: navRect.height,
+      navTop: navRect.top,
+    };
+  });
+
+  expect(geometry.navBottom).toBeLessThanOrEqual(1);
+  expect(geometry.appPaddingBottom).toBeGreaterThanOrEqual(geometry.navHeight);
+  for (const rect of geometry.linkRects) {
+    expect(rect.height).toBeGreaterThanOrEqual(44);
+    expect(rect.tabIndex).toBeGreaterThanOrEqual(0);
+    expect(rect.top).toBeGreaterThanOrEqual(geometry.navTop);
+  }
+
+  const widths = geometry.linkRects.map(({ width }) => width);
+  expect(Math.max(...widths) - Math.min(...widths)).toBeLessThanOrEqual(1);
+  const centerGaps = geometry.linkRects
+    .slice(1)
+    .map(({ center }, index) => center - geometry.linkRects[index].center);
+  expect(Math.max(...centerGaps) - Math.min(...centerGaps)).toBeLessThanOrEqual(
+    1,
+  );
+
+  for (let index = 0; verifyKeyboard && index < 4; index += 1) {
+    const adjacentIndex = index === 0 ? 1 : index - 1;
+    await links.nth(adjacentIndex).focus();
+    await page.keyboard.press(index === 0 ? "Shift+Tab" : "Tab");
+    await expect(links.nth(index)).toBeFocused();
+    expect(
+      await links
+        .nth(index)
+        .evaluate((element) => window.getComputedStyle(element).outlineStyle),
+    ).not.toBe("none");
+  }
+}
+
+async function expectNoSeriousAccessibilityViolations(
+  page: Page,
+  include?: string,
+) {
+  const builder = new AxeBuilder({ page }).withTags([
+    "wcag2a",
+    "wcag2aa",
+    "wcag21a",
+    "wcag21aa",
+    "wcag22aa",
+  ]);
+  if (include) builder.include(include);
+  const results = await builder.analyze();
   const seriousViolations = results.violations.filter(
     ({ impact }) => impact === "serious" || impact === "critical",
   );
@@ -110,6 +198,79 @@ async function expectSecondaryInteractionStates(control: Locator) {
   await control.page().mouse.up();
 }
 
+async function signInAndCompleteOnboarding(
+  page: Page,
+  request: APIRequestContext,
+  testInfo: TestInfo,
+) {
+  const unique = `${Date.now()}-${testInfo.workerIndex}`;
+  const email = `collector-${unique}@example.test`;
+  const username = `collector_${unique}`;
+
+  await page.goto("/sign-in");
+  await page.getByLabel("Email address").fill(email);
+  await page.getByRole("button", { name: /email me a sign-in link/i }).click();
+  await expect(page.getByText(/check your inbox/i)).toBeVisible();
+  await expect
+    .poll(async () => {
+      const cookies = await page.context().cookies();
+      return cookies.some((cookie) => cookie.name.includes("code-verifier"));
+    })
+    .toBe(true);
+
+  let messageId: string | undefined;
+  await expect
+    .poll(
+      async () => {
+        const response = await request.get(
+          "http://127.0.0.1:54324/api/v1/messages",
+        );
+        const body = (await response.json()) as {
+          messages?: Array<{
+            ID: string;
+            To?: Array<{ Address?: string }>;
+          }>;
+        };
+
+        messageId = body.messages?.find((message) =>
+          message.To?.some((recipient) => recipient.Address === email),
+        )?.ID;
+        return messageId;
+      },
+      { timeout: 10_000 },
+    )
+    .not.toBeUndefined();
+
+  expect(messageId).toBeDefined();
+  const messageResponse = await request.get(
+    `http://127.0.0.1:54324/api/v1/message/${messageId}`,
+  );
+  const message = (await messageResponse.json()) as {
+    HTML?: string;
+    Text?: string;
+  };
+  const content = (message.HTML ?? message.Text ?? "").replaceAll("&amp;", "&");
+  const confirmationUrl = content
+    .match(/https?:\/\/[^\s"'<>]+/g)
+    ?.find((url) => url.includes("/auth/v1/verify"));
+
+  expect(confirmationUrl).toBeDefined();
+  await page.goto(confirmationUrl!);
+  await expect(page).toHaveURL(/\/onboarding(?:\?|$)/);
+  await expect(
+    page.getByRole("heading", { name: /name your crate/i }),
+  ).toBeVisible();
+
+  await page.getByLabel("Display name").fill("Local Collector");
+  await page.getByLabel("Username").fill(username);
+  await page.getByRole("button", { name: /open my crate/i }).click();
+
+  await expect(page).toHaveURL(/\/collection$/);
+  await expect(
+    page.getByRole("heading", { name: "My collection" }),
+  ).toBeVisible();
+}
+
 test.describe("local passwordless authentication", () => {
   test.setTimeout(90_000);
 
@@ -118,88 +279,59 @@ test.describe("local passwordless authentication", () => {
     "Set RUN_LOCAL_AUTH_E2E=1 with the local Supabase stack running",
   );
 
+  test("keeps four bottom destinations aligned, accessible, and clear of content", async ({
+    page,
+    request,
+  }, testInfo) => {
+    await signInAndCompleteOnboarding(page, request, testInfo);
+    const verifyKeyboard = testInfo.project.name !== "mobile-safari";
+
+    await expectBottomNavigation(page, "Collection", verifyKeyboard);
+    await page.getByRole("link", { name: "Add", exact: true }).click();
+    await expect(page).toHaveURL(/\/add$/);
+    await expectBottomNavigation(page, "Add", verifyKeyboard);
+
+    await page.goto("/add/manual");
+    await expectBottomNavigation(page, "Add", verifyKeyboard);
+    await page.getByRole("link", { name: "Wishlist", exact: true }).click();
+    await expect(page).toHaveURL(/\/wishlist$/);
+    await expectBottomNavigation(page, "Wishlist", verifyKeyboard);
+
+    await page.getByRole("link", { name: "Profile", exact: true }).click();
+    await expect(page).toHaveURL(/\/settings$/);
+    await expectBottomNavigation(page, "Profile", verifyKeyboard);
+    await expectNoHorizontalOverflow(page);
+    await expectNoSeriousAccessibilityViolations(page, ".bottom-nav");
+    await expect(
+      page.locator(
+        "[data-nextjs-dialog], .vite-error-overlay, #webpack-dev-server-client-overlay",
+      ),
+    ).toHaveCount(0);
+  });
+
   test("signs in, completes onboarding, and maintains a collection and wishlist", async ({
     page,
     request,
   }, testInfo) => {
     const unique = `${Date.now()}-${testInfo.workerIndex}`;
-    const email = `collector-${unique}@example.test`;
-    const username = `collector_${unique}`;
-
-    await page.goto("/sign-in");
-    await page.getByLabel("Email address").fill(email);
-    await page
-      .getByRole("button", { name: /email me a sign-in link/i })
-      .click();
-    await expect(page.getByText(/check your inbox/i)).toBeVisible();
-    await expect
-      .poll(async () => {
-        const cookies = await page.context().cookies();
-        return cookies.some((cookie) => cookie.name.includes("code-verifier"));
-      })
-      .toBe(true);
-
-    let messageId: string | undefined;
-    await expect
-      .poll(
-        async () => {
-          const response = await request.get(
-            "http://127.0.0.1:54324/api/v1/messages",
-          );
-          const body = (await response.json()) as {
-            messages?: Array<{
-              ID: string;
-              To?: Array<{ Address?: string }>;
-            }>;
-          };
-
-          messageId = body.messages?.find((message) =>
-            message.To?.some((recipient) => recipient.Address === email),
-          )?.ID;
-          return messageId;
-        },
-        { timeout: 10_000 },
-      )
-      .not.toBeUndefined();
-
-    expect(messageId).toBeDefined();
-    const messageResponse = await request.get(
-      `http://127.0.0.1:54324/api/v1/message/${messageId}`,
-    );
-    const message = (await messageResponse.json()) as {
-      HTML?: string;
-      Text?: string;
-    };
-    const content = (message.HTML ?? message.Text ?? "").replaceAll(
-      "&amp;",
-      "&",
-    );
-    const confirmationUrl = content
-      .match(/https?:\/\/[^\s"'<>]+/g)
-      ?.find((url) => url.includes("/auth/v1/verify"));
-
-    expect(confirmationUrl).toBeDefined();
-    await page.goto(confirmationUrl!);
-    await expect(page).toHaveURL(/\/onboarding(?:\?|$)/);
-    await expect(
-      page.getByRole("heading", { name: /name your crate/i }),
-    ).toBeVisible();
-
-    await page.getByLabel("Display name").fill("Local Collector");
-    await page.getByLabel("Username").fill(username);
-    await page.getByRole("button", { name: /open my crate/i }).click();
-
-    await expect(page).toHaveURL(/\/collection$/);
-    await expect(
-      page.getByRole("heading", { name: "My collection" }),
-    ).toBeVisible();
+    await signInAndCompleteOnboarding(page, request, testInfo);
     await expect(
       page.getByRole("heading", { name: "Your crate is waiting" }),
     ).toBeVisible();
     await expectNoHorizontalOverflow(page);
+    await expectBottomNavigation(
+      page,
+      "Collection",
+      testInfo.project.name !== "mobile-safari",
+    );
 
-    await page.getByRole("link", { name: "Add a record", exact: true }).click();
+    await page.getByRole("link", { name: "Add", exact: true }).click();
     await expect(page).toHaveURL(/\/add$/);
+    await expectBottomNavigation(
+      page,
+      "Add",
+      testInfo.project.name !== "mobile-safari",
+    );
     await page.getByRole("link", { name: /search the catalogue/i }).click();
     await expect(page).toHaveURL(/\/add\/catalogue$/);
     await expect(
@@ -807,6 +939,11 @@ test.describe("local passwordless authentication", () => {
     ).toBeVisible();
 
     await page.getByRole("link", { name: /profile/i }).click();
+    await expectBottomNavigation(
+      page,
+      "Profile",
+      testInfo.project.name !== "mobile-safari",
+    );
     await page.getByLabel("Display name").fill("Local Crate Digger");
     await page
       .getByLabel("About your collection")

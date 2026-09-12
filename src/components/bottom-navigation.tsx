@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import {
   CollectionIcon,
@@ -8,23 +11,40 @@ import {
 } from "@/components/icons";
 
 export function BottomNavigation() {
+  const pathname = usePathname();
+  const destinations = [
+    { href: "/collection", label: "Collection", icon: <CollectionIcon /> },
+    { href: "/wishlist", label: "Wishlist", icon: <HeartIcon /> },
+    {
+      href: "/add",
+      label: "Add",
+      icon: (
+        <span className="bottom-nav-add-icon">
+          <PlusIcon width={20} height={20} />
+        </span>
+      ),
+      className: "add-nav",
+    },
+    { href: "/settings", label: "Profile", icon: <PersonIcon /> },
+  ];
+
   return (
-    <nav className="bottom-nav" aria-label="Collection navigation">
-      <Link href="/collection">
-        <CollectionIcon />
-        Collection
-      </Link>
-      <Link href="/wishlist">
-        <HeartIcon />
-        Wishlist
-      </Link>
-      <Link className="add-nav" href="/add" aria-label="Add a record">
-        <PlusIcon width={27} height={27} />
-      </Link>
-      <Link href="/settings">
-        <PersonIcon />
-        Profile
-      </Link>
+    <nav className="bottom-nav" aria-label="Primary navigation">
+      {destinations.map(({ className, href, icon, label }) => {
+        const isCurrent = pathname === href || pathname.startsWith(`${href}/`);
+
+        return (
+          <Link
+            className={className}
+            href={href}
+            aria-current={isCurrent ? "page" : undefined}
+            key={href}
+          >
+            {icon}
+            <span>{label}</span>
+          </Link>
+        );
+      })}
     </nav>
   );
 }
