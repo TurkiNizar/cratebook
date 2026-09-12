@@ -181,6 +181,22 @@ cover retrieval happen only after selection. The review screen then prefills kno
 release metadata into the existing collection or wishlist form without inferring
 copy-specific condition, acquisition, price, rating, or notes.
 
+The provider-neutral album boundary is also implemented alongside the exact-release
+methods. Ordinary searches use token-wise MusicBrainz release-group matching limited
+to albums. Barcode-shaped and short alphanumeric catalogue-number queries use release
+search and collapse results to their release-group identities. Album results preserve
+MusicBrainz rank, discard later duplicates by release-group MBID, expose bounded page
+and page-size controls, and carry only artist, title, original year, traceable album
+provenance, and an entity-scoped representative-cover URL. Identifier matches are
+deduplicated before local pagination so the same album cannot occupy several cards.
+
+Album lookup, representative cover lookup, invalid input, missing results, rate limits,
+timeouts, upstream errors, and malformed payloads all have typed outcomes. The album
+methods share the existing 24-hour public response cache, in-flight request coalescing,
+one-request-per-second MusicBrainz queue, bounded retry policy, and seven-day Cover Art
+Archive cache. This boundary is not wired into the default results page yet; the next
+album-first UI task will consume it while preserving the existing manual links.
+
 When artwork is available on the exact-release review, its thumbnail and original
 Cover Art Archive references are carried into the add form and then revalidated
 against the selected MBID at the server boundary. This avoids depending on a second

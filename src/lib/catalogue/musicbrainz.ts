@@ -3,20 +3,33 @@ import "server-only";
 import type { Enums, Json } from "@/types/database";
 
 import type {
+  CatalogueAlbumCandidate,
+  CatalogueAlbumLookupResult,
+  CatalogueAlbumProvider,
+  CatalogueAlbumSearchOptions,
+  CatalogueAlbumSearchResult,
   CatalogueCoverResult,
   CatalogueLookupResult,
   CatalogueProvider,
   CatalogueReleaseCandidate,
   CatalogueSearchResult,
 } from "./types";
+import { getCoverArtUrlForEntity } from "./provenance";
 
 const MUSICBRAINZ_API_URL = "https://musicbrainz.org/ws/2/release/";
+const MUSICBRAINZ_RELEASE_GROUP_API_URL =
+  "https://musicbrainz.org/ws/2/release-group/";
 const MUSICBRAINZ_RELEASE_URL = "https://musicbrainz.org/release/";
+const MUSICBRAINZ_RELEASE_GROUP_URL = "https://musicbrainz.org/release-group/";
 const COVER_ART_API_URL = "https://coverartarchive.org/release/";
+const COVER_ART_RELEASE_GROUP_API_URL =
+  "https://coverartarchive.org/release-group/";
 const MUSICBRAINZ_USER_AGENT = "Cratebook/0.1.0 (https://cratebook.vercel.app)";
 const SEARCH_CACHE_SECONDS = 24 * 60 * 60;
 const COVER_CACHE_SECONDS = 7 * 24 * 60 * 60;
 const DEFAULT_SEARCH_LIMIT = 12;
+const MAX_ALBUM_PAGE_SIZE = 24;
+const IDENTIFIER_SEARCH_LIMIT = 100;
 const DEFAULT_TIMEOUT_MS = 6_000;
 const DEFAULT_MINIMUM_INTERVAL_MS = 1_000;
 const DEFAULT_RETRIES = 1;
@@ -97,6 +110,69 @@ function createLookupUrl(externalId: string) {
   const url = new URL(`${MUSICBRAINZ_API_URL}${externalId}`);
   url.searchParams.set("fmt", "json");
   url.searchParams.set("inc", "artists+labels+release-groups");
+  return url.toString();
+}
+
+type AlbumSearchMode = "text" | "barcode" | "catalog_number";
+
+function albumSearchMode(query: string): AlbumSearchMode {
+  const compact = query.replace(/[\s-]/g, "");
+  if (/^\d{8,14}$/.test(compact)) {
+    return "barcode";
+  }
+  if (
+    query.length <= 40 &&
+    /\p{L}/u.test(query) &&
+    /\d/.test(query) &&
+    query.split(" ").length <= 3
+  ) {
+    return "catalog_number";
+  }
+  return "text";
+}
+
+function createAlbumSearchUrl(query: string, page: number, pageSize: number) {
+  const mode = albumSearchMode(query);
+  const url = new URL(
+    mode === "text" ? MUSICBRAINZ_RELEASE_GROUP_API_URL : MUSICBRAINZ_API_URL,
+  );
+
+  if (mode === "barcode") {
+    url.searchParams.set(
+      "query",
+      `barcode:${escapeLucene(query.replace(/[\s-]/g, ""))}`,
+    );
+  } else if (mode === "catalog_number") {
+    url.searchParams.set("query", `catno:"${escapeLucene(query)}"`);
+  } else {
+    const clauses = query
+      .split(" ")
+      .map(
+        (token) =>
+          `(artist:(${escapeLucene(token)}) OR releasegroup:(${escapeLucene(token)}))`,
+      );
+    url.searchParams.set(
+      "query",
+      `${clauses.join(" AND ")} AND primarytype:album`,
+    );
+  }
+
+  url.searchParams.set("fmt", "json");
+  url.searchParams.set(
+    "limit",
+    String(mode === "text" ? pageSize : IDENTIFIER_SEARCH_LIMIT),
+  );
+  url.searchParams.set(
+    "offset",
+    String(mode === "text" ? (page - 1) * pageSize : 0),
+  );
+  return { mode, url: url.toString() };
+}
+
+function createAlbumLookupUrl(externalId: string) {
+  const url = new URL(`${MUSICBRAINZ_RELEASE_GROUP_API_URL}${externalId}`);
+  url.searchParams.set("fmt", "json");
+  url.searchParams.set("inc", "artists");
   return url.toString();
 }
 
@@ -271,6 +347,97 @@ function normalizeCandidate(value: unknown): CatalogueReleaseCandidate | null {
   };
 }
 
+function normalizedAlbumSourceData(
+  group: JsonRecord,
+  artist: string,
+  title: string,
+): Json {
+  const secondaryTypes = Array.isArray(group["secondary-types"])
+    ? group["secondary-types"]
+        .map((value) => stringValue(value, 100))
+        .filter((value): value is string => value !== null)
+        .slice(0, 20)
+    : [];
+
+  return {
+    provider: "musicbrainz",
+    entityType: "release_group",
+    releaseGroup: {
+      id: group.id as string,
+      title,
+      artist,
+      primaryType: stringValue(group["primary-type"], 100),
+      secondaryTypes,
+      firstReleaseDate: stringValue(group["first-release-date"], 32),
+      disambiguation: stringValue(group.disambiguation, 1000),
+    },
+  };
+}
+
+function normalizeAlbumCandidate(
+  value: unknown,
+  fallbackArtist: string | null = null,
+): CatalogueAlbumCandidate | null {
+  if (!isRecord(value)) {
+    return null;
+  }
+
+  const externalId = stringValue(value.id, 64);
+  const title = stringValue(value.title, 300);
+  const artist = artistCredit(value["artist-credit"]) ?? fallbackArtist;
+  if (
+    !externalId ||
+    !MUSICBRAINZ_ID_PATTERN.test(externalId) ||
+    !title ||
+    !artist
+  ) {
+    return null;
+  }
+
+  return {
+    source: "musicbrainz",
+    entityType: "release_group",
+    externalId,
+    sourceUrl: `${MUSICBRAINZ_RELEASE_GROUP_URL}${externalId}`,
+    artist,
+    title,
+    originalYear: integerYear(value["first-release-date"]),
+    representativeCoverUrl: `${COVER_ART_RELEASE_GROUP_API_URL}${externalId}/front-500`,
+    sourceData: normalizedAlbumSourceData(value, artist, title),
+  };
+}
+
+function uniqueAlbums(candidates: Array<CatalogueAlbumCandidate | null>) {
+  const seen = new Set<string>();
+  return candidates.filter(
+    (candidate): candidate is CatalogueAlbumCandidate => {
+      if (!candidate || seen.has(candidate.externalId)) {
+        return false;
+      }
+      seen.add(candidate.externalId);
+      return true;
+    },
+  );
+}
+
+function nonnegativeInteger(value: unknown) {
+  return typeof value === "number" && Number.isInteger(value) && value >= 0
+    ? value
+    : null;
+}
+
+function validAlbumSearchOptions(options: CatalogueAlbumSearchOptions) {
+  const page = options.page ?? 1;
+  const pageSize = options.pageSize ?? DEFAULT_SEARCH_LIMIT;
+  return Number.isInteger(page) &&
+    page >= 1 &&
+    Number.isInteger(pageSize) &&
+    pageSize >= 1 &&
+    pageSize <= MAX_ALBUM_PAGE_SIZE
+    ? { page, pageSize }
+    : null;
+}
+
 function retryAfterSeconds(response: Response) {
   const header = response.headers.get("retry-after");
   if (!header) {
@@ -309,9 +476,39 @@ function coverArtUrl(value: unknown) {
   }
 }
 
+function normalizeCoverResult(
+  payload: unknown,
+  entityType: "release" | "release_group",
+  externalId: string,
+): CatalogueCoverResult {
+  if (!isRecord(payload) || !Array.isArray(payload.images)) {
+    return { status: "malformed_response" };
+  }
+
+  const front = payload.images.find(
+    (image) =>
+      isRecord(image) && image.front === true && image.approved === true,
+  );
+  if (!isRecord(front)) {
+    return { status: "no_art" };
+  }
+  const thumbnails = isRecord(front.thumbnails) ? front.thumbnails : null;
+  const rawCoverUrl = coverArtUrl(thumbnails?.["500"]);
+  const rawOriginalUrl = coverArtUrl(front.image);
+  const coverUrl = rawCoverUrl
+    ? getCoverArtUrlForEntity(rawCoverUrl, entityType, externalId)
+    : null;
+  const originalUrl = rawOriginalUrl
+    ? getCoverArtUrlForEntity(rawOriginalUrl, entityType, externalId)
+    : null;
+  return coverUrl && originalUrl
+    ? { status: "success", coverUrl, originalUrl }
+    : { status: "malformed_response" };
+}
+
 export function createMusicBrainzProvider(
   options: MusicBrainzProviderOptions = {},
-): CatalogueProvider {
+): CatalogueProvider & CatalogueAlbumProvider {
   const fetchImplementation = options.fetch ?? fetch;
   const now = options.now ?? Date.now;
   const sleep =
@@ -412,6 +609,168 @@ export function createMusicBrainzProvider(
 
   return {
     source: "musicbrainz",
+
+    async searchAlbums(
+      rawQuery: string,
+      options: CatalogueAlbumSearchOptions = {},
+    ): Promise<CatalogueAlbumSearchResult> {
+      const query = rawQuery.trim().replace(/\s+/g, " ");
+      const pagination = validAlbumSearchOptions(options);
+      if (query.length < 2 || query.length > 200 || !pagination) {
+        return {
+          status: "invalid_query",
+          message:
+            query.length < 2 || query.length > 200
+              ? "Enter between 2 and 200 characters."
+              : `Choose a page size between 1 and ${MAX_ALBUM_PAGE_SIZE}.`,
+        };
+      }
+
+      const { page, pageSize } = pagination;
+      const search = createAlbumSearchUrl(query, page, pageSize);
+      const upstream = await fetchWithTimeout(
+        search.url,
+        SEARCH_CACHE_SECONDS,
+        true,
+      );
+      if (upstream.status === "unavailable") {
+        return upstream;
+      }
+      if (upstream.statusCode === 429 || upstream.statusCode === 503) {
+        return {
+          status: "rate_limited",
+          retryAfterSeconds: upstream.retryAfterSeconds,
+        };
+      }
+      if (!upstream.ok) {
+        return { status: "unavailable" };
+      }
+
+      let payload: unknown;
+      try {
+        payload = JSON.parse(upstream.body ?? "");
+      } catch {
+        return { status: "malformed_response" };
+      }
+      if (!isRecord(payload)) {
+        return { status: "malformed_response" };
+      }
+
+      const rawCandidates =
+        search.mode === "text" ? payload["release-groups"] : payload.releases;
+      const total = nonnegativeInteger(payload.count);
+      if (!Array.isArray(rawCandidates) || total === null) {
+        return { status: "malformed_response" };
+      }
+
+      const candidates = uniqueAlbums(
+        search.mode === "text"
+          ? rawCandidates.map((group) => normalizeAlbumCandidate(group))
+          : rawCandidates.map((release) => {
+              if (!isRecord(release)) return null;
+              return normalizeAlbumCandidate(
+                release["release-group"],
+                artistCredit(release["artist-credit"]),
+              );
+            }),
+      );
+      if (rawCandidates.length > 0 && candidates.length === 0) {
+        return { status: "malformed_response" };
+      }
+
+      const pageCandidates =
+        search.mode === "text"
+          ? candidates
+          : candidates.slice((page - 1) * pageSize, page * pageSize);
+      if (pageCandidates.length === 0) {
+        return { status: "no_results" };
+      }
+
+      const totalResults = search.mode === "text" ? total : candidates.length;
+      return {
+        status: "success",
+        candidates: pageCandidates,
+        pagination: {
+          page,
+          pageSize,
+          totalResults,
+          hasNextPage: page * pageSize < totalResults,
+        },
+      };
+    },
+
+    async lookupAlbum(externalId: string): Promise<CatalogueAlbumLookupResult> {
+      if (!MUSICBRAINZ_ID_PATTERN.test(externalId)) {
+        return { status: "invalid_id" };
+      }
+
+      const upstream = await fetchWithTimeout(
+        createAlbumLookupUrl(externalId),
+        SEARCH_CACHE_SECONDS,
+        true,
+      );
+      if (upstream.status === "unavailable") {
+        return upstream;
+      }
+      if (upstream.statusCode === 404) {
+        return { status: "not_found" };
+      }
+      if (upstream.statusCode === 429 || upstream.statusCode === 503) {
+        return {
+          status: "rate_limited",
+          retryAfterSeconds: upstream.retryAfterSeconds,
+        };
+      }
+      if (!upstream.ok) {
+        return { status: "unavailable" };
+      }
+
+      let payload: unknown;
+      try {
+        payload = JSON.parse(upstream.body ?? "");
+      } catch {
+        return { status: "malformed_response" };
+      }
+      const candidate = normalizeAlbumCandidate(payload);
+      return candidate
+        ? { status: "success", candidate }
+        : { status: "malformed_response" };
+    },
+
+    async getAlbumCover(externalId: string): Promise<CatalogueCoverResult> {
+      if (!MUSICBRAINZ_ID_PATTERN.test(externalId)) {
+        return { status: "invalid_id" };
+      }
+
+      const upstream = await fetchWithTimeout(
+        `${COVER_ART_RELEASE_GROUP_API_URL}${externalId}`,
+        COVER_CACHE_SECONDS,
+        false,
+      );
+      if (upstream.status === "unavailable") {
+        return upstream;
+      }
+      if (upstream.statusCode === 404) {
+        return { status: "no_art" };
+      }
+      if (upstream.statusCode === 429 || upstream.statusCode === 503) {
+        return {
+          status: "rate_limited",
+          retryAfterSeconds: upstream.retryAfterSeconds,
+        };
+      }
+      if (!upstream.ok) {
+        return { status: "unavailable" };
+      }
+
+      let payload: unknown;
+      try {
+        payload = JSON.parse(upstream.body ?? "");
+      } catch {
+        return { status: "malformed_response" };
+      }
+      return normalizeCoverResult(payload, "release_group", externalId);
+    },
 
     async search(rawQuery: string): Promise<CatalogueSearchResult> {
       const query = rawQuery.trim().replace(/\s+/g, " ");
@@ -536,23 +895,7 @@ export function createMusicBrainzProvider(
       } catch {
         return { status: "malformed_response" };
       }
-      if (!isRecord(payload) || !Array.isArray(payload.images)) {
-        return { status: "malformed_response" };
-      }
-
-      const front = payload.images.find(
-        (image) =>
-          isRecord(image) && image.front === true && image.approved === true,
-      );
-      if (!isRecord(front)) {
-        return { status: "no_art" };
-      }
-      const thumbnails = isRecord(front.thumbnails) ? front.thumbnails : null;
-      const coverUrl = coverArtUrl(thumbnails?.["500"]);
-      const originalUrl = coverArtUrl(front.image);
-      return coverUrl && originalUrl
-        ? { status: "success", coverUrl, originalUrl }
-        : { status: "malformed_response" };
+      return normalizeCoverResult(payload, "release", externalId);
     },
   };
 }

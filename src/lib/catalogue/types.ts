@@ -31,9 +31,39 @@ export type CatalogueAlbumCandidate = CatalogueIdentity & {
   artist: string;
   title: string;
   originalYear: number | null;
-  cover: CatalogueCoverSelection | null;
+  representativeCoverUrl: string;
   sourceData: Json;
 };
+
+export type CatalogueAlbumSearchOptions = {
+  page?: number;
+  pageSize?: number;
+};
+
+export type CatalogueAlbumSearchResult =
+  | {
+      status: "success";
+      candidates: CatalogueAlbumCandidate[];
+      pagination: {
+        page: number;
+        pageSize: number;
+        totalResults: number;
+        hasNextPage: boolean;
+      };
+    }
+  | { status: "no_results" }
+  | { status: "invalid_query"; message: string }
+  | { status: "rate_limited"; retryAfterSeconds: number | null }
+  | { status: "unavailable" }
+  | { status: "malformed_response" };
+
+export type CatalogueAlbumLookupResult =
+  | { status: "success"; candidate: CatalogueAlbumCandidate }
+  | { status: "not_found" }
+  | { status: "invalid_id" }
+  | { status: "rate_limited"; retryAfterSeconds: number | null }
+  | { status: "unavailable" }
+  | { status: "malformed_response" };
 
 export type CatalogueSearchResult =
   | { status: "success"; candidates: CatalogueReleaseCandidate[] }
@@ -73,4 +103,14 @@ export interface CatalogueProvider {
   search(query: string): Promise<CatalogueSearchResult>;
   lookup(externalId: string): Promise<CatalogueLookupResult>;
   getCover(externalId: string): Promise<CatalogueCoverResult>;
+}
+
+export interface CatalogueAlbumProvider {
+  readonly source: CatalogueSource;
+  searchAlbums(
+    query: string,
+    options?: CatalogueAlbumSearchOptions,
+  ): Promise<CatalogueAlbumSearchResult>;
+  lookupAlbum(externalId: string): Promise<CatalogueAlbumLookupResult>;
+  getAlbumCover(externalId: string): Promise<CatalogueCoverResult>;
 }

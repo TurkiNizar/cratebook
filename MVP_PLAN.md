@@ -717,7 +717,7 @@ an exact physical pressing remains optional advanced detail.
 - [x] Define the album-level data and provenance contract so a quick-added album never
       claims to identify the user's exact pressing; preserve existing exact-release
       records and determine whether a schema migration is required
-- [ ] Build provider-neutral album discovery with broader matching, pagination where
+- [x] Build provider-neutral album discovery with broader matching, pagination where
       supported, deterministic deduplication, typed failures, caching, throttling, and
       a permanent manual fallback
 - [ ] Replace the default pressing-heavy results with responsive, cover-first album
@@ -923,6 +923,7 @@ in version control; this log records product-level progress and changes.
 | 2026-09-12 | 3         | Added a versioned 14-case catalogue-quality fixture, a rate-considerate repeatable benchmark runner, automated fixture/baseline validation, and the current exact-release MusicBrainz baseline: 4/14 albums recalled (28.6%), with no recall for less-common albums, partial titles, barcodes, or catalogue numbers                                          | Compare MusicBrainz release groups and a broader album/artwork source  |
 | 2026-09-12 | 3         | Compared album sources against the fixture: MusicBrainz release groups recalled 14/14 with representative Cover Art Archive fronts available for every match; Apple iTunes recalled 9/14 but failed identifiers and has incompatible promotional-artwork terms. Selected MusicBrainz release groups plus Cover Art Archive for integration                   | Define the album-level data and provenance contract                    |
 | 2026-09-12 | 3         | Defined, implemented, and deployed the album-level identity contract: catalogue rows now distinguish release groups from exact releases, provenance must match the declared entity and MBID, representative artwork is entity-scoped, and existing MusicBrainz rows are preserved as exact releases                                                          | Build provider-neutral album discovery                                 |
+| 2026-09-12 | 3         | Built provider-neutral album discovery with broad token-wise MusicBrainz release-group search, identifier-to-album resolution, bounded pagination, stable MBID deduplication, normalized provenance, representative artwork references, shared caching/throttling/retries, typed lookup and failure states, and permanent manual recovery boundaries         | Replace pressing-heavy results with cover-first album cards            |
 
 ## 21. Hosted environment checklist
 
