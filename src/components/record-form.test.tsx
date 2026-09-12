@@ -235,4 +235,48 @@ describe("RecordForm", () => {
       "/wishlist/wish-id",
     );
   });
+
+  it("keeps conversion details while warning about an owned copy", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <RecordForm
+        action={async () => ({
+          message: "",
+          fieldErrors: {},
+          duplicate: {
+            collectionItemId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+            artist: "Nina Simone",
+            title: "Pastel Blues",
+            copyCount: 1,
+            confirmationValue: '["nina simone","pastel blues"]',
+          },
+        })}
+        cancelHref="/wishlist/wish-id"
+        entryKey="bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb"
+        initialValues={values}
+        variant="convert"
+      />,
+    );
+
+    await user.clear(screen.getByLabelText("Acquired from"));
+    await user.type(screen.getByLabelText("Acquired from"), "Record fair");
+    await user.click(
+      screen.getByRole("button", { name: "Move to collection" }),
+    );
+
+    expect(await screen.findByRole("status")).toHaveTextContent(
+      "You already have 1 copy of Pastel Blues by Nina Simone",
+    );
+    expect(screen.getByLabelText("Acquired from")).toHaveValue("Record fair");
+    expect(
+      screen.getByRole("link", { name: "Review an existing copy" }),
+    ).toHaveAttribute(
+      "href",
+      "/collection/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+    );
+    expect(
+      screen.getByRole("button", { name: "Move to collection" }),
+    ).toBeVisible();
+  });
 });

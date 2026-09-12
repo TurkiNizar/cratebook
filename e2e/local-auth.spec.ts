@@ -199,9 +199,6 @@ test.describe("local passwordless authentication", () => {
     await expect(
       page.getByRole("link", { name: "MusicBrainz" }),
     ).toHaveAttribute("href", /musicbrainz\.org\/release-group\//);
-    await page.getByRole("button", { name: "Remove from collection" }).click();
-    await page.getByRole("button", { name: "Yes, remove this copy" }).click();
-    await expect(page).toHaveURL(/\/collection\?removed=1$/);
 
     await page.goto(albumWishlistHref!);
     await expect(page).toHaveURL(/\/wishlist\/add\?catalogueAlbumId=/);
@@ -232,9 +229,33 @@ test.describe("local passwordless authentication", () => {
     await expect(
       page.getByRole("link", { name: "MusicBrainz" }),
     ).toHaveAttribute("href", /musicbrainz\.org\/release-group\//);
-    await page.getByRole("button", { name: "Remove from wishlist" }).click();
-    await page.getByRole("button", { name: "Yes, remove this wish" }).click();
-    await expect(page).toHaveURL(/\/wishlist\?removed=1$/);
+    await page.getByRole("link", { name: "Move to collection" }).click();
+    await expect(page).toHaveURL(/\/wishlist\/[0-9a-f-]+\/move$/);
+    await page.getByRole("button", { name: "Move to collection" }).click();
+    const catalogueDuplicateWarning = page.getByRole("status");
+    await expect(catalogueDuplicateWarning).toContainText(
+      "This may already be in your collection",
+    );
+    await expect(catalogueDuplicateWarning).toContainText(
+      /You already have 1 copy of Kind of Blue by Miles Davis/i,
+    );
+    await page.getByRole("button", { name: "Move to collection" }).click();
+    await expect(page).toHaveURL(/\/collection\/[0-9a-f-]+\?moved=1$/);
+    await expect(page.getByAltText(/kind of blue cover/i)).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "MusicBrainz" }),
+    ).toHaveAttribute("href", /musicbrainz\.org\/release-group\//);
+    await page.getByRole("button", { name: "Remove from collection" }).click();
+    await page.getByRole("button", { name: "Yes, remove this copy" }).click();
+    await expect(page).toHaveURL(/\/collection\?removed=1$/);
+    const remainingAlbum = page
+      .getByRole("list", { name: "Records in your collection" })
+      .getByRole("article", { name: /kind of blue/i });
+    await expect(remainingAlbum).toHaveCount(1);
+    await remainingAlbum.getByRole("link").click();
+    await page.getByRole("button", { name: "Remove from collection" }).click();
+    await page.getByRole("button", { name: "Yes, remove this copy" }).click();
+    await expect(page).toHaveURL(/\/collection\?removed=1$/);
 
     await page.goto("/add/manual");
 

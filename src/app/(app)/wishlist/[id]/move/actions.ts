@@ -3,7 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { type ManualRecordActionState } from "@/lib/record";
+import {
+  getDuplicateConfirmationValue,
+  type ManualRecordActionState,
+} from "@/lib/record";
 import { createClient } from "@/lib/supabase/server";
 import { isValidWishlistId, validateWishlistConversion } from "@/lib/wishlist";
 
@@ -34,6 +37,52 @@ export async function moveWishlistItemToCollection(
   }
 
   const input = validation.data;
+  const { data: wishlistItem, error: wishlistError } = await supabase
+    .from("wishlist_items")
+    .select("releases(artist_display, title)")
+    .eq("id", wishlistItemId)
+    .maybeSingle();
+
+  if (wishlistError) {
+    console.error("Wishlist duplicate source lookup failed", {
+      code: wishlistError.code,
+      message: wishlistError.message,
+    });
+  } else if (wishlistItem) {
+    const confirmationValue = getDuplicateConfirmationValue(
+      wishlistItem.releases.artist_display,
+      wishlistItem.releases.title,
+    );
+
+    if (formData.get("duplicateConfirmation") !== confirmationValue) {
+      const { data: duplicate, error: duplicateError } = await supabase
+        .rpc("find_collection_duplicates", {
+          p_artist_display: wishlistItem.releases.artist_display,
+          p_title: wishlistItem.releases.title,
+        })
+        .maybeSingle();
+
+      if (duplicateError) {
+        console.error("Wishlist conversion duplicate lookup failed", {
+          code: duplicateError.code,
+          message: duplicateError.message,
+        });
+      } else if (duplicate) {
+        return {
+          message: "",
+          fieldErrors: {},
+          duplicate: {
+            collectionItemId: duplicate.collection_item_id,
+            artist: duplicate.artist_display,
+            title: duplicate.title,
+            copyCount: duplicate.copy_count,
+            confirmationValue,
+          },
+        };
+      }
+    }
+  }
+
   const { data: collectionItemId, error } = await supabase.rpc(
     "convert_wishlist_item_to_collection",
     {

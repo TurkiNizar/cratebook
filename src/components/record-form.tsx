@@ -189,7 +189,7 @@ export function RecordForm({
   const isEditing = variant === "edit";
   const isConverting = variant === "convert";
   const showsCopyDetails = isEditing || isConverting;
-  const duplicate = variant === "create" ? actionState.duplicate : undefined;
+  const duplicate = isEditing ? undefined : actionState.duplicate;
   const submitLabel = isConverting
     ? "Move to collection"
     : isEditing
@@ -701,7 +701,7 @@ export function RecordForm({
               You already have {duplicate.copyCount}{" "}
               {duplicate.copyCount === 1 ? "copy" : "copies"} of{" "}
               <strong>{duplicate.title}</strong> by {duplicate.artist}. If this
-              is another physical copy, you can still add it.
+              is another physical copy, you can still add it to your collection.
             </p>
             <Link href={`/collection/${duplicate.collectionItemId}`}>
               Review an existing copy
