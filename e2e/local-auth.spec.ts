@@ -339,6 +339,91 @@ test.describe("local passwordless authentication", () => {
     ).toHaveCount(0);
   });
 
+  test("shows a neutral catalogue skeleton after entering through Add", async ({
+    page,
+    request,
+  }, testInfo) => {
+    test.skip(
+      !["desktop-chromium", "mobile-chrome"].includes(testInfo.project.name),
+      "Network-throttled transition coverage runs in desktop and mobile Chromium",
+    );
+
+    await signInAndCompleteOnboarding(page, request, testInfo);
+    const devtools = await page.context().newCDPSession(page);
+    await devtools.send("Network.enable");
+    await devtools.send("Network.emulateNetworkConditions", {
+      offline: false,
+      latency: 350,
+      downloadThroughput: (500 * 1024) / 8,
+      uploadThroughput: (250 * 1024) / 8,
+    });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+
+    await page.getByRole("link", { name: "Add", exact: true }).click();
+    await expect(page).toHaveURL(/\/add$/);
+    await page.getByRole("link", { name: /search the catalogue/i }).click();
+    await expect(
+      page.getByRole("heading", { name: "Find an album" }),
+    ).toBeVisible();
+    const searchOutcome = page
+      .getByRole("heading", { name: /Nothing found for/ })
+      .or(page.getByRole("heading", { name: "MusicBrainz needs a moment" }));
+    await page
+      .getByLabel("Artist, title, or identifier")
+      .fill(`Zzqv loading warmup ${Date.now()} ${testInfo.workerIndex}`);
+    await page.getByRole("button", { name: "Search" }).click();
+    await expect(searchOutcome).toBeVisible();
+    await page
+      .getByLabel("Artist, title, or identifier")
+      .fill(`Zzqv loading check ${Date.now()} ${testInfo.workerIndex}`);
+    await page.getByRole("button", { name: "Search" }).click();
+
+    const loading = page.getByTestId("catalogue-search-loading");
+    await expect(loading).toBeVisible();
+    const geometry = await loading.evaluate((element) => {
+      const cards = Array.from(
+        element.querySelectorAll<HTMLElement>(".catalogue-album-card"),
+      );
+      return {
+        cardCount: cards.length,
+        collectionCoverCount:
+          element.querySelectorAll(".collection-cover").length,
+        coverCount: element.querySelectorAll(".catalogue-cover-skeleton")
+          .length,
+        formCount: element.querySelectorAll(".catalogue-search-form").length,
+        interactiveControlCount:
+          element.querySelectorAll("a, button, input").length,
+        reducedMotion: window.matchMedia("(prefers-reduced-motion: reduce)")
+          .matches,
+      };
+    });
+
+    expect(geometry).toMatchObject({
+      cardCount: 3,
+      collectionCoverCount: 0,
+      coverCount: 3,
+      formCount: 1,
+      interactiveControlCount: 0,
+      reducedMotion: true,
+    });
+
+    await expect(searchOutcome).toBeVisible();
+    await expectNoHorizontalOverflow(page);
+    await expect(
+      page.locator(
+        "[data-nextjs-dialog], .vite-error-overlay, #webpack-dev-server-client-overlay",
+      ),
+    ).toHaveCount(0);
+
+    await devtools.send("Network.emulateNetworkConditions", {
+      offline: false,
+      latency: 0,
+      downloadThroughput: -1,
+      uploadThroughput: -1,
+    });
+    await devtools.detach();
+  });
+
   test("signs in, completes onboarding, and maintains a collection and wishlist", async ({
     page,
     request,

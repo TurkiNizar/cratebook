@@ -791,7 +791,7 @@ Implementation decisions for this pass:
   - Verify keyboard access, touch targets, safe-area handling, content clearance, equal
     placement, and no overlap at narrow and desktop widths.
 
-- [ ] Remove the decorative-disc flash when navigating to catalogue search
+- [x] Remove the decorative-disc flash when navigating to catalogue search
   - Reproduce the transition under normal and throttled loading and confirm the route
     segment loading UI is the source.
   - Replace the skeleton's `.collection-cover` combination with a neutral primitive
@@ -1053,6 +1053,7 @@ in version control; this log records product-level progress and changes.
 | 2026-09-12 | 3         | Reopened Milestone 3 for a documented pre-Milestone 4 quality pass covering secondary-control alignment, a non-overlapping four-tab bottom navigation, catalogue loading-flash removal, optimized remote artwork delivery, and artwork selection during collection editing; implementation remains unchecked pending code and browser verification           | Standardize secondary controls and replace the floating Add action     |
 | 2026-09-12 | 3         | Standardized link- and button-backed secondary pill controls with shared centering, wrapped-label geometry, phone-sized targets, and consistent hover, focus, active, disabled, and pending states; removed redundant alignment overrides and verified representative catalogue, form, wishlist, recovery, and confirmation actions on desktop and mobile    | Replace the floating Add action with equal bottom navigation           |
 | 2026-09-12 | 3         | Replaced the floating Add control with four equal, labelled bottom-navigation destinations; added nested-route current states, a compact in-bar Add treatment, safe-area-aware content clearance, keyboard and touch coverage, and authenticated geometry/accessibility checks across desktop Chromium, Android Chrome, and iPhone Safari                    | Remove the decorative-disc flash during catalogue navigation           |
+| 2026-09-12 | 3         | Replaced the catalogue route's shared decorative record-cover skeleton with a neutral, inert loading layout matching the final header, search form, and album cards; added an announced busy state, reduced-motion behavior, component coverage, and throttled authenticated transition checks on desktop and Android Chrome                                 | Optimize wishlist and collection artwork delivery                      |
 
 ## 21. Hosted environment checklist
 

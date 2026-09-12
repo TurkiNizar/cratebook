@@ -1690,7 +1690,9 @@ a.add-option:hover {
 
 .skeleton-cover,
 .skeleton-line,
-.skeleton-button {
+.skeleton-button,
+.catalogue-input-skeleton,
+.catalogue-cover-skeleton {
   display: block;
   border-radius: 7px;
   background: linear-gradient(90deg, #e6dcc9 25%, #f2eadb 50%, #e6dcc9 75%);
@@ -2668,13 +2670,74 @@ a.add-option:hover {
   margin-top: 12px;
 }
 
-.catalogue-search-skeleton {
-  display: flex;
-  gap: 12px;
-  margin: 38px 0;
-  padding: 30px;
-  border: 1px solid var(--line);
-  border-radius: 22px;
+.catalogue-loading-header {
+  display: grid;
+}
+
+.catalogue-back-skeleton {
+  width: 112px;
+  height: 13px;
+  margin-bottom: 31px;
+}
+
+.catalogue-kicker-skeleton,
+.catalogue-label-skeleton {
+  width: 150px;
+  height: 12px;
+}
+
+.catalogue-description-skeleton {
+  width: min(570px, 92%);
+  margin-top: 20px;
+}
+
+.catalogue-description-skeleton-short {
+  width: min(430px, 72%);
+  margin-top: 9px;
+}
+
+.catalogue-search-form-loading {
+  pointer-events: none;
+}
+
+.catalogue-input-skeleton {
+  display: block;
+  min-width: 0;
+  min-height: 52px;
+  border-radius: 14px;
+}
+
+.catalogue-attribution-skeleton {
+  width: min(520px, 82%);
+  height: 12px;
+}
+
+.catalogue-search-loading .catalogue-album-grid {
+  margin-top: 48px;
+}
+
+.catalogue-cover-skeleton {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+}
+
+.catalogue-search-loading .catalogue-album-copy {
+  display: grid;
+  gap: 10px;
+}
+
+.catalogue-card-note-skeleton {
+  width: 58%;
+  height: 11px;
+  margin-top: 4px;
+}
+
+.catalogue-search-loading .catalogue-album-actions .skeleton-button {
+  width: 100%;
+  height: 48px;
 }
 
 .bottom-nav {
@@ -3085,6 +3148,14 @@ a.add-option:hover {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .catalogue-search-loading .skeleton-line,
+  .catalogue-search-loading .skeleton-button,
+  .catalogue-search-loading .catalogue-input-skeleton,
+  .catalogue-search-loading .catalogue-cover-skeleton {
+    animation: none !important;
+    background-position: 0 0;
+  }
+
   *,
   *::before,
   *::after {
