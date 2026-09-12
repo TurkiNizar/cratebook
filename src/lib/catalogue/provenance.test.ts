@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   getCatalogueAttribution,
+  getCoverArtUrlForEntity,
   getCoverArtSelectionForRelease,
   getCoverArtUrl,
   getCoverArtUrlForRelease,
@@ -12,19 +13,33 @@ describe("catalogue attribution", () => {
     expect(
       getCatalogueAttribution(
         "musicbrainz",
+        "release",
         "11111111-1111-4111-8111-111111111111",
       ),
     ).toEqual({
       label: "MusicBrainz",
       url: "https://musicbrainz.org/release/11111111-1111-4111-8111-111111111111",
     });
-    expect(getCatalogueAttribution("musicbrainz", "../unsafe")).toBeNull();
+    expect(
+      getCatalogueAttribution("musicbrainz", "release", "../unsafe"),
+    ).toBeNull();
     expect(
       getCatalogueAttribution(
         "unknown",
+        "release",
         "11111111-1111-4111-8111-111111111111",
       ),
     ).toBeNull();
+    expect(
+      getCatalogueAttribution(
+        "musicbrainz",
+        "release_group",
+        "22222222-2222-4222-8222-222222222222",
+      ),
+    ).toEqual({
+      label: "MusicBrainz",
+      url: "https://musicbrainz.org/release-group/22222222-2222-4222-8222-222222222222",
+    });
   });
 
   it("accepts only Cover Art Archive release images", () => {
@@ -71,5 +86,15 @@ describe("catalogue attribution", () => {
       originalUrl:
         "https://coverartarchive.org/release/11111111-1111-4111-8111-111111111111/front",
     });
+  });
+
+  it("distinguishes representative release-group artwork from exact-release artwork", () => {
+    const groupId = "22222222-2222-4222-8222-222222222222";
+    const groupCover = `https://coverartarchive.org/release-group/${groupId}/front-500`;
+
+    expect(getCoverArtUrlForEntity(groupCover, "release_group", groupId)).toBe(
+      groupCover,
+    );
+    expect(getCoverArtUrlForEntity(groupCover, "release", groupId)).toBeNull();
   });
 });

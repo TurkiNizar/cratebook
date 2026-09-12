@@ -192,6 +192,7 @@ function normalizedSourceData(
 
   return {
     provider: "musicbrainz",
+    entityType: "release",
     release: {
       id: release.id as string,
       title,
@@ -252,6 +253,7 @@ function normalizeCandidate(value: unknown): CatalogueReleaseCandidate | null {
 
   return {
     source: "musicbrainz",
+    entityType: "release",
     externalId,
     sourceUrl: `${MUSICBRAINZ_RELEASE_URL}${externalId}`,
     artist,

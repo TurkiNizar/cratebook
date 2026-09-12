@@ -17,6 +17,7 @@ import CatalogueReleasePage from "./page";
 const externalId = "11111111-1111-4111-8111-111111111111";
 const candidate: CatalogueReleaseCandidate = {
   source: "musicbrainz",
+  entityType: "release",
   externalId,
   sourceUrl: `https://musicbrainz.org/release/${externalId}`,
   artist: "Miles Davis",

@@ -469,6 +469,8 @@ another user; a future public view must expose an explicit safe projection.
 - `barcode`
 - `matrix_runout`
 - `external_source`, `external_id`
+- `external_entity_type` — `release_group` for album identity or `release` for an
+  exact edition; null for manual records
 - `source_data` — original catalogue payload for private provenance
 - `created_at`, `updated_at`
 
@@ -712,7 +714,7 @@ an exact physical pressing remains optional advanced detail.
       durable metadata and image-reference rights, failure behavior, and future
       commercial use; select MusicBrainz release groups with Cover Art Archive before
       integration
-- [ ] Define the album-level data and provenance contract so a quick-added album never
+- [x] Define the album-level data and provenance contract so a quick-added album never
       claims to identify the user's exact pressing; preserve existing exact-release
       records and determine whether a schema migration is required
 - [ ] Build provider-neutral album discovery with broader matching, pagination where
@@ -884,6 +886,7 @@ production environment.
 | 2026-09-11 | Carry validated Cover Art Archive references through catalogue saves and backfill only missing artwork on release reuse                      | Prevents transient repeat artwork requests from dropping a selected cover without overwriting an existing cover or other release edits                                                          |
 | 2026-09-12 | Make catalogue discovery album-first, use representative artwork, and keep exact pressing selection optional                                 | Cratebook prioritizes quick, recognizable collection and wishlist entry over Discogs-style edition cataloguing                                                                                  |
 | 2026-09-12 | Use MusicBrainz release groups with Cover Art Archive representative fronts for album-first discovery; do not integrate Apple iTunes artwork | Release groups recalled 14/14 fixture albums with artwork available for all matches, while Apple recalled 9/14 and its promotional-content terms do not fit durable personal collection artwork |
+| 2026-09-12 | Persist catalogue identity as provider, entity type, and MBID; backfill existing MusicBrainz rows as exact releases                          | Release-group and release MBIDs belong to different namespaces, and explicit provenance prevents an album quick add from implying a specific pressing                                           |
 
 ## 20. Progress log
 
@@ -919,6 +922,7 @@ in version control; this log records product-level progress and changes.
 | 2026-09-12 | 3         | Reopened catalogue discovery around an agreed album-first product direction: representative cover artwork is sufficient for browsing, exact pressing identification becomes optional, and rapid collection/wishlist capture takes priority over Discogs-style completeness                                                                                   | Benchmark current recall and select the broader album/artwork source   |
 | 2026-09-12 | 3         | Added a versioned 14-case catalogue-quality fixture, a rate-considerate repeatable benchmark runner, automated fixture/baseline validation, and the current exact-release MusicBrainz baseline: 4/14 albums recalled (28.6%), with no recall for less-common albums, partial titles, barcodes, or catalogue numbers                                          | Compare MusicBrainz release groups and a broader album/artwork source  |
 | 2026-09-12 | 3         | Compared album sources against the fixture: MusicBrainz release groups recalled 14/14 with representative Cover Art Archive fronts available for every match; Apple iTunes recalled 9/14 but failed identifiers and has incompatible promotional-artwork terms. Selected MusicBrainz release groups plus Cover Art Archive for integration                   | Define the album-level data and provenance contract                    |
+| 2026-09-12 | 3         | Defined and implemented the album-level identity contract: catalogue rows now distinguish release groups from exact releases, provenance must match the declared entity and MBID, representative artwork is entity-scoped, and existing MusicBrainz rows are preserved as exact releases                                                                     | Build provider-neutral album discovery                                 |
 
 ## 21. Hosted environment checklist
 

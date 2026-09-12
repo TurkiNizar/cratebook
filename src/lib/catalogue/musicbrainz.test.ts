@@ -66,6 +66,7 @@ describe("MusicBrainz catalogue provider", () => {
       candidates: [
         expect.objectContaining({
           source: "musicbrainz",
+          entityType: "release",
           externalId: releaseId,
           sourceUrl: `https://musicbrainz.org/release/${releaseId}`,
           artist: "Miles Davis",
@@ -81,6 +82,7 @@ describe("MusicBrainz catalogue provider", () => {
           barcode: "012345678905",
           sourceData: expect.objectContaining({
             provider: "musicbrainz",
+            entityType: "release",
             release: expect.objectContaining({
               id: releaseId,
               title: "Kind of Blue",

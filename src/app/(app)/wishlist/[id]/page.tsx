@@ -29,6 +29,7 @@ export default async function WishlistDetailPage({
   const detailRows = getRecordDetailRows(release);
   const attribution = getCatalogueAttribution(
     release.external_source,
+    release.external_entity_type,
     release.external_id,
   );
   const coverUrl = getCoverArtUrl(release.cover_url);

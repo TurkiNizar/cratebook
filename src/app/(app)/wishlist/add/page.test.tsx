@@ -22,6 +22,7 @@ const coverUrl = `https://coverartarchive.org/release/${externalId}/front-500`;
 const originalUrl = `https://coverartarchive.org/release/${externalId}/front`;
 const candidate: CatalogueReleaseCandidate = {
   source: "musicbrainz",
+  entityType: "release",
   externalId,
   sourceUrl: `https://musicbrainz.org/release/${externalId}`,
   artist: "Miles Davis",

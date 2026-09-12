@@ -55,6 +55,7 @@ function provenanceWithCover(
   return {
     ...snapshot,
     provider: candidate.source,
+    entityType: candidate.entityType,
     coverArt:
       cover.status === "success"
         ? {

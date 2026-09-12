@@ -1,3 +1,5 @@
+import type { CatalogueCoverSelection, CatalogueEntityType } from "./types";
+
 const MUSICBRAINZ_ID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -16,7 +18,8 @@ export function getCoverArtUrl(value: string | null) {
     return url.protocol === "https:" &&
       (url.hostname === "coverartarchive.org" ||
         url.hostname === "www.coverartarchive.org") &&
-      url.pathname.startsWith("/release/")
+      (url.pathname.startsWith("/release/") ||
+        url.pathname.startsWith("/release-group/"))
       ? url.toString()
       : null;
   } catch {
@@ -25,16 +28,7 @@ export function getCoverArtUrl(value: string | null) {
 }
 
 export function getCoverArtUrlForRelease(value: string, externalId: string) {
-  const safeUrl = getCoverArtUrl(value);
-  if (!safeUrl || !MUSICBRAINZ_ID_PATTERN.test(externalId)) {
-    return null;
-  }
-
-  const url = new URL(safeUrl);
-  const releasePrefix = `/release/${externalId.toLocaleLowerCase("en")}/`;
-  return url.pathname.toLocaleLowerCase("en").startsWith(releasePrefix)
-    ? safeUrl
-    : null;
+  return getCoverArtUrlForEntity(value, "release", externalId);
 }
 
 export function getCoverArtSelectionForRelease(
@@ -54,10 +48,12 @@ export function getCoverArtSelectionForRelease(
 
 export function getCatalogueAttribution(
   source: string | null,
+  entityType: string | null,
   externalId: string | null,
 ): CatalogueAttribution | null {
   if (
     source !== "musicbrainz" ||
+    (entityType !== "release" && entityType !== "release_group") ||
     !externalId ||
     !MUSICBRAINZ_ID_PATTERN.test(externalId)
   ) {
@@ -66,7 +62,25 @@ export function getCatalogueAttribution(
 
   return {
     label: "MusicBrainz",
-    url: `https://musicbrainz.org/release/${externalId}`,
+    url: `https://musicbrainz.org/${entityType === "release_group" ? "release-group" : "release"}/${externalId}`,
   };
 }
-import type { CatalogueCoverSelection } from "./types";
+
+export function getCoverArtUrlForEntity(
+  value: string,
+  entityType: CatalogueEntityType,
+  externalId: string,
+) {
+  const safeUrl = getCoverArtUrl(value);
+  if (!safeUrl || !MUSICBRAINZ_ID_PATTERN.test(externalId)) {
+    return null;
+  }
+
+  const url = new URL(safeUrl);
+  const entityPath =
+    entityType === "release_group" ? "release-group" : "release";
+  const prefix = `/${entityPath}/${externalId.toLocaleLowerCase("en")}/`;
+  return url.pathname.toLocaleLowerCase("en").startsWith(prefix)
+    ? safeUrl
+    : null;
+}

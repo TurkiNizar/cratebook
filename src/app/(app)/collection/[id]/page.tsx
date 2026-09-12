@@ -39,6 +39,7 @@ export default async function RecordDetailPage({
   const copyRows = getCopyDetailRows(item);
   const attribution = getCatalogueAttribution(
     release.external_source,
+    release.external_entity_type,
     release.external_id,
   );
   const coverUrl = getCoverArtUrl(release.cover_url);

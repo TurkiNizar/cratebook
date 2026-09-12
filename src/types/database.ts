@@ -163,6 +163,8 @@ export type Database = {
           created_by: string;
           disc_count: number | null;
           edition_description: string | null;
+          external_entity_type:
+            Database["public"]["Enums"]["catalogue_entity_type"] | null;
           external_id: string | null;
           external_source: string | null;
           format: Database["public"]["Enums"]["release_format"] | null;
@@ -187,6 +189,8 @@ export type Database = {
           created_by: string;
           disc_count?: number | null;
           edition_description?: string | null;
+          external_entity_type?:
+            Database["public"]["Enums"]["catalogue_entity_type"] | null;
           external_id?: string | null;
           external_source?: string | null;
           format?: Database["public"]["Enums"]["release_format"] | null;
@@ -211,6 +215,8 @@ export type Database = {
           created_by?: string;
           disc_count?: number | null;
           edition_description?: string | null;
+          external_entity_type?:
+            Database["public"]["Enums"]["catalogue_entity_type"] | null;
           external_id?: string | null;
           external_source?: string | null;
           format?: Database["public"]["Enums"]["release_format"] | null;
@@ -500,6 +506,7 @@ export type Database = {
       };
     };
     Enums: {
+      catalogue_entity_type: "release" | "release_group";
       purchase_state: "new" | "used" | "unknown";
       record_condition:
         | "mint"
@@ -640,6 +647,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      catalogue_entity_type: ["release", "release_group"],
       purchase_state: ["new", "used", "unknown"],
       record_condition: [
         "mint",

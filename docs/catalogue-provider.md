@@ -70,20 +70,34 @@ provider possible.
 
 ## Data and provenance policy
 
-Only MusicBrainz core release data will be mapped into Cratebook's durable release
-fields. Search score and other supplementary data may guide the current result order
-but must not be persisted as release metadata.
+Only MusicBrainz core release and release-group data will be mapped into Cratebook's
+durable release fields. Search score and other supplementary data may guide the
+current result order but must not be persisted as release metadata.
 
-For a selected result:
+Every catalogue identity is the tuple `external_source`, `external_entity_type`, and
+`external_id`. For MusicBrainz:
 
 - `external_source` is `musicbrainz`.
-- `external_id` is the release MBID, not a release-group MBID.
+- `external_entity_type` is `release_group` for an album-level quick add and `release`
+  only when the collector selected a specific edition.
+- `external_id` is the MBID for that declared entity type. Release and release-group
+  UUIDs occupy separate identity namespaces and must never be treated as interchangeable.
 - `source_data` stores a bounded snapshot of the selected release payload needed to
-  trace the import. It must not contain MusicBrainz user data, ratings, tags, or
-  annotations.
-- The UI links the selected result and saved catalogue provenance to
-  `https://musicbrainz.org/release/{mbid}` and labels it as data from MusicBrainz.
+  trace the import. Its top-level `provider` and `entityType` values must match the
+  columns, and either `release.id` or `releaseGroup.id` must match `external_id`. It
+  must not contain MusicBrainz user data, ratings, tags, or annotations.
+- The UI links saved provenance to the matching MusicBrainz release or release-group
+  URL and labels it as data from MusicBrainz.
 - A later refresh may suggest changes, but it must not overwrite user edits silently.
+
+An album-level quick add may persist only artist credit, album title, known original
+year, and optional representative Cover Art Archive artwork. Format, disc count,
+edition year, country, label, catalogue number, barcode, reissue state, vinyl colour,
+and matrix/runout stay unset because those facts describe a physical edition or copy.
+The representative image is evidence about the album, not a claim that it depicts the
+collector's pressing. Exact-release records created before the album-first revision
+are migrated to `external_entity_type = release`; their identity and metadata remain
+unchanged.
 
 MusicBrainz core metadata is CC0 and does not require attribution. Cratebook will
 still display source attribution and an MBID link for transparency, correction, and
@@ -93,8 +107,10 @@ traceability.
 
 Cratebook will reference Cover Art Archive thumbnail URLs remotely for the MVP. It
 will not copy catalogue artwork into Supabase Storage. The adapter should request the
-release's approved front image and prefer the 500-pixel thumbnail for cards and forms;
-it may retain the original Cover Art Archive URL as provenance.
+selected entity's approved front image and prefer the 500-pixel thumbnail for cards
+and forms; it may retain the original Cover Art Archive URL as provenance. Album-level
+records use `/release-group/{mbid}/...` artwork and exact editions use
+`/release/{mbid}/...`; carried artwork must match both the entity type and MBID.
 
 The [Cover Art Archive policy](https://musicbrainz.org/doc/Cover_Art_Archive) says the
 archive is public but that image use remains at the user's risk and should respect the
@@ -102,7 +118,7 @@ rights of artists and labels. Therefore:
 
 - Artwork is optional and failure to load it never blocks selection or manual entry.
 - Catalogue artwork is labelled as coming from Cover Art Archive and links back to
-  the MusicBrainz release.
+  the matching MusicBrainz release group or release.
 - Cratebook does not imply that MusicBrainz, Internet Archive, an artist, or a label
   endorses the application.
 - A removal request or provider takedown must be honored by removing the stored URL;

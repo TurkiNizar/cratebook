@@ -1,11 +1,17 @@
 import type { Enums, Json } from "@/types/database";
 
 export type CatalogueSource = "musicbrainz";
+export type CatalogueEntityType = "release" | "release_group";
 
-export type CatalogueReleaseCandidate = {
+export type CatalogueIdentity = {
   source: CatalogueSource;
+  entityType: CatalogueEntityType;
   externalId: string;
   sourceUrl: string;
+};
+
+export type CatalogueReleaseCandidate = CatalogueIdentity & {
+  entityType: "release";
   artist: string;
   title: string;
   format: Enums<"release_format"> | null;
@@ -17,6 +23,15 @@ export type CatalogueReleaseCandidate = {
   country: string | null;
   editionDescription: string | null;
   barcode: string | null;
+  sourceData: Json;
+};
+
+export type CatalogueAlbumCandidate = CatalogueIdentity & {
+  entityType: "release_group";
+  artist: string;
+  title: string;
+  originalYear: number | null;
+  cover: CatalogueCoverSelection | null;
   sourceData: Json;
 };
 

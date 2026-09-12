@@ -1,6 +1,6 @@
 begin;
 
-select plan(24);
+select plan(27);
 
 select has_function(
   'public',
@@ -46,13 +46,26 @@ select lives_ok(
 );
 
 select results_eq(
-  $$ select external_source, external_id, cover_url from public.releases $$,
+  $$ select external_source, external_entity_type, external_id, cover_url from public.releases $$,
   $$ values (
     'musicbrainz'::text,
+    'release'::public.catalogue_entity_type,
     '11111111-1111-4111-8111-111111111111'::text,
     'https://coverartarchive.org/release/11111111-1111-4111-8111-111111111111/front-500'::text
   ) $$,
   'the release stores its source identity and remote cover reference'
+);
+select is(
+  (select source_data ->> 'entityType' from public.releases),
+  'release'::text,
+  'legacy exact-release RPC writes gain explicit entity provenance'
+);
+select col_type_is(
+  'public',
+  'releases',
+  'external_entity_type',
+  'catalogue_entity_type',
+  'catalogue entity type is represented explicitly in the schema'
 );
 select is(
   (select source_data ->> 'provider' from public.releases),
@@ -134,6 +147,11 @@ select lives_ok(
     '{"provider":"musicbrainz"}'::jsonb
   ) $$,
   'another user can retain an owner-scoped copy of the same catalogue release'
+);
+select is(
+  (select source_data #>> '{release,id}' from public.releases),
+  '11111111-1111-4111-8111-111111111111'::text,
+  'the compatibility path completes legacy exact-release identity provenance'
 );
 select lives_ok(
   $$ select public.create_catalogue_collection_item(
