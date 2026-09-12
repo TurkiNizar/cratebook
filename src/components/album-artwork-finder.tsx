@@ -21,12 +21,16 @@ type AlbumArtworkFinderProps = {
   ) => Promise<CatalogueArtworkSearchState>;
   selectedExternalId?: string;
   onSelect: (suggestion: CatalogueArtworkSuggestion | null) => void;
+  emptyChoiceLabel?: string;
+  emptyChoiceDescription?: string;
 };
 
 export function AlbumArtworkFinder({
   action,
   selectedExternalId,
   onSelect,
+  emptyChoiceLabel = "Keep no cover",
+  emptyChoiceDescription = "Save this record without catalogue artwork.",
 }: AlbumArtworkFinderProps) {
   const [state, formAction, isPending] = useActionState(action, INITIAL_STATE);
 
@@ -119,8 +123,8 @@ export function AlbumArtworkFinder({
       >
         <span aria-hidden="true">×</span>
         <span>
-          <strong>Keep no cover</strong>
-          <small>Save this record without catalogue artwork.</small>
+          <strong>{emptyChoiceLabel}</strong>
+          <small>{emptyChoiceDescription}</small>
         </span>
       </button>
     </section>

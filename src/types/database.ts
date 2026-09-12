@@ -155,6 +155,7 @@ export type Database = {
       releases: {
         Row: {
           artist_display: string;
+          artwork_data: Json | null;
           barcode: string | null;
           catalog_number: string | null;
           country: string | null;
@@ -181,6 +182,7 @@ export type Database = {
         };
         Insert: {
           artist_display: string;
+          artwork_data?: Json | null;
           barcode?: string | null;
           catalog_number?: string | null;
           country?: string | null;
@@ -207,6 +209,7 @@ export type Database = {
         };
         Update: {
           artist_display?: string;
+          artwork_data?: Json | null;
           barcode?: string | null;
           catalog_number?: string | null;
           country?: string | null;
@@ -464,9 +467,11 @@ export type Database = {
           p_acquired_from?: string;
           p_acquired_on?: string;
           p_artist_display: string;
+          p_artwork_data?: Json;
           p_barcode?: string;
           p_catalog_number?: string;
           p_country?: string;
+          p_cover_url?: string;
           p_disc_count?: number;
           p_edition_description?: string;
           p_format?: Database["public"]["Enums"]["release_format"];
@@ -486,6 +491,7 @@ export type Database = {
           p_sleeve_condition?: Database["public"]["Enums"]["record_condition"];
           p_tags?: string[];
           p_title: string;
+          p_update_artwork?: boolean;
           p_vinyl_color?: string;
         };
         Returns: boolean;

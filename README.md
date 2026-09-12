@@ -82,7 +82,9 @@ Start the app with `npm run dev`, then:
 10. Confirm the saved record appears in the collection grid with its release details.
     Existing exact-release catalogue records continue to show their retained Cover Art
     Archive thumbnails.
-11. Open the record, choose **Edit record**, add a favorite, rating, condition,
+11. Open the record, choose **Edit record**, and keep, replace, or remove its artwork.
+    Artwork search remains optional and changing a cover does not change the record's
+    manual, album, or exact-edition identity. Add a favorite, rating, condition,
     acquisition detail, price, private note, or comma-separated tags, and confirm the
     saved details appear on its detail page. Favorite records and tags also appear on
     the collection card.

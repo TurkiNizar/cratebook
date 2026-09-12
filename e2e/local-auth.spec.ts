@@ -746,9 +746,10 @@ test.describe("local passwordless authentication", () => {
       page.getByRole("heading", { name: "Pastel Blues", level: 1 }),
     ).toBeVisible();
     await expect(page.getByAltText("Pastel Blues cover")).toBeVisible();
-    await expect(
-      page.getByRole("link", { name: "MusicBrainz" }),
-    ).toHaveAttribute("href", /musicbrainz\.org\/release-group\//);
+    const originalCatalogueHref = await page
+      .getByRole("link", { name: "MusicBrainz" })
+      .getAttribute("href");
+    expect(originalCatalogueHref).toMatch(/musicbrainz\.org\/release-group\//);
     await expect(page.getByText("Nina Simone", { exact: true })).toBeVisible();
     await page.getByRole("link", { name: "Edit record" }).click();
     await expect(page).toHaveURL(/\/collection\/[0-9a-f-]+\/edit$/);
@@ -756,6 +757,11 @@ test.describe("local passwordless authentication", () => {
     await expect(page.getByLabel("Album or release title")).toHaveValue(
       "Pastel Blues",
     );
+    await expect(page.getByAltText("Pastel Blues cover")).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Keep current artwork" }),
+    ).toHaveAttribute("aria-pressed", "true");
+    await page.getByRole("button", { name: "Remove artwork" }).click();
     await page.getByLabel("Album or release title").fill("Pastel Blues — Mono");
     await page.getByRole("checkbox", { name: /Favorite/ }).check();
     await page.getByLabel("Personal rating").selectOption("5");
@@ -781,6 +787,14 @@ test.describe("local passwordless authentication", () => {
     await expect(
       page.getByRole("heading", { name: "Pastel Blues — Mono", level: 1 }),
     ).toBeVisible();
+    await expect(
+      page.getByRole("img", {
+        name: "Pastel Blues — Mono cover not available",
+      }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "MusicBrainz" }),
+    ).toHaveAttribute("href", originalCatalogueHref!);
     await expect(page.getByText("PHS 600-187", { exact: true })).toBeVisible();
     await expect(page.getByText("★ Favorite")).toBeVisible();
     await expect(page.getByText("Near Mint (NM)")).toBeVisible();
@@ -791,6 +805,34 @@ test.describe("local passwordless authentication", () => {
     await expect(page.getByLabel("Tags")).toHaveText("JazzSunday morning");
     await expect(page.getByText("A late-night favorite.")).toBeVisible();
     await expectNoHorizontalOverflow(page);
+
+    await page.getByRole("link", { name: "Edit record" }).click();
+    await page.getByLabel("Album or release title").fill("Pastel Blues");
+    await page.getByRole("button", { name: "Find album artwork" }).click();
+    const replacementArtwork = page
+      .getByRole("list", { name: "Album artwork suggestions" })
+      .getByRole("button", { name: /Use artwork for/i })
+      .first();
+    await expect(replacementArtwork).toBeVisible();
+    await replacementArtwork.click();
+    await page.getByRole("button", { name: "Save changes" }).click();
+    await expect(page).toHaveURL(/\/collection\/[0-9a-f-]+\?updated=1$/);
+    await expect(page.getByAltText("Pastel Blues cover")).toBeVisible();
+    await expect(
+      page.getByText("Artwork from Cover Art Archive"),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "MusicBrainz" }),
+    ).toHaveAttribute("href", originalCatalogueHref!);
+    await expectNoHorizontalOverflow(page);
+
+    await page.getByRole("link", { name: "Edit record" }).click();
+    await page.getByLabel("Album or release title").fill("Pastel Blues — Mono");
+    await expect(
+      page.getByRole("button", { name: "Keep current artwork" }),
+    ).toHaveAttribute("aria-pressed", "true");
+    await page.getByRole("button", { name: "Save changes" }).click();
+    await expect(page.getByAltText("Pastel Blues — Mono cover")).toBeVisible();
 
     await page.getByRole("link", { name: "My collection" }).click();
     await expect(

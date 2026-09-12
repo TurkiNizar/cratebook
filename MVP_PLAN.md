@@ -816,7 +816,7 @@ Implementation decisions for this pass:
     do not introduce managed Supabase artwork copies during this task without evidence
     that the platform cache is insufficient.
 
-- [ ] Add album-artwork finding, replacement, and removal to collection record editing
+- [x] Add album-artwork finding, replacement, and removal to collection record editing
   - Reuse the authenticated manual-entry artwork finder and initialize it from the
     record's current safe cover without changing typed artist/title values.
   - Define explicit keep, choose, replace, and remove states; never infer removal from a
@@ -1055,6 +1055,7 @@ in version control; this log records product-level progress and changes.
 | 2026-09-12 | 3         | Replaced the floating Add control with four equal, labelled bottom-navigation destinations; added nested-route current states, a compact in-bar Add treatment, safe-area-aware content clearance, keyboard and touch coverage, and authenticated geometry/accessibility checks across desktop Chromium, Android Chrome, and iPhone Safari                    | Remove the decorative-disc flash during catalogue navigation           |
 | 2026-09-12 | 3         | Replaced the catalogue route's shared decorative record-cover skeleton with a neutral, inert loading layout matching the final header, search form, and album cards; added an announced busy state, reduced-motion behavior, component coverage, and throttled authenticated transition checks on desktop and Android Chrome                                 | Optimize wishlist and collection artwork delivery                      |
 | 2026-09-13 | 3         | Enabled the built-in Next.js optimizer for shared Cover Art Archive artwork with strict release and release-group allowlists, responsive source sets, lazy grid loading, detail-view preloads, fixed square geometry, resilient fallbacks, and a seven-day minimum cache; verified real miss-to-hit caching plus authenticated desktop and mobile journeys   | Add artwork replacement and removal to collection record editing       |
+| 2026-09-13 | 3         | Added explicit keep, verified replacement, and removal states to collection editing; stored bounded artwork provenance separately from catalogue identity; preserved unrelated edits atomically; and verified validation, authorization, rollback, component, database, desktop Chromium, Android Chrome, and iPhone Safari coverage                         | Complete and document the pre-Milestone 4 polish verification          |
 
 ## 21. Hosted environment checklist
 

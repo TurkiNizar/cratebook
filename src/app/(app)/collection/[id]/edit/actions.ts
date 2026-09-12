@@ -9,6 +9,7 @@ import {
   validateCopyDetails,
   validateRecordDetails,
 } from "@/lib/record";
+import { resolveArtworkEdit } from "@/lib/catalogue/edit-artwork";
 import { createClient } from "@/lib/supabase/server";
 
 export async function updateRecord(
@@ -34,9 +35,16 @@ export async function updateRecord(
 
   const recordValidation = validateRecordDetails(formData);
   const copyValidation = validateCopyDetails(formData);
-  if (!recordValidation.success || !copyValidation.success) {
+  const artworkValidation = await resolveArtworkEdit(formData);
+  if (
+    !recordValidation.success ||
+    !copyValidation.success ||
+    !artworkValidation.success
+  ) {
     return {
-      message: "Check the highlighted fields and try again.",
+      message: artworkValidation.success
+        ? "Check the highlighted fields and try again."
+        : artworkValidation.message,
       fieldErrors: {
         ...(recordValidation.success ? {} : recordValidation.errors),
         ...(copyValidation.success ? {} : copyValidation.errors),
@@ -46,6 +54,7 @@ export async function updateRecord(
 
   const record = recordValidation.data;
   const copy = copyValidation.data;
+  const artwork = artworkValidation.data;
   const { data: updated, error: updateError } = await supabase.rpc(
     "update_collection_item_details",
     {
@@ -75,6 +84,10 @@ export async function updateRecord(
       p_is_favorite: copy.isFavorite,
       p_notes: copy.notes ?? undefined,
       p_tags: copy.tags,
+      p_cover_url: artwork.action === "replace" ? artwork.coverUrl : undefined,
+      p_artwork_data:
+        artwork.action === "replace" ? artwork.artworkData : undefined,
+      p_update_artwork: artwork.action !== "keep",
     },
   );
 

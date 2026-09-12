@@ -4,6 +4,7 @@ import { useActionState, useState } from "react";
 import Link from "next/link";
 
 import { AlbumArtworkFinder } from "@/components/album-artwork-finder";
+import { ReleaseCover } from "@/components/release-cover";
 import {
   type ManualRecordActionState,
   type ManualRecordField,
@@ -82,6 +83,7 @@ type RecordFormProps = {
     previousState: CatalogueArtworkSearchState,
     formData: FormData,
   ) => Promise<CatalogueArtworkSearchState>;
+  currentCoverUrl?: string;
   cancelHref?: string;
 };
 
@@ -140,6 +142,7 @@ export function RecordForm({
   catalogueEntityType,
   catalogueCover,
   artworkFinderAction,
+  currentCoverUrl,
   cancelHref,
 }: RecordFormProps) {
   const [actionState, formAction, isPending] = useActionState(
@@ -162,11 +165,19 @@ export function RecordForm({
         }
       : null,
   );
+  const [artworkAction, setArtworkAction] = useState<
+    "keep" | "replace" | "remove"
+  >(() => (variant === "edit" && currentCoverUrl ? "keep" : "remove"));
 
   function updateValue(field: keyof RecordFormValues, value: string | boolean) {
     setValues((current) => ({ ...current, [field]: value }));
     if (artworkFinderAction && (field === "artist" || field === "title")) {
-      setArtworkSelection(null);
+      if (variant !== "edit" || artworkAction === "replace") {
+        setArtworkSelection(null);
+      }
+      if (variant === "edit" && artworkAction === "replace") {
+        setArtworkAction(currentCoverUrl ? "keep" : "remove");
+      }
     }
   }
 
@@ -183,6 +194,9 @@ export function RecordForm({
           }
         : null,
     );
+    if (variant === "edit") {
+      setArtworkAction(suggestion ? "replace" : "remove");
+    }
   }
 
   const errors = actionState.fieldErrors;
@@ -210,7 +224,10 @@ export function RecordForm({
       {entryKey ? (
         <input type="hidden" name="entryKey" value={entryKey} />
       ) : null}
-      {artworkSelection ? (
+      {isEditing ? (
+        <input type="hidden" name="artworkAction" value={artworkAction} />
+      ) : null}
+      {artworkSelection && (!isEditing || artworkAction === "replace") ? (
         <>
           <input
             type="hidden"
@@ -224,7 +241,8 @@ export function RecordForm({
           />
         </>
       ) : null}
-      {artworkSelection?.cover ? (
+      {artworkSelection?.cover &&
+      (!isEditing || artworkAction === "replace") ? (
         <>
           <input
             type="hidden"
@@ -321,11 +339,55 @@ export function RecordForm({
           </div>
 
           {artworkFinderAction ? (
-            <AlbumArtworkFinder
-              action={artworkFinderAction}
-              selectedExternalId={artworkSelection?.catalogueId}
-              onSelect={selectArtwork}
-            />
+            <>
+              {isEditing && currentCoverUrl ? (
+                <div className="current-artwork-choice">
+                  <ReleaseCover
+                    className="artwork-suggestion-cover"
+                    coverUrl={currentCoverUrl}
+                    meaningful
+                    sizes="120px"
+                    title={values.title}
+                  />
+                  <div>
+                    <p className="app-kicker">Current artwork</p>
+                    <strong>
+                      {artworkAction === "keep"
+                        ? "This cover will be kept"
+                        : "Choose to keep this cover"}
+                    </strong>
+                    <button
+                      className="secondary-button"
+                      type="button"
+                      aria-pressed={artworkAction === "keep"}
+                      onClick={() => {
+                        setArtworkSelection(null);
+                        setArtworkAction("keep");
+                      }}
+                    >
+                      Keep current artwork
+                    </button>
+                  </div>
+                </div>
+              ) : null}
+              <AlbumArtworkFinder
+                action={artworkFinderAction}
+                selectedExternalId={
+                  isEditing
+                    ? artworkAction === "replace"
+                      ? artworkSelection?.catalogueId
+                      : undefined
+                    : artworkSelection?.catalogueId
+                }
+                onSelect={selectArtwork}
+                emptyChoiceLabel={isEditing ? "Remove artwork" : undefined}
+                emptyChoiceDescription={
+                  isEditing
+                    ? "Save this record without a cover. A failed search never removes it."
+                    : undefined
+                }
+              />
+            </>
           ) : null}
         </section>
       ) : null}

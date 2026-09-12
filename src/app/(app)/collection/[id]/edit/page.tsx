@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { RecordForm, type RecordFormValues } from "@/components/record-form";
+import { getCoverArtUrl } from "@/lib/catalogue/provenance";
 import { priceMinorToInput } from "@/lib/record";
+import { findAlbumArtwork } from "@/app/(app)/artwork-actions";
 
 import { getCollectionRecord } from "../data";
 import { updateRecord } from "./actions";
@@ -61,7 +63,9 @@ export default async function EditRecordPage({
       </p>
       <RecordForm
         action={updateRecordWithId}
+        artworkFinderAction={findAlbumArtwork}
         cancelHref={`/collection/${item.id}`}
+        currentCoverUrl={getCoverArtUrl(release.cover_url) ?? undefined}
         initialValues={initialValues}
         variant="edit"
       />

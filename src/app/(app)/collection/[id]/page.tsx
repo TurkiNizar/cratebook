@@ -100,6 +100,10 @@ export default async function RecordDetailPage({
               </a>
               {coverUrl ? ", artwork from Cover Art Archive" : ""}.
             </p>
+          ) : coverUrl ? (
+            <p className="catalogue-attribution saved-catalogue-attribution">
+              Artwork from Cover Art Archive.
+            </p>
           ) : null}
         </div>
       </article>

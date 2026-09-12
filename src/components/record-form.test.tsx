@@ -129,6 +129,101 @@ describe("RecordForm", () => {
     );
   });
 
+  it("keeps, replaces, and explicitly removes existing artwork while editing", async () => {
+    const user = userEvent.setup();
+    const artworkFinderAction = vi.fn(async () => ({
+      status: "success" as const,
+      message: "Choose artwork.",
+      suggestions: [
+        {
+          externalId: "22222222-2222-4222-8222-222222222222",
+          artist: "Nina Simone",
+          title: "Pastel Blues",
+          originalYear: 1965,
+          sourceUrl:
+            "https://musicbrainz.org/release-group/22222222-2222-4222-8222-222222222222",
+          coverUrl:
+            "https://coverartarchive.org/release-group/22222222-2222-4222-8222-222222222222/front-500",
+          originalUrl:
+            "https://coverartarchive.org/release-group/22222222-2222-4222-8222-222222222222/front",
+        },
+      ],
+    }));
+    const { container } = render(
+      <RecordForm
+        action={async () => ({ message: "", fieldErrors: {} })}
+        artworkFinderAction={artworkFinderAction}
+        currentCoverUrl="https://coverartarchive.org/release/11111111-1111-4111-8111-111111111111/front-500"
+        initialValues={values}
+        variant="edit"
+      />,
+    );
+
+    expect(container.querySelector('input[name="artworkAction"]')).toHaveValue(
+      "keep",
+    );
+    expect(screen.getByAltText("Pastel Blues cover")).toBeVisible();
+
+    await user.click(
+      screen.getByRole("button", { name: "Find album artwork" }),
+    );
+    await user.click(
+      await screen.findByRole("button", {
+        name: "Use artwork for Pastel Blues by Nina Simone",
+      }),
+    );
+    expect(container.querySelector('input[name="artworkAction"]')).toHaveValue(
+      "replace",
+    );
+    expect(container.querySelector('input[name="catalogueId"]')).toHaveValue(
+      "22222222-2222-4222-8222-222222222222",
+    );
+
+    await user.click(screen.getByRole("button", { name: /Remove artwork/ }));
+    expect(container.querySelector('input[name="artworkAction"]')).toHaveValue(
+      "remove",
+    );
+    expect(container.querySelector('input[name="catalogueId"]')).toBeNull();
+    await user.type(screen.getByLabelText("Album or release title"), " — Mono");
+    expect(container.querySelector('input[name="artworkAction"]')).toHaveValue(
+      "remove",
+    );
+
+    await user.click(
+      screen.getByRole("button", { name: "Keep current artwork" }),
+    );
+    expect(container.querySelector('input[name="artworkAction"]')).toHaveValue(
+      "keep",
+    );
+  });
+
+  it("does not remove current artwork when finding replacements fails", async () => {
+    const user = userEvent.setup();
+    const { container } = render(
+      <RecordForm
+        action={async () => ({ message: "", fieldErrors: {} })}
+        artworkFinderAction={async () => ({
+          status: "unavailable",
+          message: "Artwork suggestions are unavailable right now.",
+          suggestions: [],
+        })}
+        currentCoverUrl="https://coverartarchive.org/release/11111111-1111-4111-8111-111111111111/front-500"
+        initialValues={values}
+        variant="edit"
+      />,
+    );
+
+    await user.click(
+      screen.getByRole("button", { name: "Find album artwork" }),
+    );
+    expect(await screen.findByRole("status")).toHaveTextContent(
+      "Artwork suggestions are unavailable right now.",
+    );
+    expect(container.querySelector('input[name="artworkAction"]')).toHaveValue(
+      "keep",
+    );
+  });
+
   it("submits the selected catalogue identifier and its verified cover references", () => {
     const catalogueCover = {
       coverUrl:
