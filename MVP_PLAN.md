@@ -3,8 +3,8 @@
 > Living product specification, technical reference, and development tracker.
 >
 > Last updated: 2026-09-13
-> Overall status: **In development**
-> Current milestone: **Milestone 4 — Sharing, portability, and MVP release**
+> Overall status: **MVP released for invited collectors**
+> Current milestone: **Milestone 4 complete**
 
 ## How to use this document
 
@@ -880,7 +880,11 @@ the record's catalogue identity.
       lint, an optimized-build five-browser authenticated matrix, a read-only production
       smoke check, and a clean dependency advisory scan; record the results in
       `docs/release-testing.md`
-- [ ] Deploy production application and document operations
+- [x] Deploy production application from the verified `main` commit, confirm Vercel and
+      GitHub checks, apply the sole missing reviewed privacy migration, verify all 18
+      hosted migrations and read-only production health, and document release,
+      monitoring, secrets, incident, and rollback operations in
+      `docs/production-operations.md`
 
 Exit condition: the MVP is secure, installable, shareable, portable, and usable by
 invited collectors without developer assistance.
@@ -1096,6 +1100,7 @@ in version control; this log records product-level progress and changes.
 | 2026-09-13 | 4         | Completed the performance review with bounded 24-record server pagination for private and shared lists, filter-preserving URLs, and a documented 13-request, 158 KB, zero-CLS production-build baseline; 215 app tests, 331 database assertions, the build, and authenticated desktop/mobile journeys pass                                                   | Complete the security and privacy review                               |
 | 2026-09-13 | 4         | Completed the security/privacy review: closed direct profile-read and callback-redirect gaps, added browser defenses and threat-model docs; 225 app tests, 339 database assertions, schema lint, build, and desktop/mobile privacy journeys pass                                                                                                             | Run full automated and manual release tests                            |
 | 2026-09-13 | 4         | Completed the MVP release gate: repaired local account-deletion E2E credentials and loading-skeleton ARIA; 231 app tests, optimized build, clean 18-migration/339-assertion database pass, type parity, schema lint, five-browser auth matrix, production smoke, and a 0-vulnerability audit pass                                                            | Deploy production application and document operations                  |
+| 2026-09-13 | 4         | Completed Milestone 4 and released the invited-collector MVP from commit `40c3705`: Vercel production and all GitHub checks succeeded, hosted Supabase reached 18/18 migration parity after applying the reviewed privacy hardening, public health checks passed, and the deployment, monitoring, secret, incident, and rollback runbook is documented       | Validate with invited collectors and prioritize the post-MVP backlog   |
 
 ## 21. Hosted environment checklist
 

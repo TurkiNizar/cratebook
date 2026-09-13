@@ -11,6 +11,10 @@ in [docs/catalogue-provider.md](./docs/catalogue-provider.md).
 
 Production: [https://cratebook.vercel.app](https://cratebook.vercel.app)
 
+Release verification and production runbooks are documented in
+[docs/release-testing.md](./docs/release-testing.md) and
+[docs/production-operations.md](./docs/production-operations.md).
+
 ## Quick UI preview
 
 Requirements:
@@ -167,7 +171,7 @@ npx supabase stop
 
 ## Hosted Supabase and Vercel
 
-The Milestone 1 production environment is live at
+The invited-collector MVP production environment is live at
 [cratebook.vercel.app](https://cratebook.vercel.app), backed by hosted Supabase. The
 homepage, passwordless authentication, onboarding, protected-route redirects,
 collection access, profile editing, PWA manifest, and installable icons have been
