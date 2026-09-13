@@ -3,10 +3,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   createClient: vi.fn(),
   redirect: vi.fn(),
-  revalidatePath: vi.fn(),
 }));
 
-vi.mock("next/cache", () => ({ revalidatePath: mocks.revalidatePath }));
 vi.mock("next/navigation", () => ({ redirect: mocks.redirect }));
 vi.mock("@/lib/supabase/server", () => ({ createClient: mocks.createClient }));
 
@@ -120,8 +118,6 @@ describe("moveWishlistItemToCollection", () => {
         p_acquired_from: "Record fair",
       }),
     );
-    expect(mocks.revalidatePath).toHaveBeenCalledWith("/wishlist");
-    expect(mocks.revalidatePath).toHaveBeenCalledWith("/collection");
     expect(mocks.redirect).toHaveBeenCalledWith(
       `/collection/${entryKey}?moved=1`,
     );

@@ -19,11 +19,19 @@ export default async function AppLayout({
     redirect("/sign-in");
   }
 
-  const { data: profile } = await supabase
+  const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select("username")
     .eq("id", user.id)
     .maybeSingle();
+
+  if (profileError) {
+    console.error("Profile gate query failed", {
+      code: profileError.code,
+      message: profileError.message,
+    });
+    throw new Error("Unable to load profile");
+  }
 
   if (!profile?.username) {
     redirect("/onboarding");

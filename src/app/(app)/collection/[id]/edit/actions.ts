@@ -1,6 +1,5 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import {
@@ -104,7 +103,5 @@ export async function updateRecord(
     };
   }
 
-  revalidatePath("/collection");
-  revalidatePath(`/collection/${itemId}`);
   redirect(`/collection/${itemId}?updated=1`);
 }

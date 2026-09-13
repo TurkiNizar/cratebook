@@ -26,6 +26,24 @@ export default async function OnboardingPage({
     redirect("/sign-in");
   }
 
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("username")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (profileError) {
+    console.error("Onboarding profile query failed", {
+      code: profileError.code,
+      message: profileError.message,
+    });
+    throw new Error("Unable to load profile");
+  }
+
+  if (profile?.username) {
+    redirect("/collection");
+  }
+
   return (
     <main className="auth-page">
       <section className="auth-art" aria-hidden="true">

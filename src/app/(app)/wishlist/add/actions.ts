@@ -1,6 +1,5 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import {
@@ -117,6 +116,5 @@ export async function createWishlistItem(
     };
   }
 
-  revalidatePath("/wishlist");
   redirect(`/wishlist?added=${itemId}`);
 }

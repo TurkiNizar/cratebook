@@ -1,7 +1,6 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
 
 import { getProfileUpdateError, normalizeUsername } from "@/lib/profile";
 import { createClient } from "@/lib/supabase/server";
@@ -32,12 +31,6 @@ export async function updateProfile(formData: FormData) {
     redirect("/sign-in");
   }
 
-  const { data: existingProfile } = await supabase
-    .from("profiles")
-    .select("username")
-    .eq("id", user.id)
-    .single();
-
   const { error } = await supabase
     .from("profiles")
     .update({
@@ -56,10 +49,5 @@ export async function updateProfile(formData: FormData) {
     redirect(`/settings?error=${encodeURIComponent(message)}`);
   }
 
-  revalidatePath("/settings");
-  revalidatePath(`/u/${username}`);
-  if (existingProfile?.username && existingProfile.username !== username) {
-    revalidatePath(`/u/${existingProfile.username}`);
-  }
   redirect("/settings?saved=1");
 }

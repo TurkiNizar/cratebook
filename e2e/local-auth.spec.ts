@@ -1439,6 +1439,12 @@ test.describe("local passwordless authentication", () => {
       page.getByRole("heading", { name: "Your want list is wide open" }),
     ).toBeVisible();
 
+    await page.goto("/onboarding");
+    await expect(page).toHaveURL(/\/collection$/);
+    await expect(
+      page.getByRole("heading", { name: "My collection", level: 1 }),
+    ).toBeVisible();
+
     await page.getByRole("link", { name: /profile/i }).click();
     await expectBottomNavigation(
       page,

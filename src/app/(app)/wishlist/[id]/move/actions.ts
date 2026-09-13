@@ -1,6 +1,5 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import {
@@ -114,7 +113,5 @@ export async function moveWishlistItemToCollection(
     };
   }
 
-  revalidatePath("/wishlist");
-  revalidatePath("/collection");
   redirect(`/collection/${collectionItemId}?moved=1`);
 }
