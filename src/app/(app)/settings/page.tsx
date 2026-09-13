@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { createClient } from "@/lib/supabase/server";
 
@@ -71,7 +72,7 @@ export default async function SettingsPage({
                 defaultValue={profile?.username ?? ""}
                 minLength={3}
                 maxLength={30}
-                pattern="[a-zA-Z0-9][a-zA-Z0-9_-]{1,28}[a-zA-Z0-9]"
+                pattern="[a-zA-Z0-9][a-zA-Z0-9_\-]{1,28}[a-zA-Z0-9]"
                 required
               />
               <p className="field-hint">
@@ -122,6 +123,14 @@ export default async function SettingsPage({
           )}
 
           <div className="settings-actions">
+            {profile?.username ? (
+              <Link
+                className="secondary-button"
+                href={`/u/${profile.username}`}
+              >
+                Preview public profile
+              </Link>
+            ) : null}
             <button className="button" type="submit">
               Save profile
             </button>

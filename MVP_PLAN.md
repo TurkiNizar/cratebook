@@ -853,9 +853,9 @@ the record's catalogue identity.
 
 - [x] Implement profile-level public/private control
 - [x] Implement item-level visibility controls
-- [ ] Build public collection and wishlist profile
-- [ ] Add public-preview mode
-- [ ] Verify private-field exclusion at query/API level
+- [x] Build public collection and wishlist profile
+- [x] Add public-preview mode
+- [x] Verify private-field exclusion at query/API level
 - [ ] Implement CSV export
 - [ ] Implement full JSON export
 - [ ] Implement account and image deletion flow
@@ -944,7 +944,8 @@ These items require a scope decision before being promoted into an MVP milestone
       references before introducing managed artwork copies in Supabase Storage.
 - [x] Allow collection artwork to be changed independently during editing without
       changing the record's manual, album-level, or exact-release catalogue identity.
-- [ ] Decide whether public pages should be indexed by search engines by default.
+- [x] Keep public profiles out of search-engine indexes by default for the MVP; direct
+      share links remain usable.
 
 None of these decisions should block project scaffolding except where explicitly noted.
 
@@ -1008,6 +1009,8 @@ production environment.
 | 2026-09-12 | Enable Next.js/Vercel optimization for remote Cover Art Archive images before considering managed copies                                     | The existing shared image component bypasses an already configured optimizer; using the platform cache improves delivery without adding storage lifecycle and image-deletion obligations                          |
 | 2026-09-12 | Keep editable artwork attribution separate from a record's catalogue identity                                                                | A representative cover can improve browsing, but selecting it must not turn a manual entry or exact pressing into a different catalogue entity                                                                    |
 | 2026-09-13 | Keep every collection and wishlist item private until its owner explicitly makes that item visible                                           | A public profile should not retroactively expose an existing library; per-item opt-in matches Cratebook's private-by-default promise and keeps sharing understandable                                             |
+| 2026-09-13 | Keep public profile pages out of search-engine indexes by default for the MVP                                                                | A deliberate link-sharing model is more consistent with private-by-default expectations; broader discoverability can be reconsidered after collectors understand the control                                      |
+| 2026-09-13 | Use the real public-profile route for owner preview, including while the profile is private                                                  | One owner-aware safe projection keeps the preview identical to the visitor view while preserving private/missing equivalence for everyone else                                                                    |
 
 ## 20. Progress log
 
@@ -1061,6 +1064,8 @@ in version control; this log records product-level progress and changes.
 | 2026-09-13 | 3         | Closed the pre-Milestone 4 polish pass after correcting cross-browser geometry and keyboard-test assumptions; formatting, lint, type-check, 166 unit/component tests, production build, a clean 15-migration reset, 300 database assertions, generated-type parity, and the full authenticated five-project browser matrix all pass                          | Begin Milestone 4 with profile-level public/private control            |
 | 2026-09-13 | 4         | Confirmed and completed profile-level privacy control already founded in Milestone 1: profiles remain private by default, only owners can change visibility, anonymous access is granted and revoked by RLS with the toggle, and the authenticated browser journey now verifies both enabling and disabling sharing                                          | Decide the default item visibility and implement item-level controls   |
 | 2026-09-13 | 4         | Chose explicit per-item sharing with private defaults; completed collection visibility editing alongside the existing wishlist control through owner-scoped atomic persistence, rollback and cross-user protection, clear private-field guidance, generated types, and authenticated desktop/mobile verification                                             | Build the public collection and wishlist profile                       |
+| 2026-09-13 | 4         | Built the signed-out public collection and wishlist profile with private/missing equivalence, no-index metadata, responsive loading/empty/error states, and narrow security-definer projections that exclude prices, sellers, notes, tags, conditions, and provenance; verified 318 database assertions plus accessible desktop/mobile browser journeys      | Add owner-facing public-preview mode                                   |
+| 2026-09-13 | 4         | Added owner-only preview on the real public-profile route for private and live profiles, with exact opted-in projections, clear sharing status, settings navigation, and live-link copying; deployed all 17 migrations and verified 175 app tests, 324 database assertions, the production build, and responsive authenticated desktop/mobile behavior       | Implement CSV export                                                   |
 
 ## 21. Hosted environment checklist
 

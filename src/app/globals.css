@@ -1562,7 +1562,8 @@ a.add-option:hover {
   padding: 15px 2px 4px;
 }
 
-.collection-card-copy h2 {
+.collection-card-copy h2,
+.collection-card-copy h3 {
   display: -webkit-box;
   overflow: hidden;
   margin: 0;
@@ -1573,6 +1574,197 @@ a.add-option:hover {
   line-height: 1.18;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+}
+
+.public-profile-page {
+  min-height: 100vh;
+  background:
+    radial-gradient(
+      circle at 92% 10%,
+      rgba(228, 169, 67, 0.16),
+      transparent 26rem
+    ),
+    var(--paper-light);
+}
+
+.public-profile-header {
+  border-bottom: 1px solid var(--line);
+}
+
+.public-profile-main {
+  padding-block: clamp(54px, 8vw, 90px) 80px;
+}
+
+.public-preview-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  margin-bottom: clamp(42px, 7vw, 72px);
+  padding: clamp(20px, 4vw, 30px);
+  border: 1px solid #d7c7aa;
+  border-radius: 20px;
+  background: #f5ead7;
+}
+
+.public-preview-banner.is-live {
+  border-color: #c6d7bc;
+  background: #edf3e9;
+}
+
+.public-preview-banner.is-live .eyebrow {
+  color: var(--terracotta-dark);
+}
+
+.public-preview-banner .eyebrow {
+  margin-bottom: 8px;
+}
+
+.public-preview-banner h2 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(22px, 3vw, 29px);
+  font-weight: 500;
+  letter-spacing: -0.025em;
+}
+
+.public-preview-banner > div > p:last-child {
+  max-width: 650px;
+  margin: 9px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.public-preview-actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 10px;
+}
+
+.public-preview-copy {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.public-preview-copy [role="status"] {
+  max-width: 105px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+.public-profile-intro {
+  max-width: 720px;
+}
+
+.public-profile-intro h1 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(46px, 8vw, 76px);
+  font-weight: 500;
+  letter-spacing: -0.055em;
+  line-height: 1;
+}
+
+.public-profile-handle {
+  margin: 12px 0 0;
+  color: var(--terracotta-dark);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.public-profile-bio {
+  max-width: 610px;
+  margin: 24px 0 0;
+  color: var(--muted);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(19px, 3vw, 25px);
+  line-height: 1.5;
+}
+
+.public-profile-counts {
+  display: flex;
+  gap: 34px;
+  margin: 34px 0 0;
+}
+
+.public-profile-counts div {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+}
+
+.public-profile-counts dt {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.public-profile-counts dd {
+  order: -1;
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 28px;
+}
+
+.public-profile-empty {
+  margin-top: 54px;
+}
+
+.public-profile-section {
+  margin-top: clamp(58px, 9vw, 96px);
+}
+
+.public-profile-section-heading {
+  display: flex;
+  min-height: 70px;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  border-bottom: 1px solid var(--line);
+}
+
+.public-profile-section-heading h2 {
+  margin: 0 0 17px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(32px, 5vw, 45px);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+}
+
+.public-profile-section-heading > p {
+  margin: 0 0 19px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.public-record-card {
+  position: relative;
+}
+
+.public-profile-footer {
+  display: flex;
+  min-height: 120px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  border-top: 1px solid var(--line);
+}
+
+.public-profile-footer p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.public-profile-message {
+  margin-top: 0;
 }
 
 .collection-artist {
@@ -2212,7 +2404,9 @@ a.add-option:hover {
 
 .settings-actions {
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-end;
+  gap: 10px;
 }
 
 .settings-actions .button {
@@ -2887,6 +3081,53 @@ a.add-option:hover {
 
   .site-header .button-small {
     padding-inline: 15px;
+  }
+
+  .public-profile-header nav .text-link {
+    display: none;
+  }
+
+  .public-profile-main {
+    padding-block: 48px 62px;
+  }
+
+  .public-preview-banner,
+  .public-preview-actions,
+  .public-preview-copy {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .public-preview-actions,
+  .public-preview-actions .secondary-button,
+  .public-preview-copy .button {
+    width: 100%;
+  }
+
+  .public-preview-copy [role="status"] {
+    max-width: none;
+    text-align: center;
+  }
+
+  .public-profile-counts {
+    gap: 22px;
+  }
+
+  .public-profile-section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .public-profile-section-heading > p {
+    margin-top: -8px;
+  }
+
+  .public-profile-footer {
+    align-items: flex-start;
+    flex-direction: column;
+    justify-content: center;
+    padding-block: 28px;
   }
 
   .hero {

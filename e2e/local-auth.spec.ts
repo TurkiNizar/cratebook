@@ -347,6 +347,8 @@ async function signInAndCompleteOnboarding(
   await expect(
     page.getByRole("heading", { name: "My collection" }),
   ).toBeVisible();
+
+  return username;
 }
 
 test.describe("local passwordless authentication", () => {
@@ -356,6 +358,130 @@ test.describe("local passwordless authentication", () => {
     !runLocalAuth,
     "Set RUN_LOCAL_AUTH_E2E=1 with the local Supabase stack running",
   );
+
+  test("shares only opted-in collection and wishlist records on the signed-out profile", async ({
+    page,
+    request,
+  }, testInfo) => {
+    test.skip(
+      !["desktop-chromium", "mobile-chrome"].includes(testInfo.project.name),
+      "Public profile journey runs in representative desktop and mobile browsers",
+    );
+
+    const browserErrors: string[] = [];
+    page.on("console", (message) => {
+      if (message.type() === "error") browserErrors.push(message.text());
+    });
+
+    const username = await signInAndCompleteOnboarding(page, request, testInfo);
+
+    await page.goto("/add/manual");
+    await page.getByLabel("Artist").fill("Nina Simone");
+    await page.getByLabel("Album or release title").fill("Pastel Blues");
+    await page.getByRole("button", { name: "Add to my collection" }).click();
+    await expect(page).toHaveURL(/\/collection\?added=/);
+    await page
+      .getByRole("article", { name: "Pastel Blues" })
+      .getByRole("link")
+      .click();
+    await page.getByRole("link", { name: "Edit record" }).click();
+    await page.getByLabel("Acquired from").fill("Private record shop");
+    await page.getByLabel("Price paid").fill("24.99");
+    await page.getByLabel("Currency").fill("USD");
+    await page
+      .getByLabel("Personal notes or story")
+      .fill("Private collection memory");
+    await page
+      .getByRole("checkbox", { name: /Visible when my profile is public/ })
+      .check();
+    await page.getByRole("button", { name: "Save changes" }).click();
+    await expect(page).toHaveURL(/\/collection\/[0-9a-f-]+\?updated=1/);
+
+    await page.goto("/wishlist/add");
+    await page.getByLabel("Artist").fill("Alice Coltrane");
+    await page
+      .getByLabel("Album or release title")
+      .fill("Journey in Satchidananda");
+    await page.getByLabel("Priority").selectOption("must_have");
+    await page
+      .getByLabel("Preferred edition or pressing")
+      .fill("Any clean Impulse pressing");
+    await page.getByLabel("Maximum price", { exact: true }).fill("75.00");
+    await page.getByLabel("Currency").fill("USD");
+    await page
+      .getByLabel("Private notes", { exact: true })
+      .fill("Private wishlist note");
+    await page.getByRole("checkbox", { name: /Visible/ }).check();
+    await page.getByRole("button", { name: "Add to wishlist" }).click();
+    await expect(page).toHaveURL(/\/wishlist\?added=/);
+
+    await page.goto("/settings");
+    await page.getByLabel("Display name").fill("Local Crate Digger");
+    await page
+      .getByLabel("About your collection")
+      .fill("Jazz discoveries and records with a story.");
+    await page.getByLabel("Public profile").uncheck();
+    await page.getByRole("button", { name: "Save profile" }).click();
+    await expect(page.getByText("Your profile has been saved.")).toBeVisible();
+    await page.getByRole("link", { name: "Preview public profile" }).click();
+    await expect(page).toHaveURL(new RegExp(`/u/${username}$`));
+    await expect(
+      page.getByRole("heading", { name: "Only you can see this preview" }),
+    ).toBeVisible();
+    await expect(page.getByText("Pastel Blues")).toBeVisible();
+    await expect(page.getByText("Journey in Satchidananda")).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Copy profile link" }),
+    ).toHaveCount(0);
+
+    await page.getByRole("link", { name: "Manage sharing" }).click();
+    await page.getByLabel("Public profile").check();
+    await page.getByRole("button", { name: "Save profile" }).click();
+    await expect(page.getByText("Your profile has been saved.")).toBeVisible();
+    await page.getByRole("link", { name: "Preview public profile" }).click();
+    await expect(
+      page.getByRole("heading", { name: "This is what visitors can see" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Copy profile link" }),
+    ).toBeVisible();
+    await page.getByRole("link", { name: "Manage sharing" }).click();
+    await page.getByRole("button", { name: "Sign out" }).click();
+
+    await page.goto(`/u/${username}`);
+    await expect(
+      page.getByRole("heading", { name: "Local Crate Digger", level: 1 }),
+    ).toBeVisible();
+    await expect(page.getByText(`@${username}`)).toBeVisible();
+    await expect(
+      page
+        .getByRole("list", { name: "Local Crate Digger's shared collection" })
+        .getByRole("article", { name: "Pastel Blues" }),
+    ).toBeVisible();
+    await expect(
+      page
+        .getByRole("list", { name: "Local Crate Digger's shared wishlist" })
+        .getByRole("article", { name: "Journey in Satchidananda" }),
+    ).toBeVisible();
+    await expect(page.getByText("Must-have")).toBeVisible();
+    await expect(page.getByText("Any clean Impulse pressing")).toBeVisible();
+    await expect(page.getByText("Private record shop")).toHaveCount(0);
+    await expect(page.getByText("$24.99")).toHaveCount(0);
+    await expect(page.getByText("Private collection memory")).toHaveCount(0);
+    await expect(page.getByText("$75.00")).toHaveCount(0);
+    await expect(page.getByText("Private wishlist note")).toHaveCount(0);
+    await expect(
+      page.getByRole("navigation", { name: "Primary navigation" }),
+    ).toHaveCount(0);
+    await expect(
+      page.locator(
+        "[data-nextjs-dialog], .vite-error-overlay, #webpack-dev-server-client-overlay",
+      ),
+    ).toHaveCount(0);
+    await expectNoHorizontalOverflow(page);
+    await expectNoSeriousAccessibilityViolations(page);
+    expect(browserErrors).toEqual([]);
+  });
 
   test("keeps four bottom destinations aligned, accessible, and clear of content", async ({
     page,

@@ -64,7 +64,7 @@ export default async function OnboardingPage({
                 autoComplete="username"
                 minLength={3}
                 maxLength={30}
-                pattern="[a-zA-Z0-9][a-zA-Z0-9_-]{1,28}[a-zA-Z0-9]"
+                pattern="[a-zA-Z0-9][a-zA-Z0-9_\-]{1,28}[a-zA-Z0-9]"
                 placeholder="alexs_crate"
                 required
               />

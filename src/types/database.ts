@@ -432,6 +432,48 @@ export type Database = {
           title: string;
         }[];
       };
+      get_public_collection_items: {
+        Args: { p_username: string };
+        Returns: {
+          artist_display: string;
+          catalog_number: string;
+          country: string;
+          cover_url: string;
+          created_at: string;
+          disc_count: number;
+          format: Database["public"]["Enums"]["release_format"];
+          id: string;
+          is_favorite: boolean;
+          label: string;
+          original_year: number;
+          release_year: number;
+          title: string;
+        }[];
+      };
+      get_public_profile: {
+        Args: { p_username: string };
+        Returns: {
+          bio: string;
+          collection_count: number;
+          display_name: string;
+          is_owner: boolean;
+          is_public: boolean;
+          username: string;
+          wishlist_count: number;
+        }[];
+      };
+      get_public_wishlist_items: {
+        Args: { p_username: string };
+        Returns: {
+          artist_display: string;
+          cover_url: string;
+          created_at: string;
+          id: string;
+          preferred_edition: string;
+          priority: Database["public"]["Enums"]["wishlist_priority"];
+          title: string;
+        }[];
+      };
       search_collection_items: {
         Args: {
           p_condition?: Database["public"]["Enums"]["record_condition"];

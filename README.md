@@ -112,6 +112,14 @@ Start the app with `npm run dev`, then:
     copy and that the original wishlist item is gone.
 19. Add another wishlist item, choose **Remove from wishlist**, cancel once, then
     confirm removal and verify the wishlist returns to its empty state.
+20. Mark at least one collection item and one wishlist item visible, then use
+    **Preview public profile** in **Profile** while the profile is still private.
+    Confirm the preview shows only opted-in records and clearly says that only you can
+    see it. Enable the public profile, preview the live version, and copy its link.
+    After signing out, open `/u/your-username` and confirm prices, sellers, personal
+    notes, catalogue provenance, and private items are absent. A private profile
+    remains unavailable to everyone except its signed-in owner; a missing profile has
+    the same unavailable visitor state.
 
 Catalogue search needs no additional environment variable or provider account. If
 MusicBrainz has no suitable result or is unavailable, both manual collection and
