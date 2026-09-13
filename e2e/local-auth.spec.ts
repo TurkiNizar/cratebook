@@ -846,6 +846,19 @@ test.describe("local passwordless authentication", () => {
       .getAttribute("href");
     expect(albumWishlistHref).toMatch(/^\/wishlist\/add\?catalogueAlbumId=/);
     expect(albumCollectionHref).toMatch(/^\/add\/manual\?catalogueAlbumId=/);
+    for (const href of [albumWishlistHref, albumCollectionHref]) {
+      const selection = new URL(href!, "http://127.0.0.1").searchParams;
+      expect(selection.get("coverUrl")).toMatch(
+        new RegExp(
+          `^https://coverartarchive\\.org/release-group/${selection.get("catalogueAlbumId")}/front-500$`,
+        ),
+      );
+      expect(selection.get("coverOriginalUrl")).toMatch(
+        new RegExp(
+          `^https://coverartarchive\\.org/release-group/${selection.get("catalogueAlbumId")}/front$`,
+        ),
+      );
+    }
     await expectNoHorizontalOverflow(page);
     await expectNoAccessibilityViolations(page);
 

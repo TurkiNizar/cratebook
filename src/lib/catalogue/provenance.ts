@@ -62,6 +62,32 @@ export function getCoverArtSelectionForEntity(
   return coverUrl && originalUrl ? { coverUrl, originalUrl } : null;
 }
 
+export function getRepresentativeAlbumCoverSelection(
+  coverUrlValue: string | null | undefined,
+  externalId: string,
+): CatalogueCoverSelection | null {
+  if (!coverUrlValue) {
+    return null;
+  }
+
+  const coverUrl = getCoverArtUrlForEntity(
+    coverUrlValue,
+    "release_group",
+    externalId,
+  );
+  if (!coverUrl) {
+    return null;
+  }
+
+  const originalUrl = new URL(coverUrl);
+  if (!originalUrl.pathname.endsWith("/front-500")) {
+    return null;
+  }
+  originalUrl.pathname = originalUrl.pathname.slice(0, -4);
+
+  return { coverUrl, originalUrl: originalUrl.toString() };
+}
+
 export function getCatalogueAttribution(
   source: string | null,
   entityType: string | null,

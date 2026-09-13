@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { ReleaseCover } from "@/components/release-cover";
+import { getRepresentativeAlbumCoverSelection } from "@/lib/catalogue/provenance";
 import type { CatalogueAlbumCandidate } from "@/lib/catalogue/types";
 
 export function CatalogueAlbumCard({
@@ -8,7 +9,18 @@ export function CatalogueAlbumCard({
 }: {
   candidate: CatalogueAlbumCandidate;
 }) {
-  const albumParameter = `catalogueAlbumId=${encodeURIComponent(candidate.externalId)}`;
+  const albumParameters = new URLSearchParams({
+    catalogueAlbumId: candidate.externalId,
+  });
+  const cover = getRepresentativeAlbumCoverSelection(
+    candidate.representativeCoverUrl,
+    candidate.externalId,
+  );
+  if (cover) {
+    albumParameters.set("coverUrl", cover.coverUrl);
+    albumParameters.set("coverOriginalUrl", cover.originalUrl);
+  }
+  const albumQuery = albumParameters.toString();
 
   return (
     <article
@@ -35,13 +47,10 @@ export function CatalogueAlbumCard({
         </p>
       </div>
       <div className="catalogue-album-actions">
-        <Link className="button" href={`/add/manual?${albumParameter}`}>
+        <Link className="button" href={`/add/manual?${albumQuery}`}>
           Add to collection
         </Link>
-        <Link
-          className="secondary-button"
-          href={`/wishlist/add?${albumParameter}`}
-        >
+        <Link className="secondary-button" href={`/wishlist/add?${albumQuery}`}>
           Add to wishlist
         </Link>
         <Link

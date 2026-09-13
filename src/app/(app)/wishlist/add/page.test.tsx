@@ -88,7 +88,7 @@ describe("AddWishlistPage", () => {
     expect(getCover).not.toHaveBeenCalled();
   });
 
-  it("prefills album identity without inventing a preferred edition", async () => {
+  it("keeps carried album artwork when a second cover lookup is unavailable", async () => {
     const albumCover = {
       status: "success" as const,
       coverUrl: `${albumCandidate.representativeCoverUrl}`,
@@ -98,12 +98,14 @@ describe("AddWishlistPage", () => {
       status: "success",
       candidate: albumCandidate,
     });
-    getAlbumCover.mockResolvedValue(albumCover);
+    getAlbumCover.mockResolvedValue({ status: "unavailable" });
 
     const { container } = render(
       await AddWishlistPage({
         searchParams: Promise.resolve({
           catalogueAlbumId: albumCandidate.externalId,
+          coverUrl: albumCover.coverUrl,
+          coverOriginalUrl: albumCover.originalUrl,
         }),
       }),
     );
@@ -126,5 +128,9 @@ describe("AddWishlistPage", () => {
     expect(
       container.querySelector('input[name="catalogueCoverUrl"]'),
     ).toHaveValue(albumCover.coverUrl);
+    expect(
+      container.querySelector('input[name="catalogueCoverOriginalUrl"]'),
+    ).toHaveValue(albumCover.originalUrl);
+    expect(getAlbumCover).not.toHaveBeenCalled();
   });
 });

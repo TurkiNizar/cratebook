@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import type { CatalogueAlbumCandidate } from "@/lib/catalogue/types";
@@ -18,6 +18,12 @@ const candidate: CatalogueAlbumCandidate = {
     "https://coverartarchive.org/release-group/11111111-1111-4111-8111-111111111111/front-500",
   sourceData: { provider: "musicbrainz" },
 };
+
+const albumSelectionQuery = new URLSearchParams({
+  catalogueAlbumId: candidate.externalId,
+  coverUrl: candidate.representativeCoverUrl,
+  coverOriginalUrl: `https://coverartarchive.org/release-group/${candidate.externalId}/front`,
+}).toString();
 
 describe("CatalogueSearchResults", () => {
   it("shows a cover-first album with both add destinations and attribution", () => {
@@ -52,19 +58,13 @@ describe("CatalogueSearchResults", () => {
     ).toBeVisible();
     expect(
       screen.getByRole("link", { name: "Add to collection" }),
-    ).toHaveAttribute(
-      "href",
-      "/add/manual?catalogueAlbumId=" + candidate.externalId,
-    );
+    ).toHaveAttribute("href", "/add/manual?" + albumSelectionQuery);
     expect(screen.getByRole("link", { name: "Add to wishlist" })).toHaveClass(
       "secondary-button",
     );
     expect(
       screen.getByRole("link", { name: "Add to wishlist" }),
-    ).toHaveAttribute(
-      "href",
-      "/wishlist/add?catalogueAlbumId=" + candidate.externalId,
-    );
+    ).toHaveAttribute("href", "/wishlist/add?" + albumSelectionQuery);
     expect(
       screen.getByRole("link", { name: "Choose a specific edition" }),
     ).toHaveClass("secondary-button");
@@ -162,6 +162,16 @@ describe("CatalogueSearchResults", () => {
     expect(
       screen.getByRole("img", { name: "Kind of Blue cover not available" }),
     ).toBeVisible();
+    expect(
+      within(
+        screen.getByRole("article", {
+          name: "Kind of Blue by The Soundalikes",
+        }),
+      ).getByRole("link", { name: "Add to wishlist" }),
+    ).toHaveAttribute(
+      "href",
+      `/wishlist/add?catalogueAlbumId=${sameTitleByAnotherArtist.externalId}`,
+    );
   });
 
   it.each([

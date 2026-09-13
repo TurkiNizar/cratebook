@@ -9,7 +9,10 @@ import {
   candidateToWishlistFormValues,
 } from "@/lib/catalogue/forms";
 import { musicBrainzCatalogueProvider } from "@/lib/catalogue/musicbrainz";
-import { getCoverArtSelectionForRelease } from "@/lib/catalogue/provenance";
+import {
+  getCoverArtSelectionForEntity,
+  getCoverArtSelectionForRelease,
+} from "@/lib/catalogue/provenance";
 
 import { findAlbumArtwork } from "../../artwork-actions";
 import { createWishlistItem } from "./actions";
@@ -40,6 +43,14 @@ export default async function AddWishlistPage({
         catalogueId,
       )
     : null;
+  const carriedAlbumCover = catalogueAlbumId
+    ? getCoverArtSelectionForEntity(
+        firstValue(query.coverUrl),
+        firstValue(query.coverOriginalUrl),
+        "release_group",
+        catalogueAlbumId,
+      )
+    : null;
   const [lookup, cover] = catalogueId
     ? await Promise.all([
         musicBrainzCatalogueProvider.lookup(catalogueId),
@@ -52,7 +63,12 @@ export default async function AddWishlistPage({
     !catalogueId && catalogueAlbumId
       ? await Promise.all([
           musicBrainzCatalogueProvider.lookupAlbum(catalogueAlbumId),
-          musicBrainzCatalogueProvider.getAlbumCover(catalogueAlbumId),
+          carriedAlbumCover
+            ? Promise.resolve({
+                status: "success" as const,
+                ...carriedAlbumCover,
+              })
+            : musicBrainzCatalogueProvider.getAlbumCover(catalogueAlbumId),
         ])
       : [null, null];
   const initialValues =

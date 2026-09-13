@@ -88,7 +88,7 @@ describe("ManualRecordPage", () => {
     expect(getCover).not.toHaveBeenCalled();
   });
 
-  it("prefills safe album fields while leaving pressing and copy details optional", async () => {
+  it("keeps carried album artwork without refetching it", async () => {
     const albumCover = {
       status: "success" as const,
       coverUrl: `${albumCandidate.representativeCoverUrl}`,
@@ -98,12 +98,14 @@ describe("ManualRecordPage", () => {
       status: "success",
       candidate: albumCandidate,
     });
-    getAlbumCover.mockResolvedValue(albumCover);
+    getAlbumCover.mockResolvedValue({ status: "unavailable" });
 
     const { container } = render(
       await ManualRecordPage({
         searchParams: Promise.resolve({
           catalogueAlbumId: albumCandidate.externalId,
+          coverUrl: albumCover.coverUrl,
+          coverOriginalUrl: albumCover.originalUrl,
         }),
       }),
     );
@@ -126,6 +128,10 @@ describe("ManualRecordPage", () => {
     expect(
       container.querySelector('input[name="catalogueCoverUrl"]'),
     ).toHaveValue(albumCover.coverUrl);
+    expect(
+      container.querySelector('input[name="catalogueCoverOriginalUrl"]'),
+    ).toHaveValue(albumCover.originalUrl);
+    expect(getAlbumCover).not.toHaveBeenCalled();
     expect(container.querySelector('select[name="format"]')).toHaveValue("");
   });
 });

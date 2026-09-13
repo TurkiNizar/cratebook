@@ -3,10 +3,11 @@ import { describe, expect, it } from "vitest";
 import {
   getCatalogueAttribution,
   getCoverArtSelectionForEntity,
-  getCoverArtUrlForEntity,
   getCoverArtSelectionForRelease,
   getCoverArtUrl,
+  getCoverArtUrlForEntity,
   getCoverArtUrlForRelease,
+  getRepresentativeAlbumCoverSelection,
 } from "./provenance";
 
 describe("catalogue attribution", () => {
@@ -108,5 +109,25 @@ describe("catalogue attribution", () => {
       coverUrl: groupCover,
       originalUrl: `https://coverartarchive.org/release-group/${groupId}/front`,
     });
+  });
+
+  it("derives a validated original album cover from the displayed thumbnail", () => {
+    const albumId = "22222222-2222-4222-8222-222222222222";
+
+    expect(
+      getRepresentativeAlbumCoverSelection(
+        `https://coverartarchive.org/release-group/${albumId}/front-500`,
+        albumId,
+      ),
+    ).toEqual({
+      coverUrl: `https://coverartarchive.org/release-group/${albumId}/front-500`,
+      originalUrl: `https://coverartarchive.org/release-group/${albumId}/front`,
+    });
+    expect(
+      getRepresentativeAlbumCoverSelection(
+        "https://example.com/untrusted.jpg",
+        albumId,
+      ),
+    ).toBeNull();
   });
 });
