@@ -120,6 +120,11 @@ Start the app with `npm run dev`, then:
     notes, catalogue provenance, and private items are absent. A private profile
     remains unavailable to everyone except its signed-in owner; a missing profile has
     the same unavailable visitor state.
+21. In **Profile → Export your data**, download the collection and wishlist CSV
+    files. Open them in a spreadsheet application and confirm release metadata,
+    private copy or wishlist details, prices in major currency units, visibility, and
+    catalogue identifiers are present. Treat exported files as private because they
+    include details that never appear on a public profile.
 
 Catalogue search needs no additional environment variable or provider account. If
 MusicBrainz has no suitable result or is unavailable, both manual collection and

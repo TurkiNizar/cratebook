@@ -2,6 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import {
   expect,
   type APIRequestContext,
+  type Download,
   type Locator,
   type Page,
   test,
@@ -9,6 +10,13 @@ import {
 } from "@playwright/test";
 
 const runLocalAuth = process.env.RUN_LOCAL_AUTH_E2E === "1";
+
+async function readDownload(download: Download) {
+  const stream = await download.createReadStream();
+  const chunks: Buffer[] = [];
+  for await (const chunk of stream) chunks.push(Buffer.from(chunk));
+  return Buffer.concat(chunks).toString("utf8");
+}
 
 function supportsPlainTabNavigation(testInfo: TestInfo) {
   return !["desktop-webkit", "mobile-safari"].includes(testInfo.project.name);
@@ -446,6 +454,30 @@ test.describe("local passwordless authentication", () => {
       page.getByRole("button", { name: "Copy profile link" }),
     ).toBeVisible();
     await page.getByRole("link", { name: "Manage sharing" }).click();
+
+    const collectionDownloadPromise = page.waitForEvent("download");
+    await page.getByRole("link", { name: "Download collection CSV" }).click();
+    const collectionDownload = await collectionDownloadPromise;
+    expect(collectionDownload.suggestedFilename()).toBe(
+      "cratebook-collection.csv",
+    );
+    const collectionCsv = await readDownload(collectionDownload);
+    expect(collectionCsv).toMatch(/^\uFEFFCollection item ID,Artist,Title/);
+    expect(collectionCsv).toContain("Nina Simone,Pastel Blues");
+    expect(collectionCsv).toContain("Private record shop,24.99,USD");
+    expect(collectionCsv).toContain("Private collection memory");
+
+    const wishlistDownloadPromise = page.waitForEvent("download");
+    await page.getByRole("link", { name: "Download wishlist CSV" }).click();
+    const wishlistDownload = await wishlistDownloadPromise;
+    expect(wishlistDownload.suggestedFilename()).toBe("cratebook-wishlist.csv");
+    const wishlistCsv = await readDownload(wishlistDownload);
+    expect(wishlistCsv).toMatch(/^\uFEFFWishlist item ID,Artist,Title/);
+    expect(wishlistCsv).toContain("Alice Coltrane,Journey in Satchidananda");
+    expect(wishlistCsv).toContain("75.00,USD,Private wishlist note");
+    await expectNoHorizontalOverflow(page);
+    await expectNoSeriousAccessibilityViolations(page);
+
     await page.getByRole("button", { name: "Sign out" }).click();
 
     await page.goto(`/u/${username}`);

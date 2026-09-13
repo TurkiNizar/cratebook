@@ -2301,6 +2301,27 @@ a.add-option:hover {
   line-height: 1.5;
 }
 
+.settings-card .settings-heading p,
+.settings-card .field-hint {
+  color: #675f54;
+}
+
+.settings-heading-compact {
+  margin-bottom: 20px;
+}
+
+.settings-export-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.settings-card
+  .secondary-button:hover:not(:disabled):not([aria-disabled="true"]) {
+  border-color: var(--terracotta-dark);
+  color: var(--terracotta-dark);
+}
+
 .visibility-badge {
   flex: none;
   padding: 6px 10px;
@@ -3407,6 +3428,11 @@ a.add-option:hover {
 
   .settings-card-quiet form,
   .settings-card-quiet .secondary-button {
+    width: 100%;
+  }
+
+  .settings-export-actions,
+  .settings-export-actions .secondary-button {
     width: 100%;
   }
 

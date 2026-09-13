@@ -138,6 +138,34 @@ export default async function SettingsPage({
         </form>
       </section>
 
+      <section className="settings-card" aria-labelledby="data-export-title">
+        <div className="settings-heading settings-heading-compact">
+          <div>
+            <h2 id="data-export-title">Export your data</h2>
+            <p>
+              Download spreadsheet-ready copies of your collection and wishlist.
+              These files include private details, so keep them safe.
+            </p>
+          </div>
+        </div>
+        <div className="settings-export-actions">
+          <a
+            className="secondary-button"
+            href="/settings/export/collection.csv"
+            download="cratebook-collection.csv"
+          >
+            Download collection CSV
+          </a>
+          <a
+            className="secondary-button"
+            href="/settings/export/wishlist.csv"
+            download="cratebook-wishlist.csv"
+          >
+            Download wishlist CSV
+          </a>
+        </div>
+      </section>
+
       <section
         className="settings-card settings-card-quiet"
         aria-labelledby="session-title"
