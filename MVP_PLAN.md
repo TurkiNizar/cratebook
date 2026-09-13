@@ -863,7 +863,10 @@ the record's catalogue identity.
       first launch, collection/wishlist/add shortcuts, complete any/maskable/Apple icon
       coverage, a native install prompt when available, accessible browser-specific
       fallback guidance, and explicit network-dependent MVP expectations
-- [ ] Complete accessibility review
+- [x] Complete accessibility review with WCAG 2.2 A/AA axe coverage across the
+      primary signed-out and authenticated journeys, corrected color contrast,
+      authenticated skip navigation, destructive-cancellation focus restoration,
+      decorative preview isolation, and desktop/mobile browser verification
 - [ ] Complete performance review
 - [ ] Complete security and privacy review
 - [ ] Run full automated and manual release tests
@@ -1077,6 +1080,7 @@ in version control; this log records product-level progress and changes.
 | 2026-09-13 | 4         | Added an authenticated, versioned full JSON backup with every owner-scoped domain table, including private fields, stable relationships, and raw catalogue/artwork provenance; 194 app tests, 324 database assertions, generated-type parity, the build, and desktop/mobile downloads pass                                                                   | Implement account and image deletion flow                              |
 | 2026-09-13 | 4         | Added typed-confirmation account deletion through a server-only Supabase Admin client, verified full-domain cascades and session cleanup, documented the current no-upload image lifecycle, and blocked anonymous protected-route rendering; application, database, build, and accessible desktop/mobile browser checks pass                                 | Finish installable PWA assets and behavior                             |
 | 2026-09-13 | 4         | Finished PWA installability with stable identity, collection-first launch, shortcuts, full-bleed maskable and Apple icons, native-prompt integration, and accessible browser guidance; formatting, lint, type-check, 210 app tests, build, 331 database assertions, visual review, and 15 browser cases pass                                                 | Complete the accessibility review                                      |
+| 2026-09-13 | 4         | Completed full WCAG 2.2 A/AA axe review across primary routes; fixed contrast, skip navigation, destructive-cancellation focus restoration, and decorative preview semantics; 210 app tests, 331 database assertions, build, visual review, and all supported browser projects pass                                                                          | Complete the performance review                                        |
 
 ## 21. Hosted environment checklist
 

@@ -28,8 +28,10 @@ describe("DeleteRecord", () => {
     expect(
       screen.queryByRole("group", { name: "Remove Pastel Blues?" }),
     ).toBeNull();
-    expect(
-      screen.getByRole("button", { name: "Remove from collection" }),
-    ).toBeVisible();
+    const removeButton = screen.getByRole("button", {
+      name: "Remove from collection",
+    });
+    expect(removeButton).toBeVisible();
+    expect(removeButton).toHaveFocus();
   });
 });

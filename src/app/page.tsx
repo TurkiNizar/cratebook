@@ -62,10 +62,7 @@ export default function HomePage() {
           </p>
         </div>
 
-        <div
-          className="phone-scene"
-          aria-label="Preview of a Cratebook collection"
-        >
+        <div className="phone-scene" aria-hidden="true">
           <div className="sun-shape" />
           <div className="phone-frame">
             <div className="phone-topline">

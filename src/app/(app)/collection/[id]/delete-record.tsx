@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 
 import type { DeleteRecordActionState } from "./actions";
 
@@ -17,6 +17,20 @@ type DeleteRecordProps = {
 export function DeleteRecord({ title, action }: DeleteRecordProps) {
   const [isConfirming, setIsConfirming] = useState(false);
   const [state, formAction, isPending] = useActionState(action, INITIAL_STATE);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const shouldRestoreFocus = useRef(false);
+
+  useEffect(() => {
+    if (!isConfirming && shouldRestoreFocus.current) {
+      triggerRef.current?.focus();
+      shouldRestoreFocus.current = false;
+    }
+  }, [isConfirming]);
+
+  function cancelConfirmation() {
+    shouldRestoreFocus.current = true;
+    setIsConfirming(false);
+  }
 
   return (
     <section
@@ -34,6 +48,7 @@ export function DeleteRecord({ title, action }: DeleteRecordProps) {
 
       {!isConfirming ? (
         <button
+          ref={triggerRef}
           className="danger-button"
           type="button"
           aria-controls="delete-record-confirmation"
@@ -58,7 +73,7 @@ export function DeleteRecord({ title, action }: DeleteRecordProps) {
               type="button"
               autoFocus
               disabled={isPending}
-              onClick={() => setIsConfirming(false)}
+              onClick={cancelConfirmation}
             >
               Keep record
             </button>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 
 import type { DeleteAccountActionState } from "./delete-account-actions";
 
@@ -16,6 +16,20 @@ type DeleteAccountProps = {
 export function DeleteAccount({ action }: DeleteAccountProps) {
   const [isConfirming, setIsConfirming] = useState(false);
   const [state, formAction, isPending] = useActionState(action, INITIAL_STATE);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const shouldRestoreFocus = useRef(false);
+
+  useEffect(() => {
+    if (!isConfirming && shouldRestoreFocus.current) {
+      triggerRef.current?.focus();
+      shouldRestoreFocus.current = false;
+    }
+  }, [isConfirming]);
+
+  function cancelConfirmation() {
+    shouldRestoreFocus.current = true;
+    setIsConfirming(false);
+  }
 
   return (
     <section
@@ -34,6 +48,7 @@ export function DeleteAccount({ action }: DeleteAccountProps) {
 
       {!isConfirming ? (
         <button
+          ref={triggerRef}
           className="danger-button"
           type="button"
           aria-controls="delete-account-confirmation"
@@ -74,7 +89,7 @@ export function DeleteAccount({ action }: DeleteAccountProps) {
                 type="button"
                 autoFocus
                 disabled={isPending}
-                onClick={() => setIsConfirming(false)}
+                onClick={cancelConfirmation}
               >
                 Keep my account
               </button>

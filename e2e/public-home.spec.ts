@@ -19,6 +19,10 @@ test("introduces the product and links to sign in", async ({ page }) => {
   await expect(
     page.getByRole("link", { name: /build your collection/i }),
   ).toHaveAttribute("href", "/sign-in");
+  const collectionPreview = page.locator(".phone-scene");
+  await expect(collectionPreview).toBeVisible();
+  await expect(collectionPreview).toHaveAttribute("aria-hidden", "true");
+  await expect(collectionPreview.getByRole("heading")).toHaveCount(0);
 });
 
 test("publishes an installable web app manifest", async ({ request }) => {
@@ -84,7 +88,7 @@ test("offers installation guidance and publishes Apple install metadata", async 
   }
 
   const accessibilityScan = await new AxeBuilder({ page })
-    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
     .analyze();
   expect(accessibilityScan.violations).toEqual([]);
 

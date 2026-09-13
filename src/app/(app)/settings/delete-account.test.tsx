@@ -35,6 +35,10 @@ describe("DeleteAccount", () => {
         name: "Delete your entire Cratebook account?",
       }),
     ).toBeNull();
+    const deleteButton = screen.getByRole("button", {
+      name: "Delete my account",
+    });
+    expect(deleteButton).toHaveFocus();
     expect(action).not.toHaveBeenCalled();
   });
 

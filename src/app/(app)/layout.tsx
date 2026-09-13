@@ -31,6 +31,9 @@ export default async function AppLayout({
 
   return (
     <div className="app-page">
+      <a className="skip-link" href="#app-content">
+        Skip to main content
+      </a>
       <header className="app-header">
         <Link
           className="brand-link"
@@ -39,11 +42,13 @@ export default async function AppLayout({
         >
           <BrandMark />
         </Link>
-        <span className="avatar-placeholder">
+        <span className="avatar-placeholder" aria-hidden="true">
           {profile.username.slice(0, 2).toUpperCase()}
         </span>
       </header>
-      {children}
+      <div id="app-content" tabIndex={-1}>
+        {children}
+      </div>
       <BottomNavigation />
     </div>
   );

@@ -181,10 +181,7 @@ async function expectBottomNavigation(
   }
 }
 
-async function expectNoSeriousAccessibilityViolations(
-  page: Page,
-  include?: string,
-) {
+async function expectNoAccessibilityViolations(page: Page, include?: string) {
   const builder = new AxeBuilder({ page }).withTags([
     "wcag2a",
     "wcag2aa",
@@ -194,11 +191,8 @@ async function expectNoSeriousAccessibilityViolations(
   ]);
   if (include) builder.include(include);
   const results = await builder.analyze();
-  const seriousViolations = results.violations.filter(
-    ({ impact }) => impact === "serious" || impact === "critical",
-  );
 
-  expect(seriousViolations).toEqual([]);
+  expect(results.violations).toEqual([]);
 }
 
 async function expectCenteredSecondaryControl(control: Locator) {
@@ -294,6 +288,7 @@ async function signInAndCompleteOnboarding(
   const username = `collector_${unique}`;
 
   await page.goto("/sign-in");
+  await expectNoAccessibilityViolations(page);
   await page.getByLabel("Email address").fill(email);
   await page.getByRole("button", { name: /email me a sign-in link/i }).click();
   await expect(page.getByText(/check your inbox/i)).toBeVisible();
@@ -346,6 +341,7 @@ async function signInAndCompleteOnboarding(
   await expect(
     page.getByRole("heading", { name: /name your crate/i }),
   ).toBeVisible();
+  await expectNoAccessibilityViolations(page);
 
   await page.getByLabel("Display name").fill("Local Collector");
   await page.getByLabel("Username").fill(username);
@@ -508,7 +504,7 @@ test.describe("local passwordless authentication", () => {
     });
     expect(backup.data.releases).toHaveLength(2);
     await expectNoHorizontalOverflow(page);
-    await expectNoSeriousAccessibilityViolations(page);
+    await expectNoAccessibilityViolations(page);
 
     await page.getByRole("button", { name: "Sign out" }).click();
 
@@ -543,7 +539,7 @@ test.describe("local passwordless authentication", () => {
       ),
     ).toHaveCount(0);
     await expectNoHorizontalOverflow(page);
-    await expectNoSeriousAccessibilityViolations(page);
+    await expectNoAccessibilityViolations(page);
     expect(browserErrors).toEqual([]);
   });
 
@@ -592,7 +588,7 @@ test.describe("local passwordless authentication", () => {
       page.getByRole("heading", { name: "This crate isn’t available" }),
     ).toBeVisible();
     await expectNoHorizontalOverflow(page);
-    await expectNoSeriousAccessibilityViolations(page);
+    await expectNoAccessibilityViolations(page);
   });
 
   test("keeps four bottom destinations aligned, accessible, and clear of content", async ({
@@ -601,6 +597,24 @@ test.describe("local passwordless authentication", () => {
   }, testInfo) => {
     await signInAndCompleteOnboarding(page, request, testInfo);
     const verifyKeyboard = supportsPlainTabNavigation(testInfo);
+
+    const skipLink = page.getByRole("link", { name: "Skip to main content" });
+    expect(
+      await skipLink.evaluate((element) => {
+        const header = document.querySelector(".app-header");
+        return header
+          ? Boolean(
+              element.compareDocumentPosition(header) &
+              Node.DOCUMENT_POSITION_FOLLOWING,
+            )
+          : false;
+      }),
+    ).toBe(true);
+    await skipLink.focus();
+    await expect(skipLink).toBeFocused();
+    await expect(skipLink).toBeVisible();
+    await page.keyboard.press("Enter");
+    await expect(page.locator("#app-content")).toBeFocused();
 
     await expectBottomNavigation(page, "Collection", verifyKeyboard);
     await page.getByRole("link", { name: "Add", exact: true }).click();
@@ -617,7 +631,7 @@ test.describe("local passwordless authentication", () => {
     await expect(page).toHaveURL(/\/settings$/);
     await expectBottomNavigation(page, "Profile", verifyKeyboard);
     await expectNoHorizontalOverflow(page);
-    await expectNoSeriousAccessibilityViolations(page, ".bottom-nav");
+    await expectNoAccessibilityViolations(page, ".bottom-nav");
     await expect(
       page.locator(
         "[data-nextjs-dialog], .vite-error-overlay, #webpack-dev-server-client-overlay",
@@ -720,6 +734,7 @@ test.describe("local passwordless authentication", () => {
       page.getByRole("heading", { name: "Your crate is waiting" }),
     ).toBeVisible();
     await expectNoHorizontalOverflow(page);
+    await expectNoAccessibilityViolations(page);
     await expectBottomNavigation(
       page,
       "Collection",
@@ -733,6 +748,7 @@ test.describe("local passwordless authentication", () => {
       "Add",
       supportsPlainTabNavigation(testInfo),
     );
+    await expectNoAccessibilityViolations(page);
     await page.getByRole("link", { name: /search the catalogue/i }).click();
     await expect(page).toHaveURL(/\/add\/catalogue$/);
     await expect(
@@ -743,7 +759,7 @@ test.describe("local passwordless authentication", () => {
       page.getByRole("link", { name: "← Add options" }),
     ).toBeVisible();
     await expectNoHorizontalOverflow(page);
-    await expectNoSeriousAccessibilityViolations(page);
+    await expectNoAccessibilityViolations(page);
 
     await page
       .getByLabel("Artist, title, or identifier")
@@ -763,10 +779,11 @@ test.describe("local passwordless authentication", () => {
     await expectCenteredSecondaryControl(
       page.getByRole("link", { name: "Add to wishlist manually" }),
     );
-    await expectNoSeriousAccessibilityViolations(page);
+    await expectNoAccessibilityViolations(page);
     await page.getByRole("link", { name: "Add manually" }).click();
     await expect(page).toHaveURL(/\/add\/manual$/);
     await expect(page.getByLabel("Artist")).toBeVisible();
+    await expectNoAccessibilityViolations(page);
     const findArtworkControl = page.getByRole("button", {
       name: "Find album artwork",
     });
@@ -830,7 +847,7 @@ test.describe("local passwordless authentication", () => {
     expect(albumWishlistHref).toMatch(/^\/wishlist\/add\?catalogueAlbumId=/);
     expect(albumCollectionHref).toMatch(/^\/add\/manual\?catalogueAlbumId=/);
     await expectNoHorizontalOverflow(page);
-    await expectNoSeriousAccessibilityViolations(page);
+    await expectNoAccessibilityViolations(page);
 
     await page.goto(editionHref!);
     await expect(
@@ -992,6 +1009,7 @@ test.describe("local passwordless authentication", () => {
     await expect(
       page.getByRole("heading", { name: "Pastel Blues", level: 1 }),
     ).toBeVisible();
+    await expectNoAccessibilityViolations(page);
     await expect(page.getByAltText("Pastel Blues cover")).toBeVisible();
     const originalCatalogueHref = await page
       .getByRole("link", { name: "MusicBrainz" })
@@ -1012,6 +1030,7 @@ test.describe("local passwordless authentication", () => {
       name: /Visible when my profile is public/,
     });
     await expect(collectionVisibility).not.toBeChecked();
+    await expectNoAccessibilityViolations(page);
     await collectionVisibility.check();
     await page.getByRole("button", { name: "Remove artwork" }).click();
     await page.getByLabel("Album or release title").fill("Pastel Blues — Mono");
@@ -1248,10 +1267,12 @@ test.describe("local passwordless authentication", () => {
       page.getByRole("heading", { name: "Your want list is wide open" }),
     ).toBeVisible();
     await expectNoHorizontalOverflow(page);
+    await expectNoAccessibilityViolations(page);
 
     await page.getByRole("link", { name: "Add your first wish" }).click();
     await expect(page).toHaveURL(/\/wishlist\/add$/);
     await expectNoHorizontalOverflow(page);
+    await expectNoAccessibilityViolations(page);
     await page.getByLabel("Artist").fill("Alice Coltrane");
     await page
       .getByLabel("Album or release title")
@@ -1289,12 +1310,14 @@ test.describe("local passwordless authentication", () => {
     await expect(page.getByText("Check the sleeve.")).toBeVisible();
     await expect(page.getByText("Visible on a public profile")).toBeVisible();
     await expectNoHorizontalOverflow(page);
+    await expectNoAccessibilityViolations(page);
     const editWishControl = page.getByRole("link", { name: "Edit wish" });
     await expectCenteredSecondaryControl(editWishControl);
     await editWishControl.click();
     await expectCenteredSecondaryControl(
       page.getByRole("link", { name: "Cancel" }),
     );
+    await expectNoAccessibilityViolations(page);
     await page
       .getByLabel("Album or release title")
       .fill("Journey in Satchidananda — Reissue");
@@ -1332,6 +1355,7 @@ test.describe("local passwordless authentication", () => {
     await expect(page.getByLabel("Personal notes or story")).toHaveValue(
       "Check the sleeve.",
     );
+    await expectNoAccessibilityViolations(page);
     await page.getByLabel("Bought as").selectOption("used");
     await page.getByLabel("Media condition").selectOption("near_mint");
     await page.getByLabel("Acquisition date").fill("2026-09-10");
@@ -1408,6 +1432,7 @@ test.describe("local passwordless authentication", () => {
       "Profile",
       supportsPlainTabNavigation(testInfo),
     );
+    await expectNoAccessibilityViolations(page);
     await page.getByLabel("Display name").fill("Local Crate Digger");
     await page
       .getByLabel("About your collection")

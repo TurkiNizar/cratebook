@@ -24,5 +24,8 @@ describe("DeleteWishlistItem", () => {
     expect(
       screen.queryByRole("group", { name: "Remove Journey in Satchidananda?" }),
     ).toBeNull();
+    expect(
+      screen.getByRole("button", { name: "Remove from wishlist" }),
+    ).toHaveFocus();
   });
 });

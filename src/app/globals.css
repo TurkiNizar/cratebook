@@ -4,9 +4,9 @@
   --paper: #f3ead7;
   --paper-light: #faf6ec;
   --ink: #201d19;
-  --muted: #756c61;
+  --muted: #70675d;
   --line: #d8cdb8;
-  --terracotta: #bd4b2f;
+  --terracotta: #b14329;
   --terracotta-dark: #963821;
   --mustard: #e4a943;
   --sage: #62795b;
@@ -25,6 +25,27 @@
   clip: rect(0 0 0 0);
   clip-path: inset(50%);
   white-space: nowrap;
+}
+
+.skip-link {
+  position: fixed;
+  z-index: 100;
+  top: 12px;
+  left: 12px;
+  min-height: 44px;
+  padding: 11px 16px;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: var(--paper-light);
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 800;
+  transform: translateY(calc(-100% - 20px));
+  transition: transform 160ms ease;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
 }
 
 html {
@@ -673,7 +694,7 @@ a {
   bottom: 48px;
   left: 48px;
   max-width: 420px;
-  color: var(--paper-light);
+  color: var(--ink);
 }
 
 .auth-art-copy p {
@@ -2425,7 +2446,7 @@ a.add-option:hover {
   padding: 6px 10px;
   border-radius: 999px;
   background: #ddd3c1;
-  color: #675f54;
+  color: #625a50;
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.08em;
