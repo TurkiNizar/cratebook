@@ -31,11 +31,12 @@ const CONDITION_FIELDS = [
 const RATING_OPTIONS = [5, 4, 3, 2, 1] as const;
 
 export type RecordFormValues = Record<
-  Exclude<ManualRecordField, "entryKey" | "isFavorite">,
+  Exclude<ManualRecordField, "entryKey" | "isFavorite" | "isPublic">,
   string
 > & {
   isReissue: boolean;
   isFavorite: boolean;
+  isPublic: boolean;
 };
 
 export const EMPTY_RECORD_FORM_VALUES: RecordFormValues = {
@@ -64,6 +65,7 @@ export const EMPTY_RECORD_FORM_VALUES: RecordFormValues = {
   tags: "",
   isReissue: false,
   isFavorite: false,
+  isPublic: false,
 };
 
 type RecordFormAction = (
@@ -423,6 +425,26 @@ export function RecordForm({
                 <small>Mark this as one of the records you love most.</small>
               </span>
             </label>
+
+            {isEditing ? (
+              <label className="checkbox-field" htmlFor="isPublic">
+                <input
+                  id="isPublic"
+                  name="isPublic"
+                  type="checkbox"
+                  checked={values.isPublic}
+                  onChange={(event) =>
+                    updateValue("isPublic", event.target.checked)
+                  }
+                />
+                <span>
+                  <strong>Visible when my profile is public</strong>
+                  <small>
+                    Price, seller, and personal notes are never shared.
+                  </small>
+                </span>
+              </label>
+            ) : null}
 
             <div className="field">
               <label htmlFor="rating">Personal rating</label>

@@ -48,6 +48,7 @@ export default async function EditRecordPage({
       .join(", "),
     isReissue: release.is_reissue ?? false,
     isFavorite: item.is_favorite,
+    isPublic: item.is_public,
   };
   const updateRecordWithId = updateRecord.bind(null, item.id);
 

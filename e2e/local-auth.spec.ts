@@ -770,6 +770,11 @@ test.describe("local passwordless authentication", () => {
     await expect(
       page.getByRole("button", { name: "Keep current artwork" }),
     ).toHaveAttribute("aria-pressed", "true");
+    const collectionVisibility = page.getByRole("checkbox", {
+      name: /Visible when my profile is public/,
+    });
+    await expect(collectionVisibility).not.toBeChecked();
+    await collectionVisibility.check();
     await page.getByRole("button", { name: "Remove artwork" }).click();
     await page.getByLabel("Album or release title").fill("Pastel Blues — Mono");
     await page.getByRole("checkbox", { name: /Favorite/ }).check();
@@ -811,6 +816,7 @@ test.describe("local passwordless authentication", () => {
     await expect(page.getByText("Local record shop")).toBeVisible();
     await expect(page.getByText("$24.99")).toBeVisible();
     await expect(page.getByText("5 / 5")).toBeVisible();
+    await expect(page.getByText("Public", { exact: true })).toBeVisible();
     await expect(page.getByLabel("Tags")).toHaveText("JazzSunday morning");
     await expect(page.getByText("A late-night favorite.")).toBeVisible();
     await expectNoHorizontalOverflow(page);
@@ -840,8 +846,12 @@ test.describe("local passwordless authentication", () => {
     await expect(
       page.getByRole("button", { name: "Keep current artwork" }),
     ).toHaveAttribute("aria-pressed", "true");
+    await page
+      .getByRole("checkbox", { name: /Visible when my profile is public/ })
+      .uncheck();
     await page.getByRole("button", { name: "Save changes" }).click();
     await expect(page.getByAltText("Pastel Blues — Mono cover")).toBeVisible();
+    await expect(page.getByText("Private", { exact: true })).toBeVisible();
 
     await page.getByRole("link", { name: "My collection" }).click();
     await expect(

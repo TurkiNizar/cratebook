@@ -495,7 +495,7 @@ Represents one user's physical copy.
 - `rating`
 - `is_favorite`
 - `notes`
-- `is_public` — defaults according to an agreed safe policy
+- `is_public` — defaults to false and requires an explicit owner opt-in
 - `created_at`, `updated_at`
 
 ### `wishlist_items`
@@ -852,7 +852,7 @@ the record's catalogue identity.
 ### Milestone 4 — Sharing, portability, and MVP release
 
 - [x] Implement profile-level public/private control
-- [ ] Implement item-level visibility controls
+- [x] Implement item-level visibility controls
 - [ ] Build public collection and wishlist profile
 - [ ] Add public-preview mode
 - [ ] Verify private-field exclusion at query/API level
@@ -922,7 +922,8 @@ These items require a scope decision before being promoted into an MVP milestone
 
 - [ ] Confirm **Cratebook** as the product name or choose another name.
 - [ ] Select the visual personality: warm analogue, clean archival, or another direction.
-- [ ] Decide the default item visibility for users who enable a public profile.
+- [x] Keep collection and wishlist items private by default, including when the profile
+      is public; owners explicitly opt individual items into sharing.
 - [x] Use Goldmine-compatible condition grades; beginner-facing guidance remains a UI task.
 - [x] Use MusicBrainz releases as the first external catalogue provider, with Cover Art
       Archive as the artwork companion.
@@ -1006,6 +1007,7 @@ production environment.
 | 2026-09-12 | Make Add a labelled, non-overlapping fourth bottom-navigation tab                                                                            | Equal navigation destinations provide cleaner geometry, safe-area behavior, and accessibility than the negatively translated floating action                                                                      |
 | 2026-09-12 | Enable Next.js/Vercel optimization for remote Cover Art Archive images before considering managed copies                                     | The existing shared image component bypasses an already configured optimizer; using the platform cache improves delivery without adding storage lifecycle and image-deletion obligations                          |
 | 2026-09-12 | Keep editable artwork attribution separate from a record's catalogue identity                                                                | A representative cover can improve browsing, but selecting it must not turn a manual entry or exact pressing into a different catalogue entity                                                                    |
+| 2026-09-13 | Keep every collection and wishlist item private until its owner explicitly makes that item visible                                           | A public profile should not retroactively expose an existing library; per-item opt-in matches Cratebook's private-by-default promise and keeps sharing understandable                                             |
 
 ## 20. Progress log
 
@@ -1058,6 +1060,7 @@ in version control; this log records product-level progress and changes.
 | 2026-09-13 | 3         | Added explicit keep, verified replacement, and removal states to collection editing; stored bounded artwork provenance separately from catalogue identity; preserved unrelated edits atomically; and verified validation, authorization, rollback, component, database, desktop Chromium, Android Chrome, and iPhone Safari coverage                         | Complete and document the pre-Milestone 4 polish verification          |
 | 2026-09-13 | 3         | Closed the pre-Milestone 4 polish pass after correcting cross-browser geometry and keyboard-test assumptions; formatting, lint, type-check, 166 unit/component tests, production build, a clean 15-migration reset, 300 database assertions, generated-type parity, and the full authenticated five-project browser matrix all pass                          | Begin Milestone 4 with profile-level public/private control            |
 | 2026-09-13 | 4         | Confirmed and completed profile-level privacy control already founded in Milestone 1: profiles remain private by default, only owners can change visibility, anonymous access is granted and revoked by RLS with the toggle, and the authenticated browser journey now verifies both enabling and disabling sharing                                          | Decide the default item visibility and implement item-level controls   |
+| 2026-09-13 | 4         | Chose explicit per-item sharing with private defaults; completed collection visibility editing alongside the existing wishlist control through owner-scoped atomic persistence, rollback and cross-user protection, clear private-field guidance, generated types, and authenticated desktop/mobile verification                                             | Build the public collection and wishlist profile                       |
 
 ## 21. Hosted environment checklist
 

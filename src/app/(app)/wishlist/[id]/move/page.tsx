@@ -45,6 +45,7 @@ export default async function MoveWishlistItemPage({
     tags: "",
     isReissue: release.is_reissue ?? false,
     isFavorite: false,
+    isPublic: false,
   };
   const moveWithId = moveWishlistItemToCollection.bind(null, item.id);
 

@@ -30,6 +30,7 @@ const values: RecordFormValues = {
   tags: "Jazz, Sunday morning",
   isReissue: false,
   isFavorite: true,
+  isPublic: true,
 };
 
 describe("RecordForm", () => {
@@ -119,6 +120,11 @@ describe("RecordForm", () => {
     expect(screen.getByLabelText("Format")).toHaveValue("lp");
     expect(screen.getByLabelText("Original release year")).toHaveValue(1965);
     expect(screen.getByRole("checkbox", { name: /Favorite/ })).toBeChecked();
+    expect(
+      screen.getByRole("checkbox", {
+        name: /Visible when my profile is public/,
+      }),
+    ).toBeChecked();
     expect(screen.getByLabelText("Media condition")).toHaveValue("near_mint");
     expect(screen.getByLabelText("Price paid")).toHaveValue("24.99");
     expect(screen.getByLabelText("Tags")).toHaveValue("Jazz, Sunday morning");
@@ -127,6 +133,39 @@ describe("RecordForm", () => {
       "href",
       "/collection/item-id",
     );
+  });
+
+  it("keeps collection visibility private by default and only offers the control while editing", () => {
+    const { unmount } = render(
+      <RecordForm
+        action={async () => ({ message: "", fieldErrors: {} })}
+        variant="create"
+      />,
+    );
+
+    expect(
+      screen.queryByRole("checkbox", {
+        name: /Visible when my profile is public/,
+      }),
+    ).not.toBeInTheDocument();
+
+    unmount();
+    render(
+      <RecordForm
+        action={async () => ({ message: "", fieldErrors: {} })}
+        initialValues={{ ...values, isPublic: false }}
+        variant="edit"
+      />,
+    );
+
+    expect(
+      screen.getByRole("checkbox", {
+        name: /Visible when my profile is public/,
+      }),
+    ).not.toBeChecked();
+    expect(
+      screen.getByText(/Price, seller, and personal notes are never shared/),
+    ).toBeVisible();
   });
 
   it("keeps, replaces, and explicitly removes existing artwork while editing", async () => {

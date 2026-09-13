@@ -476,6 +476,7 @@ export type Database = {
           p_edition_description?: string;
           p_format?: Database["public"]["Enums"]["release_format"];
           p_is_favorite?: boolean;
+          p_is_public?: boolean;
           p_is_reissue?: boolean;
           p_item_id: string;
           p_label?: string;

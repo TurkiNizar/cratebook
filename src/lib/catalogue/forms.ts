@@ -35,6 +35,7 @@ export function albumCandidateToRecordFormValues(
     tags: "",
     isReissue: false,
     isFavorite: false,
+    isPublic: false,
   };
 }
 
@@ -82,6 +83,7 @@ export function candidateToRecordFormValues(
     tags: "",
     isReissue: false,
     isFavorite: false,
+    isPublic: false,
   };
 }
 

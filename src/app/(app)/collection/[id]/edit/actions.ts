@@ -82,6 +82,7 @@ export async function updateRecord(
       p_price_currency: copy.priceCurrency ?? undefined,
       p_rating: copy.rating ?? undefined,
       p_is_favorite: copy.isFavorite,
+      p_is_public: copy.isPublic,
       p_notes: copy.notes ?? undefined,
       p_tags: copy.tags,
       p_cover_url: artwork.action === "replace" ? artwork.coverUrl : undefined,

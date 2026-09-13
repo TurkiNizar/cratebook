@@ -86,8 +86,9 @@ Start the app with `npm run dev`, then:
     Artwork search remains optional and changing a cover does not change the record's
     manual, album, or exact-edition identity. Add a favorite, rating, condition,
     acquisition detail, price, private note, or comma-separated tags, and confirm the
-    saved details appear on its detail page. Favorite records and tags also appear on
-    the collection card.
+    saved details appear on its detail page. Choose whether the copy may appear when
+    your profile is public; price, seller, and personal notes remain private. Favorite
+    records and tags also appear on the collection card.
 12. Try adding the same artist and title again with different capitalization or spacing.
     Confirm the possible-duplicate warning offers the existing copy for review and
     still allows another physical copy to be added.

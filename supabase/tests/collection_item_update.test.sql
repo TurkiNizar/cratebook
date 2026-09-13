@@ -1,6 +1,6 @@
 begin;
 
-select plan(10);
+select plan(13);
 
 insert into auth.users (id, aud, role, email, created_at, updated_at)
 values
@@ -38,6 +38,7 @@ select is(
     p_price_currency => 'usd',
     p_rating => 5::smallint,
     p_is_favorite => true,
+    p_is_public => true,
     p_notes => 'A late-night favorite.',
     p_tags => array['Jazz', ' Late   night ', 'jazz']
   ),
@@ -49,14 +50,14 @@ select results_eq(
   $$
     select purchase_state::text, media_condition::text, sleeve_condition::text,
       acquired_on::text, acquired_from, price_paid_minor, price_currency, rating,
-      is_favorite, notes
+      is_favorite, is_public, notes
     from public.collection_items
     where entry_key = '77777777-0000-4000-8000-777777777777'
   $$,
   $$ values (
     'used'::text, 'near_mint'::text, 'very_good_plus'::text,
     '2026-09-10'::text, 'Local record shop'::text, 2499::bigint, 'USD'::text,
-    5::smallint, true, 'A late-night favorite.'::text
+    5::smallint, true, true, 'A late-night favorite.'::text
   ) $$,
   'copy details are normalized and stored'
 );
@@ -104,6 +105,7 @@ select is(
     p_artist_display => 'Nina Simone',
     p_title => 'Pastel Blues — Mono',
     p_rating => 5::smallint,
+    p_is_public => true,
     p_tags => array[]::text[]
   ),
   true,
@@ -135,6 +137,40 @@ select is(
   'a failed release update rolls back the physical-copy update'
 );
 
+select is(
+  (
+    select is_public from public.collection_items
+    where entry_key = '77777777-0000-4000-8000-777777777777'
+  ),
+  true,
+  'a failed release update also rolls back the visibility change'
+);
+
+select is(
+  public.update_collection_item_details(
+    p_item_id => (
+      select id from public.collection_items
+      where entry_key = '77777777-0000-4000-8000-777777777777'
+    ),
+    p_artist_display => 'Nina Simone',
+    p_title => 'Pastel Blues — Mono',
+    p_rating => 5::smallint,
+    p_is_favorite => true,
+    p_is_public => false
+  ),
+  true,
+  'the owner can make a collection item private again'
+);
+
+select is(
+  (
+    select is_public from public.collection_items
+    where entry_key = '77777777-0000-4000-8000-777777777777'
+  ),
+  false,
+  'the private visibility choice is stored'
+);
+
 select set_config('request.jwt.claim.sub', '88888888-8888-4888-8888-888888888888', true);
 
 select is(
@@ -144,7 +180,8 @@ select is(
       where entry_key = '77777777-0000-4000-8000-777777777777'
     ),
     p_artist_display => 'Changed',
-    p_title => 'Changed'
+    p_title => 'Changed',
+    p_is_public => true
   ),
   false,
   'another user cannot update the physical copy or release'

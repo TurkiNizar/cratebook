@@ -72,6 +72,7 @@ export type CopyDetailsField =
   | "priceCurrency"
   | "rating"
   | "isFavorite"
+  | "isPublic"
   | "notes"
   | "tags";
 
@@ -121,6 +122,7 @@ export type CopyDetailsInput = {
   priceCurrency: string | null;
   rating: number | null;
   isFavorite: boolean;
+  isPublic: boolean;
   notes: string | null;
   tags: string[];
 };
@@ -496,6 +498,7 @@ export function validateCopyDetails(formData: FormData): CopyDetailsValidation {
       priceCurrency: priceCurrency || null,
       rating,
       isFavorite: formData.get("isFavorite") === "on",
+      isPublic: formData.get("isPublic") === "on",
       notes,
       tags,
     },
