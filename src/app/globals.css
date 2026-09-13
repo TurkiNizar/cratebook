@@ -737,6 +737,7 @@ a {
 
 .field {
   display: grid;
+  align-content: start;
   gap: 8px;
 }
 
@@ -2563,14 +2564,17 @@ a.add-option:hover {
 }
 
 .settings-actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
+  display: grid;
+  width: min(100%, 460px);
+  grid-template-columns: minmax(190px, 0.9fr) minmax(220px, 1.1fr);
   gap: 10px;
+  margin-left: auto;
 }
 
+.settings-actions .secondary-button,
 .settings-actions .button {
-  min-width: 160px;
+  width: 100%;
+  min-height: 52px;
   cursor: pointer;
 }
 
@@ -3594,8 +3598,23 @@ a.add-option:hover {
     flex-direction: column-reverse;
   }
 
-  .settings-actions .button {
+  .settings-actions {
     width: 100%;
+    grid-template-columns: 1fr;
+  }
+
+  .settings-actions .button {
+    grid-row: 1;
+  }
+
+  .settings-actions .secondary-button {
+    grid-row: 2;
+  }
+
+  .settings-actions .button,
+  .settings-actions .secondary-button {
+    width: 100%;
+    min-width: 0;
   }
 }
 

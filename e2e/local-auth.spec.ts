@@ -35,6 +35,59 @@ async function expectNoHorizontalOverflow(page: Page) {
   expect(overflow).toBeLessThanOrEqual(1);
 }
 
+async function expectControlsAligned(
+  page: Page,
+  firstControl: Locator,
+  secondControl: Locator,
+  secondControlWidthTarget = secondControl,
+) {
+  const [firstBox, secondBox, secondWidthBox, viewport] = await Promise.all([
+    firstControl.boundingBox(),
+    secondControl.boundingBox(),
+    secondControlWidthTarget.boundingBox(),
+    page.viewportSize(),
+  ]);
+
+  expect(firstBox).not.toBeNull();
+  expect(secondBox).not.toBeNull();
+  expect(secondWidthBox).not.toBeNull();
+  expect(viewport).not.toBeNull();
+  expect(Math.abs(firstBox!.height - secondBox!.height)).toBeLessThanOrEqual(1);
+  expect(Math.abs(firstBox!.width - secondWidthBox!.width)).toBeLessThanOrEqual(
+    1,
+  );
+
+  if (viewport!.width <= 520) {
+    expect(Math.abs(firstBox!.x - secondWidthBox!.x)).toBeLessThanOrEqual(1);
+    expect(firstBox!.y).toBeLessThan(secondBox!.y);
+  } else {
+    expect(Math.abs(firstBox!.y - secondBox!.y)).toBeLessThanOrEqual(1);
+  }
+}
+
+async function expectResponsiveProfileActions(page: Page) {
+  const preview = page.getByRole("link", { name: "Preview public profile" });
+  const save = page.getByRole("button", { name: "Save profile" });
+  const [previewBox, saveBox, viewport] = await Promise.all([
+    preview.boundingBox(),
+    save.boundingBox(),
+    page.viewportSize(),
+  ]);
+
+  expect(previewBox).not.toBeNull();
+  expect(saveBox).not.toBeNull();
+  expect(viewport).not.toBeNull();
+  expect(Math.abs(previewBox!.height - saveBox!.height)).toBeLessThanOrEqual(1);
+
+  if (viewport!.width <= 520) {
+    expect(Math.abs(previewBox!.width - saveBox!.width)).toBeLessThanOrEqual(1);
+    expect(saveBox!.y).toBeLessThan(previewBox!.y);
+  } else {
+    expect(Math.abs(previewBox!.y - saveBox!.y)).toBeLessThanOrEqual(1);
+    expect(saveBox!.width).toBeGreaterThan(previewBox!.width);
+  }
+}
+
 async function expectOptimizedArtwork(
   image: Locator,
   loading: "lazy" | "preloaded",
@@ -1286,6 +1339,12 @@ test.describe("local passwordless authentication", () => {
     await expect(page).toHaveURL(/\/wishlist\/add$/);
     await expectNoHorizontalOverflow(page);
     await expectNoAccessibilityViolations(page);
+    await expectControlsAligned(
+      page,
+      page.getByLabel("Priority"),
+      page.getByLabel("Maximum price", { exact: true }),
+      page.getByLabel("Maximum price", { exact: true }).locator(".."),
+    );
     await page.getByLabel("Artist").fill("Alice Coltrane");
     await page
       .getByLabel("Album or release title")
@@ -1452,6 +1511,12 @@ test.describe("local passwordless authentication", () => {
       supportsPlainTabNavigation(testInfo),
     );
     await expectNoAccessibilityViolations(page);
+    await expectControlsAligned(
+      page,
+      page.getByLabel("Display name"),
+      page.getByLabel("Username"),
+    );
+    await expectResponsiveProfileActions(page);
     await page.getByLabel("Display name").fill("Local Crate Digger");
     await page
       .getByLabel("About your collection")
