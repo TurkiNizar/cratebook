@@ -283,6 +283,12 @@ for the distinction.
 
 ## Verification
 
+The completed MVP performance review, list-growth limits, lab measurements, and future
+monitoring guidance are recorded in
+[docs/performance-review.md](./docs/performance-review.md). Collection, wishlist, and
+public-profile lists use URL-based pages of 24 records so growing crates remain bounded
+without requiring client-side JavaScript.
+
 ```bash
 npm run lint
 npm run typecheck

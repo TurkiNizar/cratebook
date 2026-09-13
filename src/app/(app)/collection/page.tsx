@@ -1,10 +1,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
+import { RecordPagination } from "@/components/record-pagination";
 import {
   type CollectionSearchParams,
   parseCollectionControls,
 } from "@/lib/collection";
+import {
+  getPageHref,
+  getPageRange,
+  parsePageParam,
+  takePage,
+} from "@/lib/pagination";
 import { createClient } from "@/lib/supabase/server";
 
 import { CollectionCard } from "./collection-card";
@@ -29,15 +37,19 @@ export default async function CollectionPage({
   const addedId = Array.isArray(added) ? added[0] : added;
   const removedValue = Array.isArray(removed) ? removed[0] : removed;
   const controls = parseCollectionControls(params);
+  const page = parsePageParam(params.page);
+  const range = getPageRange(page);
   const supabase = await createClient();
-  const { data: items, error } = await supabase.rpc("search_collection_items", {
-    p_query: controls.query || undefined,
-    p_favorite: controls.favorite ? true : undefined,
-    p_purchase_state: controls.purchaseState || undefined,
-    p_format: controls.format || undefined,
-    p_condition: controls.condition || undefined,
-    p_sort: controls.sort,
-  });
+  const { data: fetchedItems, error } = await supabase
+    .rpc("search_collection_items", {
+      p_query: controls.query || undefined,
+      p_favorite: controls.favorite ? true : undefined,
+      p_purchase_state: controls.purchaseState || undefined,
+      p_format: controls.format || undefined,
+      p_condition: controls.condition || undefined,
+      p_sort: controls.sort,
+    })
+    .range(range.from, range.to);
 
   if (error) {
     console.error("Collection query failed", {
@@ -47,6 +59,11 @@ export default async function CollectionPage({
     throw new Error("Unable to load collection");
   }
 
+  if (page > 1 && fetchedItems.length === 0) {
+    redirect(getPageHref("/collection", params, "page", 1));
+  }
+
+  const { items, hasNextPage } = takePage(fetchedItems);
   const addedItem =
     addedId && UUID_PATTERN.test(addedId)
       ? items.find((item) => item.id === addedId)
@@ -147,6 +164,13 @@ export default async function CollectionPage({
               </li>
             ))}
           </ul>
+          <RecordPagination
+            page={page}
+            hasNextPage={hasNextPage}
+            previousHref={getPageHref("/collection", params, "page", page - 1)}
+            nextHref={getPageHref("/collection", params, "page", page + 1)}
+            label="Collection pages"
+          />
         </>
       )}
     </main>

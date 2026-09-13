@@ -867,7 +867,10 @@ the record's catalogue identity.
       primary signed-out and authenticated journeys, corrected color contrast,
       authenticated skip navigation, destructive-cancellation focus restoration,
       decorative preview isolation, and desktop/mobile browser verification
-- [ ] Complete performance review
+- [x] Complete performance review with bounded, server-rendered 24-record pagination
+      for collection, wishlist, and independent public-profile sections; preserve
+      filters without client state; document the optimized-build request, transfer,
+      paint, and layout-shift baseline; and verify desktop/mobile production behavior
 - [ ] Complete security and privacy review
 - [ ] Run full automated and manual release tests
 - [ ] Deploy production application and document operations
@@ -1021,6 +1024,7 @@ production environment.
 | 2026-09-13 | Export complete domain backups as versioned JSON without managed authentication or session data                                              | Raw owner-scoped rows preserve private details, relationships, and catalogue provenance while keeping portability independent of Supabase Auth                                                                    |
 | 2026-09-13 | Hard-delete the authenticated Supabase user through a server-only Admin API after typed confirmation                                         | Existing foreign-key cascades remove every owner-scoped domain row; the MVP owns no uploaded images, and future Storage objects must be removed before deleting their owner                                       |
 | 2026-09-13 | Keep the installed MVP network-dependent, give it a stable root identity, and launch into the collection                                     | Installation should make the existing online companion easier to reach without implying offline support; a stable identity allows launch behavior to evolve without creating a duplicate installed app            |
+| 2026-09-13 | Bound collection, wishlist, and public-profile lists to 24 records per server-rendered page                                                  | Keeps database responses, rendered DOM size, and image work predictable as crates grow while preserving shareable filter and page URLs without adding client-side state                                           |
 
 ## 20. Progress log
 
@@ -1081,6 +1085,7 @@ in version control; this log records product-level progress and changes.
 | 2026-09-13 | 4         | Added typed-confirmation account deletion through a server-only Supabase Admin client, verified full-domain cascades and session cleanup, documented the current no-upload image lifecycle, and blocked anonymous protected-route rendering; application, database, build, and accessible desktop/mobile browser checks pass                                 | Finish installable PWA assets and behavior                             |
 | 2026-09-13 | 4         | Finished PWA installability with stable identity, collection-first launch, shortcuts, full-bleed maskable and Apple icons, native-prompt integration, and accessible browser guidance; formatting, lint, type-check, 210 app tests, build, 331 database assertions, visual review, and 15 browser cases pass                                                 | Complete the accessibility review                                      |
 | 2026-09-13 | 4         | Completed full WCAG 2.2 A/AA axe review across primary routes; fixed contrast, skip navigation, destructive-cancellation focus restoration, and decorative preview semantics; 210 app tests, 331 database assertions, build, visual review, and all supported browser projects pass                                                                          | Complete the performance review                                        |
+| 2026-09-13 | 4         | Completed the performance review with bounded 24-record server pagination for private and shared lists, filter-preserving URLs, and a documented 13-request, 158 KB, zero-CLS production-build baseline; 215 app tests, 331 database assertions, the build, and authenticated desktop/mobile journeys pass                                                   | Complete the security and privacy review                               |
 
 ## 21. Hosted environment checklist
 

@@ -6,6 +6,12 @@ const { createClient, rpc } = vi.hoisted(() => ({
   rpc: vi.fn(),
 }));
 
+function pagedResult(data: unknown[]) {
+  return {
+    range: vi.fn().mockResolvedValue({ data, error: null }),
+  };
+}
+
 vi.mock("@/lib/supabase/server", () => ({ createClient }));
 
 import PublicProfilePage from "./page";
@@ -32,41 +38,35 @@ describe("PublicProfilePage", () => {
         });
       }
       if (name === "get_public_collection_items") {
-        return Promise.resolve({
-          data: [
-            {
-              id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
-              artist_display: "Nina Simone",
-              title: "Pastel Blues",
-              cover_url: null,
-              format: "lp",
-              disc_count: 1,
-              original_year: 1965,
-              release_year: null,
-              label: "Philips",
-              catalog_number: null,
-              country: "US",
-              is_favorite: true,
-              created_at: "2026-09-13T12:00:00Z",
-            },
-          ],
-          error: null,
-        });
-      }
-      return Promise.resolve({
-        data: [
+        return pagedResult([
           {
-            id: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
-            artist_display: "Alice Coltrane",
-            title: "Journey in Satchidananda",
+            id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+            artist_display: "Nina Simone",
+            title: "Pastel Blues",
             cover_url: null,
-            priority: "must_have",
-            preferred_edition: "Any clean Impulse pressing",
-            created_at: "2026-09-13T11:00:00Z",
+            format: "lp",
+            disc_count: 1,
+            original_year: 1965,
+            release_year: null,
+            label: "Philips",
+            catalog_number: null,
+            country: "US",
+            is_favorite: true,
+            created_at: "2026-09-13T12:00:00Z",
           },
-        ],
-        error: null,
-      });
+        ]);
+      }
+      return pagedResult([
+        {
+          id: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+          artist_display: "Alice Coltrane",
+          title: "Journey in Satchidananda",
+          cover_url: null,
+          priority: "must_have",
+          preferred_edition: "Any clean Impulse pressing",
+          created_at: "2026-09-13T11:00:00Z",
+        },
+      ]);
     });
   });
 
@@ -74,6 +74,7 @@ describe("PublicProfilePage", () => {
     render(
       await PublicProfilePage({
         params: Promise.resolve({ username: "local_collector" }),
+        searchParams: Promise.resolve({}),
       }),
     );
 
@@ -102,32 +103,41 @@ describe("PublicProfilePage", () => {
     expect(screen.queryByText(/price paid/i)).toBeNull();
     expect(screen.queryByText(/private note/i)).toBeNull();
     expect(screen.queryByText(/acquired from/i)).toBeNull();
+    const rangedQueries = rpc.mock.results
+      .map(({ value }) => value as { range?: ReturnType<typeof vi.fn> })
+      .filter(({ range }) => range)
+      .map(({ range }) => range);
+    expect(rangedQueries).toHaveLength(2);
+    for (const range of rangedQueries) {
+      expect(range).toHaveBeenCalledWith(0, 24);
+    }
   });
 
   it("explains when a public profile has not shared any items", async () => {
-    rpc.mockImplementation((name: string) =>
-      Promise.resolve({
-        data:
-          name === "get_public_profile"
-            ? [
-                {
-                  username: "quiet_crate",
-                  display_name: null,
-                  bio: null,
-                  is_public: true,
-                  is_owner: false,
-                  collection_count: 0,
-                  wishlist_count: 0,
-                },
-              ]
-            : [],
-        error: null,
-      }),
-    );
+    rpc.mockImplementation((name: string) => {
+      if (name === "get_public_profile") {
+        return Promise.resolve({
+          data: [
+            {
+              username: "quiet_crate",
+              display_name: null,
+              bio: null,
+              is_public: true,
+              is_owner: false,
+              collection_count: 0,
+              wishlist_count: 0,
+            },
+          ],
+          error: null,
+        });
+      }
+      return pagedResult([]);
+    });
 
     render(
       await PublicProfilePage({
         params: Promise.resolve({ username: "quiet_crate" }),
+        searchParams: Promise.resolve({}),
       }),
     );
 
@@ -138,29 +148,30 @@ describe("PublicProfilePage", () => {
   });
 
   it("labels an owner-only private preview and does not offer its unavailable link", async () => {
-    rpc.mockImplementation((name: string) =>
-      Promise.resolve({
-        data:
-          name === "get_public_profile"
-            ? [
-                {
-                  username: "local_collector",
-                  display_name: "Local Collector",
-                  bio: null,
-                  is_public: false,
-                  is_owner: true,
-                  collection_count: 0,
-                  wishlist_count: 0,
-                },
-              ]
-            : [],
-        error: null,
-      }),
-    );
+    rpc.mockImplementation((name: string) => {
+      if (name === "get_public_profile") {
+        return Promise.resolve({
+          data: [
+            {
+              username: "local_collector",
+              display_name: "Local Collector",
+              bio: null,
+              is_public: false,
+              is_owner: true,
+              collection_count: 0,
+              wishlist_count: 0,
+            },
+          ],
+          error: null,
+        });
+      }
+      return pagedResult([]);
+    });
 
     render(
       await PublicProfilePage({
         params: Promise.resolve({ username: "local_collector" }),
+        searchParams: Promise.resolve({}),
       }),
     );
 
@@ -176,29 +187,30 @@ describe("PublicProfilePage", () => {
   });
 
   it("labels the owner's live view and offers its share link", async () => {
-    rpc.mockImplementation((name: string) =>
-      Promise.resolve({
-        data:
-          name === "get_public_profile"
-            ? [
-                {
-                  username: "local_collector",
-                  display_name: "Local Collector",
-                  bio: null,
-                  is_public: true,
-                  is_owner: true,
-                  collection_count: 0,
-                  wishlist_count: 0,
-                },
-              ]
-            : [],
-        error: null,
-      }),
-    );
+    rpc.mockImplementation((name: string) => {
+      if (name === "get_public_profile") {
+        return Promise.resolve({
+          data: [
+            {
+              username: "local_collector",
+              display_name: "Local Collector",
+              bio: null,
+              is_public: true,
+              is_owner: true,
+              collection_count: 0,
+              wishlist_count: 0,
+            },
+          ],
+          error: null,
+        });
+      }
+      return pagedResult([]);
+    });
 
     render(
       await PublicProfilePage({
         params: Promise.resolve({ username: "local_collector" }),
+        searchParams: Promise.resolve({}),
       }),
     );
 

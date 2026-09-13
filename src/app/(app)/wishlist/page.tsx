@@ -1,6 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
+import { RecordPagination } from "@/components/record-pagination";
+import {
+  getPageHref,
+  getPageRange,
+  parsePageParam,
+  takePage,
+} from "@/lib/pagination";
 import { createClient } from "@/lib/supabase/server";
 
 import { WishlistCard } from "./wishlist-card";
@@ -10,16 +18,24 @@ export const metadata: Metadata = { title: "Wishlist" };
 export default async function WishlistPage({
   searchParams,
 }: {
-  searchParams: Promise<{ added?: string; removed?: string }>;
+  searchParams: Promise<{
+    added?: string | string[];
+    removed?: string | string[];
+    page?: string | string[];
+  }>;
 }) {
-  const { added, removed } = await searchParams;
+  const params = await searchParams;
+  const { added, removed } = params;
+  const page = parsePageParam(params.page);
+  const range = getPageRange(page);
   const supabase = await createClient();
-  const { data: items, error } = await supabase
+  const { data: fetchedItems, error } = await supabase
     .from("wishlist_items")
     .select(
       "id, priority, preferred_edition, max_price_minor, price_currency, is_public, releases(artist_display, title, cover_url)",
     )
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .range(range.from, range.to);
 
   if (error) {
     console.error("Wishlist query failed", {
@@ -29,6 +45,11 @@ export default async function WishlistPage({
     throw new Error("Unable to load wishlist");
   }
 
+  if (page > 1 && fetchedItems.length === 0) {
+    redirect(getPageHref("/wishlist", params, "page", 1));
+  }
+
+  const { items, hasNextPage } = takePage(fetchedItems);
   const addedId = Array.isArray(added) ? added[0] : added;
   const addedItem = items.find((item) => item.id === addedId);
 
@@ -96,6 +117,13 @@ export default async function WishlistPage({
               </li>
             ))}
           </ul>
+          <RecordPagination
+            page={page}
+            hasNextPage={hasNextPage}
+            previousHref={getPageHref("/wishlist", params, "page", page - 1)}
+            nextHref={getPageHref("/wishlist", params, "page", page + 1)}
+            label="Wishlist pages"
+          />
         </>
       )}
     </main>

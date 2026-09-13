@@ -1,9 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { cache } from "react";
 
 import { BrandMark } from "@/components/brand-mark";
+import { RecordPagination } from "@/components/record-pagination";
+import {
+  getPageHref,
+  getPageRange,
+  parsePageParam,
+  takePage,
+} from "@/lib/pagination";
 import { createClient } from "@/lib/supabase/server";
 
 import { PublicCollectionCard, PublicWishlistCard } from "./public-record-card";
@@ -16,6 +23,7 @@ const getPublicProfile = cache(async (username: string) => {
 
 type PublicProfilePageProps = {
   params: Promise<{ username: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
 export async function generateMetadata({
@@ -44,14 +52,24 @@ export async function generateMetadata({
 
 export default async function PublicProfilePage({
   params,
+  searchParams,
 }: PublicProfilePageProps) {
   const { username } = await params;
+  const query = await searchParams;
+  const collectionPage = parsePageParam(query.collectionPage);
+  const wishlistPage = parsePageParam(query.wishlistPage);
+  const collectionRange = getPageRange(collectionPage);
+  const wishlistRange = getPageRange(wishlistPage);
   const supabasePromise = createClient();
   const profilePromise = getPublicProfile(username);
   const itemsPromise = supabasePromise.then((supabase) =>
     Promise.all([
-      supabase.rpc("get_public_collection_items", { p_username: username }),
-      supabase.rpc("get_public_wishlist_items", { p_username: username }),
+      supabase
+        .rpc("get_public_collection_items", { p_username: username })
+        .range(collectionRange.from, collectionRange.to),
+      supabase
+        .rpc("get_public_wishlist_items", { p_username: username })
+        .range(wishlistRange.from, wishlistRange.to),
     ]),
   );
   const [profileResult, [collectionResult, wishlistResult]] = await Promise.all(
@@ -78,8 +96,17 @@ export default async function PublicProfilePage({
     throw new Error("Unable to load shared records");
   }
 
-  const collection = collectionResult.data ?? [];
-  const wishlist = wishlistResult.data ?? [];
+  if (collectionPage > 1 && collectionResult.data?.length === 0) {
+    redirect(getPageHref(`/u/${profile.username}`, query, "collectionPage", 1));
+  }
+  if (wishlistPage > 1 && wishlistResult.data?.length === 0) {
+    redirect(getPageHref(`/u/${profile.username}`, query, "wishlistPage", 1));
+  }
+
+  const collectionPageData = takePage(collectionResult.data ?? []);
+  const wishlistPageData = takePage(wishlistResult.data ?? []);
+  const collection = collectionPageData.items;
+  const wishlist = wishlistPageData.items;
   const name = profile.display_name || `@${profile.username}`;
 
   return (
@@ -192,6 +219,23 @@ export default async function PublicProfilePage({
                 </li>
               ))}
             </ul>
+            <RecordPagination
+              page={collectionPage}
+              hasNextPage={collectionPageData.hasNextPage}
+              previousHref={getPageHref(
+                `/u/${profile.username}`,
+                query,
+                "collectionPage",
+                collectionPage - 1,
+              )}
+              nextHref={getPageHref(
+                `/u/${profile.username}`,
+                query,
+                "collectionPage",
+                collectionPage + 1,
+              )}
+              label="Shared collection pages"
+            />
           </section>
         ) : null}
 
@@ -219,6 +263,23 @@ export default async function PublicProfilePage({
                 </li>
               ))}
             </ul>
+            <RecordPagination
+              page={wishlistPage}
+              hasNextPage={wishlistPageData.hasNextPage}
+              previousHref={getPageHref(
+                `/u/${profile.username}`,
+                query,
+                "wishlistPage",
+                wishlistPage - 1,
+              )}
+              nextHref={getPageHref(
+                `/u/${profile.username}`,
+                query,
+                "wishlistPage",
+                wishlistPage + 1,
+              )}
+              label="Shared wishlist pages"
+            />
           </section>
         ) : null}
       </main>
