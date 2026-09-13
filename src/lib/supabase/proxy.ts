@@ -28,7 +28,20 @@ export async function updateSession(request: NextRequest) {
   );
 
   // getUser validates the session with the Auth server and refreshes it when needed.
-  await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user && request.nextUrl.pathname !== "/auth/callback") {
+    const signInUrl = request.nextUrl.clone();
+    signInUrl.pathname = "/sign-in";
+    signInUrl.search = "";
+    const redirectResponse = NextResponse.redirect(signInUrl);
+    response.cookies.getAll().forEach((cookie) => {
+      redirectResponse.cookies.set(cookie);
+    });
+    return redirectResponse;
+  }
 
   return response;
 }

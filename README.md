@@ -53,6 +53,7 @@ Create `.env.local` from `.env.example`, then use these values:
 NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=paste-the-publishable-or-anon-key-from-supabase-start
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
+SUPABASE_SECRET_KEY=paste-the-secret-key-from-supabase-start
 ```
 
 Start the app with `npm run dev`, then:
@@ -127,6 +128,18 @@ Start the app with `npm run dev`, then:
     it includes the profile, releases, collection, wishlist, tags, tag assignments,
     and raw catalogue and artwork provenance. Treat every export as private because
     it includes details that never appear on a public profile.
+22. In **Profile → Delete account**, open the confirmation, cancel once, then type
+    `DELETE` and confirm. Verify that you return to the sign-in screen, cannot
+    reopen a protected page without signing in, and that the profile, collection,
+    wishlist, tags, release metadata, and authentication account are gone.
+
+Account deletion uses the server-only `SUPABASE_SECRET_KEY`. Never prefix it with
+`NEXT_PUBLIC_` or expose it to browser code. The current MVP does not accept or store
+uploaded images: Cover Art Archive artwork remains on the provider and Cratebook stores
+only remote references, which are removed with the account's release rows. The reserved
+`avatar_path` profile field is not connected to an upload flow. Before uploads are
+introduced later, deletion must remove every user-owned Supabase Storage object before
+deleting the Auth user.
 
 Catalogue search needs no additional environment variable or provider account. If
 MusicBrainz has no suitable result or is unavailable, both manual collection and
@@ -185,6 +198,7 @@ See the official [Supabase CLI deployment guide](https://supabase.com/docs/refer
 | -------------------------------------- | ------------------------------- |
 | `NEXT_PUBLIC_SUPABASE_URL`             | Hosted Supabase project URL     |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Hosted Supabase publishable key |
+| `SUPABASE_SECRET_KEY`                  | Server-only Supabase secret key |
 
 4. Deploy the project and copy its production URL, for example
    `https://cratebook.vercel.app`.
@@ -318,6 +332,8 @@ Review the generated output before replacing the committed types.
 ## Environment variables
 
 Only variables prefixed with `NEXT_PUBLIC_` are exposed to the browser. The Supabase
-URL and publishable key are intentionally public; never expose the service-role key.
+URL and publishable key are intentionally public. `SUPABASE_SECRET_KEY` authorizes
+account deletion and must remain server-only; never expose a secret or service-role key
+with a `NEXT_PUBLIC_` prefix.
 
 See `.env.example` for the currently required values.

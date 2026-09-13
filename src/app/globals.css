@@ -1767,6 +1767,10 @@ a.add-option:hover {
   margin-top: 0;
 }
 
+.collection-error.public-profile-message > p {
+  color: #675f54;
+}
+
 .collection-artist {
   overflow: hidden;
   margin: 6px 0 0;
@@ -2314,6 +2318,32 @@ a.add-option:hover {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+}
+
+.settings-account-deletion {
+  margin-top: 38px;
+}
+
+.settings-account-deletion .app-kicker {
+  color: #852b1b;
+}
+
+.settings-account-deletion > div > p:last-child {
+  color: #675f54;
+}
+
+.settings-account-deletion .delete-record-confirmation form {
+  display: grid;
+}
+
+.settings-account-deletion .field {
+  text-align: left;
+}
+
+.delete-account-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
 }
 
 .settings-card
@@ -3402,6 +3432,16 @@ a.add-option:hover {
     flex-direction: column-reverse;
   }
 
+  .delete-account-actions {
+    align-items: stretch;
+    flex-direction: column-reverse;
+  }
+
+  .delete-account-actions .danger-button,
+  .delete-account-actions .secondary-button {
+    width: 100%;
+  }
+
   .collection-error-actions {
     align-items: stretch;
     flex-direction: column;
@@ -3434,6 +3474,11 @@ a.add-option:hover {
   .settings-export-actions,
   .settings-export-actions .secondary-button {
     width: 100%;
+  }
+
+  .delete-account-actions {
+    align-items: stretch;
+    flex-direction: column-reverse;
   }
 
   .settings-actions .button {

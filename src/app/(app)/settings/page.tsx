@@ -4,6 +4,8 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 
 import { signOut, updateProfile } from "../actions";
+import { deleteAccount } from "./delete-account-actions";
+import { DeleteAccount } from "./delete-account";
 
 export const metadata: Metadata = { title: "Profile settings" };
 
@@ -172,6 +174,8 @@ export default async function SettingsPage({
           </a>
         </div>
       </section>
+
+      <DeleteAccount action={deleteAccount} />
 
       <section
         className="settings-card settings-card-quiet"

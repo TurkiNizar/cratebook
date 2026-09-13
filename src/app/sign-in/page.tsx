@@ -10,11 +10,15 @@ export const metadata: Metadata = {
 };
 
 type SignInPageProps = {
-  searchParams: Promise<{ error?: string; sent?: string }>;
+  searchParams: Promise<{
+    accountDeleted?: string;
+    error?: string;
+    sent?: string;
+  }>;
 };
 
 export default async function SignInPage({ searchParams }: SignInPageProps) {
-  const { error, sent } = await searchParams;
+  const { accountDeleted, error, sent } = await searchParams;
 
   return (
     <main className="auth-page">
@@ -34,6 +38,11 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
             We will email you a secure link. New here? The same link creates
             your account.
           </p>
+          {accountDeleted === "1" ? (
+            <p className="form-message form-message-success" role="status">
+              Your Cratebook account and personal data have been deleted.
+            </p>
+          ) : null}
 
           <form className="form-stack" action={requestMagicLink}>
             <div className="field">

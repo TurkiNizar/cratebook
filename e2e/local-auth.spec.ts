@@ -547,6 +547,54 @@ test.describe("local passwordless authentication", () => {
     expect(browserErrors).toEqual([]);
   });
 
+  test("deletes the authenticated account only after explicit confirmation", async ({
+    page,
+    request,
+  }, testInfo) => {
+    test.skip(
+      !["desktop-chromium", "mobile-chrome"].includes(testInfo.project.name),
+      "Account deletion runs in representative desktop and mobile browsers",
+    );
+
+    const username = await signInAndCompleteOnboarding(page, request, testInfo);
+    await page.goto("/settings");
+    await expect(
+      page.getByText(/Cratebook stores no uploaded images in the MVP/),
+    ).toBeVisible();
+
+    await page.getByRole("button", { name: "Delete my account" }).click();
+    await expect(
+      page.getByRole("group", {
+        name: "Delete your entire Cratebook account?",
+      }),
+    ).toBeVisible();
+    await page.getByRole("button", { name: "Keep my account" }).click();
+    await expect(
+      page.getByRole("button", { name: "Delete my account" }),
+    ).toBeVisible();
+
+    await page.getByRole("button", { name: "Delete my account" }).click();
+    await page.getByLabel("Type DELETE to confirm").fill("DELETE");
+    await page
+      .getByRole("button", { name: "Delete account permanently" })
+      .click();
+
+    await expect(page).toHaveURL(/\/sign-in\?accountDeleted=1$/);
+    await expect(
+      page.getByText(
+        "Your Cratebook account and personal data have been deleted.",
+      ),
+    ).toBeVisible();
+    await page.goto("/collection");
+    await expect(page).toHaveURL(/\/sign-in$/);
+    await page.goto(`/u/${username}`);
+    await expect(
+      page.getByRole("heading", { name: "This crate isn’t available" }),
+    ).toBeVisible();
+    await expectNoHorizontalOverflow(page);
+    await expectNoSeriousAccessibilityViolations(page);
+  });
+
   test("keeps four bottom destinations aligned, accessible, and clear of content", async ({
     page,
     request,
