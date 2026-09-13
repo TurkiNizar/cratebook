@@ -1172,5 +1172,12 @@ test.describe("local passwordless authentication", () => {
     await expect(page.getByLabel("Display name")).toHaveValue(
       "Local Crate Digger",
     );
+
+    await page.getByLabel("Public profile").uncheck();
+    await page.getByRole("button", { name: "Save profile" }).click();
+
+    await expect(page.getByText("Your profile has been saved.")).toBeVisible();
+    await expect(page.getByText("Private", { exact: true })).toBeVisible();
+    await expect(page.getByLabel("Public profile")).not.toBeChecked();
   });
 });

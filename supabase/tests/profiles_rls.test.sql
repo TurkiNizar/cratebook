@@ -1,6 +1,6 @@
 begin;
 
-select plan(13);
+select plan(14);
 
 insert into auth.users (id, aud, role, email, created_at, updated_at)
 values
@@ -50,6 +50,37 @@ select results_eq(
 );
 
 reset role;
+
+select set_config(
+  'request.jwt.claim.sub',
+  '22222222-2222-4222-8222-222222222222',
+  true
+);
+set local role authenticated;
+
+update public.profiles
+set is_public = false
+where id = '22222222-2222-4222-8222-222222222222';
+
+reset role;
+select set_config('request.jwt.claim.sub', '', true);
+set local role anon;
+
+select is(
+  (
+    select count(*)
+    from public.profiles
+    where id = '22222222-2222-4222-8222-222222222222'
+  ),
+  0::bigint,
+  'making a profile private immediately revokes anonymous access'
+);
+
+reset role;
+
+update public.profiles
+set is_public = true
+where id = '22222222-2222-4222-8222-222222222222';
 
 update public.profiles
 set username = 'listener_a'
