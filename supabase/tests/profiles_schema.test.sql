@@ -23,7 +23,7 @@ select has_trigger(
 select policies_are(
   'public',
   'profiles',
-  array['profiles_select_self_or_public', 'profiles_update_self'],
+  array['profiles_select_self', 'profiles_update_self'],
   'profiles expose only the intended RLS policies'
 );
 select is(

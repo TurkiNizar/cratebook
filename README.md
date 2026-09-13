@@ -289,6 +289,10 @@ monitoring guidance are recorded in
 public-profile lists use URL-based pages of 24 records so growing crates remain bounded
 without requiring client-side JavaScript.
 
+The completed application and database threat review, implemented hardening, browser
+headers, and release follow-ups are recorded in
+[docs/security-privacy-review.md](./docs/security-privacy-review.md).
+
 ```bash
 npm run lint
 npm run typecheck

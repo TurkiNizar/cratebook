@@ -26,27 +26,19 @@ where id = '22222222-2222-4222-8222-222222222222';
 
 set local role anon;
 
-select is(
-  (
-    select count(*)
-    from public.profiles
-    where id in (
-      '11111111-1111-4111-8111-111111111111',
-      '22222222-2222-4222-8222-222222222222'
-    )
-  ),
-  1::bigint,
-  'anonymous users see only public profiles'
+select throws_like(
+  $$ select * from public.profiles $$,
+  '%permission denied for table profiles%',
+  'anonymous users cannot query the profiles table directly'
 );
 
 select results_eq(
   $$
     select username
-    from public.profiles
-    where id = '22222222-2222-4222-8222-222222222222'
+    from public.get_public_profile('listener_b')
   $$,
   $$ values ('listener_b'::text) $$,
-  'the public profile is visible anonymously'
+  'the narrow public profile projection is visible anonymously'
 );
 
 reset role;
@@ -69,11 +61,10 @@ set local role anon;
 select is(
   (
     select count(*)
-    from public.profiles
-    where id = '22222222-2222-4222-8222-222222222222'
+    from public.get_public_profile('listener_b')
   ),
   0::bigint,
-  'making a profile private immediately revokes anonymous access'
+  'making a profile private immediately revokes projected anonymous access'
 );
 
 reset role;
@@ -102,8 +93,8 @@ select is(
       '22222222-2222-4222-8222-222222222222'
     )
   ),
-  2::bigint,
-  'an authenticated user sees their private profile and other public profiles'
+  1::bigint,
+  'an authenticated user directly sees only their own profile'
 );
 
 update public.profiles
