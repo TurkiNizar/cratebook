@@ -857,7 +857,7 @@ the record's catalogue identity.
 - [x] Add public-preview mode
 - [x] Verify private-field exclusion at query/API level
 - [x] Implement CSV export
-- [ ] Implement full JSON export
+- [x] Implement full JSON export
 - [ ] Implement account and image deletion flow
 - [ ] Finish installable PWA assets and behavior
 - [ ] Complete accessibility review
@@ -1012,6 +1012,7 @@ production environment.
 | 2026-09-13 | Keep public profile pages out of search-engine indexes by default for the MVP                                                                | A deliberate link-sharing model is more consistent with private-by-default expectations; broader discoverability can be reconsidered after collectors understand the control                                      |
 | 2026-09-13 | Use the real public-profile route for owner preview, including while the profile is private                                                  | One owner-aware safe projection keeps the preview identical to the visitor view while preserving private/missing equivalence for everyone else                                                                    |
 | 2026-09-13 | Export collection and wishlist as separate UTF-8 CSV files with private details and spreadsheet-injection protection                         | Distinct schemas stay readable in ordinary spreadsheet software; full raw provenance belongs in the complete JSON backup, while formula-like user text must remain inert                                          |
+| 2026-09-13 | Export complete domain backups as versioned JSON without managed authentication or session data                                              | Raw owner-scoped rows preserve private details, relationships, and catalogue provenance while keeping portability independent of Supabase Auth                                                                    |
 
 ## 20. Progress log
 
@@ -1068,6 +1069,7 @@ in version control; this log records product-level progress and changes.
 | 2026-09-13 | 4         | Built the signed-out public collection and wishlist profile with private/missing equivalence, no-index metadata, responsive loading/empty/error states, and narrow security-definer projections that exclude prices, sellers, notes, tags, conditions, and provenance; verified 318 database assertions plus accessible desktop/mobile browser journeys      | Add owner-facing public-preview mode                                   |
 | 2026-09-13 | 4         | Added owner-only preview on the real public-profile route for private and live profiles, with exact opted-in projections, clear sharing status, settings navigation, and live-link copying; deployed all 17 migrations and verified 175 app tests, 324 database assertions, the production build, and responsive authenticated desktop/mobile behavior       | Implement CSV export                                                   |
 | 2026-09-13 | 4         | Added authenticated collection and wishlist CSV downloads with private details, major-unit prices, stable UTF-8 formatting, no-store responses, and formula-injection protection; 190 app tests, 324 database assertions, the build, and accessible desktop/mobile downloads pass                                                                            | Implement full JSON export                                             |
+| 2026-09-13 | 4         | Added an authenticated, versioned full JSON backup with every owner-scoped domain table, including private fields, stable relationships, and raw catalogue/artwork provenance; 194 app tests, 324 database assertions, generated-type parity, the build, and desktop/mobile downloads pass                                                                   | Implement account and image deletion flow                              |
 
 ## 21. Hosted environment checklist
 

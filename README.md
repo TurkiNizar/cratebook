@@ -123,8 +123,10 @@ Start the app with `npm run dev`, then:
 21. In **Profile → Export your data**, download the collection and wishlist CSV
     files. Open them in a spreadsheet application and confirm release metadata,
     private copy or wishlist details, prices in major currency units, visibility, and
-    catalogue identifiers are present. Treat exported files as private because they
-    include details that never appear on a public profile.
+    catalogue identifiers are present. Download the complete JSON backup and confirm
+    it includes the profile, releases, collection, wishlist, tags, tag assignments,
+    and raw catalogue and artwork provenance. Treat every export as private because
+    it includes details that never appear on a public profile.
 
 Catalogue search needs no additional environment variable or provider account. If
 MusicBrainz has no suitable result or is unavailable, both manual collection and

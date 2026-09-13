@@ -475,6 +475,38 @@ test.describe("local passwordless authentication", () => {
     expect(wishlistCsv).toMatch(/^\uFEFFWishlist item ID,Artist,Title/);
     expect(wishlistCsv).toContain("Alice Coltrane,Journey in Satchidananda");
     expect(wishlistCsv).toContain("75.00,USD,Private wishlist note");
+
+    const backupDownloadPromise = page.waitForEvent("download");
+    await page.getByRole("link", { name: "Download complete JSON" }).click();
+    const backupDownload = await backupDownloadPromise;
+    expect(backupDownload.suggestedFilename()).toBe(
+      "cratebook-complete-backup.json",
+    );
+    const backup = JSON.parse(await readDownload(backupDownload));
+    expect(backup).toMatchObject({
+      format: "cratebook-backup",
+      version: 1,
+      data: {
+        profile: {
+          username,
+          display_name: "Local Crate Digger",
+        },
+        collection_items: [
+          {
+            acquired_from: "Private record shop",
+            price_paid_minor: 2499,
+            notes: "Private collection memory",
+          },
+        ],
+        wishlist_items: [
+          {
+            max_price_minor: 7500,
+            notes: "Private wishlist note",
+          },
+        ],
+      },
+    });
+    expect(backup.data.releases).toHaveLength(2);
     await expectNoHorizontalOverflow(page);
     await expectNoSeriousAccessibilityViolations(page);
 

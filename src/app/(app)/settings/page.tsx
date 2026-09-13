@@ -143,7 +143,7 @@ export default async function SettingsPage({
           <div>
             <h2 id="data-export-title">Export your data</h2>
             <p>
-              Download spreadsheet-ready copies of your collection and wishlist.
+              Download spreadsheet-ready lists or a complete portable backup.
               These files include private details, so keep them safe.
             </p>
           </div>
@@ -162,6 +162,13 @@ export default async function SettingsPage({
             download="cratebook-wishlist.csv"
           >
             Download wishlist CSV
+          </a>
+          <a
+            className="secondary-button"
+            href="/settings/export/backup.json"
+            download="cratebook-complete-backup.json"
+          >
+            Download complete JSON
           </a>
         </div>
       </section>
