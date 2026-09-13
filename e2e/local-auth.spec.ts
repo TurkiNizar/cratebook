@@ -84,6 +84,7 @@ async function expectResponsiveProfileActions(page: Page) {
     expect(saveBox!.y).toBeLessThan(previewBox!.y);
   } else {
     expect(Math.abs(previewBox!.y - saveBox!.y)).toBeLessThanOrEqual(1);
+    expect(saveBox!.x).toBeLessThan(previewBox!.x);
     expect(saveBox!.width).toBeGreaterThan(previewBox!.width);
   }
 }
