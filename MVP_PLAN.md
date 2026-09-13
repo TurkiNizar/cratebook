@@ -859,7 +859,10 @@ the record's catalogue identity.
 - [x] Implement CSV export
 - [x] Implement full JSON export
 - [x] Implement account and image deletion flow
-- [ ] Finish installable PWA assets and behavior
+- [x] Finish installable PWA assets and behavior with stable app identity, collection-
+      first launch, collection/wishlist/add shortcuts, complete any/maskable/Apple icon
+      coverage, a native install prompt when available, accessible browser-specific
+      fallback guidance, and explicit network-dependent MVP expectations
 - [ ] Complete accessibility review
 - [ ] Complete performance review
 - [ ] Complete security and privacy review
@@ -1014,6 +1017,7 @@ production environment.
 | 2026-09-13 | Export collection and wishlist as separate UTF-8 CSV files with private details and spreadsheet-injection protection                         | Distinct schemas stay readable in ordinary spreadsheet software; full raw provenance belongs in the complete JSON backup, while formula-like user text must remain inert                                          |
 | 2026-09-13 | Export complete domain backups as versioned JSON without managed authentication or session data                                              | Raw owner-scoped rows preserve private details, relationships, and catalogue provenance while keeping portability independent of Supabase Auth                                                                    |
 | 2026-09-13 | Hard-delete the authenticated Supabase user through a server-only Admin API after typed confirmation                                         | Existing foreign-key cascades remove every owner-scoped domain row; the MVP owns no uploaded images, and future Storage objects must be removed before deleting their owner                                       |
+| 2026-09-13 | Keep the installed MVP network-dependent, give it a stable root identity, and launch into the collection                                     | Installation should make the existing online companion easier to reach without implying offline support; a stable identity allows launch behavior to evolve without creating a duplicate installed app            |
 
 ## 20. Progress log
 
@@ -1072,6 +1076,7 @@ in version control; this log records product-level progress and changes.
 | 2026-09-13 | 4         | Added authenticated collection and wishlist CSV downloads with private details, major-unit prices, stable UTF-8 formatting, no-store responses, and formula-injection protection; 190 app tests, 324 database assertions, the build, and accessible desktop/mobile downloads pass                                                                            | Implement full JSON export                                             |
 | 2026-09-13 | 4         | Added an authenticated, versioned full JSON backup with every owner-scoped domain table, including private fields, stable relationships, and raw catalogue/artwork provenance; 194 app tests, 324 database assertions, generated-type parity, the build, and desktop/mobile downloads pass                                                                   | Implement account and image deletion flow                              |
 | 2026-09-13 | 4         | Added typed-confirmation account deletion through a server-only Supabase Admin client, verified full-domain cascades and session cleanup, documented the current no-upload image lifecycle, and blocked anonymous protected-route rendering; application, database, build, and accessible desktop/mobile browser checks pass                                 | Finish installable PWA assets and behavior                             |
+| 2026-09-13 | 4         | Finished PWA installability with stable identity, collection-first launch, shortcuts, full-bleed maskable and Apple icons, native-prompt integration, and accessible browser guidance; formatting, lint, type-check, 210 app tests, build, 331 database assertions, visual review, and 15 browser cases pass                                                 | Complete the accessibility review                                      |
 
 ## 21. Hosted environment checklist
 

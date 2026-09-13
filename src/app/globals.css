@@ -252,6 +252,74 @@ a {
   margin-top: 34px;
 }
 
+.hero-secondary-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.install-trigger {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.install-trigger:hover {
+  color: var(--terracotta);
+}
+
+.install-message {
+  max-width: 240px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.install-dialog {
+  position: fixed;
+  inset: 0;
+  width: min(100%, 430px);
+  max-width: calc(100% - 40px);
+  max-height: calc(100% - 40px);
+  margin: auto;
+  padding: clamp(24px, 6vw, 38px);
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--paper-light);
+  box-shadow: var(--shadow);
+}
+
+.install-dialog::backdrop {
+  background: rgba(32, 29, 25, 0.54);
+}
+
+.install-dialog .eyebrow {
+  margin-bottom: 13px;
+}
+
+.install-dialog h2 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 30px;
+  font-weight: 500;
+}
+
+.install-dialog > p:not(.eyebrow) {
+  margin: 14px 0 24px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
 .quiet-note {
   margin: 18px 0 0 8px;
   color: #887e70;
@@ -3201,6 +3269,10 @@ a.add-option:hover {
   }
 
   .hero-actions .text-link {
+    justify-content: center;
+  }
+
+  .hero-secondary-actions {
     justify-content: center;
   }
 

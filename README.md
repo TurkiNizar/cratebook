@@ -36,6 +36,19 @@ The landing and sign-in screens work without backend configuration. Protected pa
 need Supabase; use the full setup below to test sign-in, onboarding, catalogue-assisted
 or manual collection entry, and wishlist management.
 
+## Install Cratebook
+
+Cratebook can be installed from the production site or a secure local development
+origin. Choose **Install app** on the landing page. When the browser exposes its native
+install prompt, Cratebook opens it directly; otherwise the app explains where to find
+**Install Cratebook** or **Add to Home Screen** in the browser menu. On iPhone and iPad,
+open the site in Safari and use **Share → Add to Home Screen**.
+
+The installed app opens at the collection and provides shortcuts to the collection,
+wishlist, and Add screen where the operating system supports them. Cratebook remains
+network-dependent in the MVP: installation does not add offline collection access or
+offline writes.
+
 ## Full local setup
 
 Additional requirement: Docker Desktop (or another running Docker-compatible engine).

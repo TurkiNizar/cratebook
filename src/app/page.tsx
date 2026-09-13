@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { BrandMark } from "@/components/brand-mark";
 import { ArrowIcon, SearchIcon } from "@/components/icons";
+import { InstallApp } from "@/components/install-app";
 
 const records = [
   { artist: "Miles Davis", title: "Kind of Blue", color: "blue", year: "1959" },
@@ -49,9 +50,12 @@ export default function HomePage() {
             <Link className="button" href="/sign-in">
               Build your collection <ArrowIcon width={18} height={18} />
             </Link>
-            <a className="text-link text-link-arrow" href="#how-it-works">
-              See how it works <span aria-hidden="true">↓</span>
-            </a>
+            <div className="hero-secondary-actions">
+              <a className="text-link text-link-arrow" href="#how-it-works">
+                See how it works <span aria-hidden="true">↓</span>
+              </a>
+              <InstallApp />
+            </div>
           </div>
           <p className="quiet-note">
             Free to start · Private by default · Yours to export

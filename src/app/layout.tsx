@@ -3,7 +3,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://cratebook.example"),
+  metadataBase: new URL("https://cratebook.vercel.app"),
   title: {
     default: "Cratebook — Your records, remembered",
     template: "%s · Cratebook",
