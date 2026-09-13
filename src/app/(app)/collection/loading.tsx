@@ -8,7 +8,7 @@ export default function CollectionLoading() {
         <span className="skeleton-line skeleton-line-short" />
         <span className="skeleton-button" />
       </div>
-      <div className="collection-grid" aria-label="Loading collection">
+      <div className="collection-grid" aria-hidden="true">
         {Array.from({ length: 4 }, (_, index) => (
           <div className="collection-card collection-card-skeleton" key={index}>
             <span className="skeleton-cover" />

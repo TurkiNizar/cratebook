@@ -19,7 +19,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest",
     "test:run": "vitest run",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "e2e:release": "node scripts/release-browser-tests.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.7",

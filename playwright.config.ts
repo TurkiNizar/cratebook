@@ -1,5 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
+const useProductionServer = process.env.PLAYWRIGHT_USE_PRODUCTION === "1";
+
 export default defineConfig({
   testDir: "./e2e",
   fullyParallel: true,
@@ -20,8 +22,10 @@ export default defineConfig({
     { name: "mobile-safari", use: { ...devices["iPhone 15"] } },
   ],
   webServer: {
-    command: "npm run dev",
+    command: useProductionServer
+      ? "node_modules/.bin/next start"
+      : "npm run dev",
     url: "http://127.0.0.1:3000",
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: useProductionServer ? false : !process.env.CI,
   },
 });

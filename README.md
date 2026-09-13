@@ -344,6 +344,20 @@ for a faster targeted run. The catalogue portion also checks serious and critica
 WCAG A/AA violations with axe, including album search, no-result recovery, and
 cover-first results.
 
+Before a release, reset the local database and run the same authenticated matrix
+against an optimized production build:
+
+```bash
+npx supabase db reset
+npm run db:test
+npm run e2e:release
+```
+
+`e2e:release` reads the running local Supabase API URL and keys from
+`supabase status`, passes them only to the build and browser-test child processes, and
+refuses to run against a hosted Supabase URL. This makes account-deletion coverage part
+of the repeatable release command without printing or committing the local secret key.
+
 Regenerate `src/types/database.ts` after a migration with:
 
 ```bash

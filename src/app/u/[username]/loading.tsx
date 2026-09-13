@@ -11,7 +11,7 @@ export default function PublicProfileLoading() {
           <p className="eyebrow">Shared crate</p>
           <h1>Opening this crate…</h1>
         </section>
-        <div className="collection-grid" aria-label="Loading shared records">
+        <div className="collection-grid" aria-hidden="true">
           {Array.from({ length: 4 }, (_, index) => (
             <div
               className="collection-card collection-card-skeleton"

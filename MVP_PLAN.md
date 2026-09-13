@@ -875,7 +875,11 @@ the record's catalogue identity.
       narrow public projections, same-origin authentication callback redirects,
       server-only data clients, defensive browser headers, schema linting, and a
       documented threat model and release follow-ups
-- [ ] Run full automated and manual release tests
+- [x] Run full automated and manual release tests with a clean 18-migration database,
+      231 unit/component tests, 339 pgTAP assertions, generated-type parity, schema
+      lint, an optimized-build five-browser authenticated matrix, a read-only production
+      smoke check, and a clean dependency advisory scan; record the results in
+      `docs/release-testing.md`
 - [ ] Deploy production application and document operations
 
 Exit condition: the MVP is secure, installable, shareable, portable, and usable by
@@ -1091,6 +1095,7 @@ in version control; this log records product-level progress and changes.
 | 2026-09-13 | 4         | Completed full WCAG 2.2 A/AA axe review across primary routes; fixed contrast, skip navigation, destructive-cancellation focus restoration, and decorative preview semantics; 210 app tests, 331 database assertions, build, visual review, and all supported browser projects pass                                                                          | Complete the performance review                                        |
 | 2026-09-13 | 4         | Completed the performance review with bounded 24-record server pagination for private and shared lists, filter-preserving URLs, and a documented 13-request, 158 KB, zero-CLS production-build baseline; 215 app tests, 331 database assertions, the build, and authenticated desktop/mobile journeys pass                                                   | Complete the security and privacy review                               |
 | 2026-09-13 | 4         | Completed the security/privacy review: closed direct profile-read and callback-redirect gaps, added browser defenses and threat-model docs; 225 app tests, 339 database assertions, schema lint, build, and desktop/mobile privacy journeys pass                                                                                                             | Run full automated and manual release tests                            |
+| 2026-09-13 | 4         | Completed the MVP release gate: repaired local account-deletion E2E credentials and loading-skeleton ARIA; 231 app tests, optimized build, clean 18-migration/339-assertion database pass, type parity, schema lint, five-browser auth matrix, production smoke, and a 0-vulnerability audit pass                                                            | Deploy production application and document operations                  |
 
 ## 21. Hosted environment checklist
 
