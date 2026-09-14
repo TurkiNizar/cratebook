@@ -6,7 +6,10 @@ export const SECURITY_HEADERS = [
     value:
       "base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'",
   },
-  { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+  {
+    key: "Cross-Origin-Opener-Policy",
+    value: "same-origin-allow-popups",
+  },
   {
     key: "Permissions-Policy",
     value: "camera=(), geolocation=(), microphone=()",

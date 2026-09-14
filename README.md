@@ -70,8 +70,12 @@ Create `.env.local` from `.env.example`, then use these values:
 NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=paste-the-publishable-or-anon-key-from-supabase-start
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
+NEXT_PUBLIC_GOOGLE_CLIENT_ID=paste-your-google-oauth-web-client-id
 SUPABASE_SECRET_KEY=paste-the-secret-key-from-supabase-start
 ```
+
+The Google client ID is public configuration. Omit it when you only need the local
+Mailpit magic-link flow; the Google button is hidden when the value is absent.
 
 Start the app with `npm run dev`, then:
 
@@ -221,6 +225,9 @@ See the official [Supabase CLI deployment guide](https://supabase.com/docs/refer
    `https://cratebook.vercel.app`.
 5. Add `NEXT_PUBLIC_SITE_URL` in Vercel's **Production** environment with that exact
    URL, then redeploy Production so the new value is included in the build.
+6. When Google sign-in is enabled, add `NEXT_PUBLIC_GOOGLE_CLIENT_ID` as a
+   non-secret **Config** value in Production. It is the public web client ID, never
+   the Google client secret.
 
 Vercel will now deploy `main` to Production and create a separate Preview URL for each
 pull request or non-production branch. See [Vercel Git deployments](https://vercel.com/docs/git)
@@ -244,14 +251,56 @@ values. The wildcard permits generated Vercel Preview URLs; keep the production
 callback exact. Supabase documents the same Vercel pattern in its
 [redirect URL guide](https://supabase.com/docs/guides/auth/redirect-urls#vercel-preview-urls).
 
-### 4. Verify the hosted environment
+### 4. Configure Google sign-in
+
+Google sign-in uses Google Identity Services' popup credential flow and Supabase's
+ID-token exchange. It returns to `/collection` in the same browser or installed PWA;
+new users are then gated through onboarding. A Google identity with the same verified
+email as an existing Supabase user is linked automatically by Supabase.
+
+1. In Google Cloud, create an **External** OAuth web client and set these authorized
+   JavaScript origins:
+
+   ```text
+   https://cratebook.vercel.app
+   http://localhost:3000
+   http://127.0.0.1:3000
+   ```
+
+2. Add the Supabase Auth callback as an authorized redirect URI:
+
+   ```text
+   https://YOUR_PROJECT_REF.supabase.co/auth/v1/callback
+   ```
+
+3. Complete the Google Auth Platform branding page with the app home page, public
+   privacy notice, and terms page. Keep the app in Testing only while using an
+   explicit test-user list; publish it to Production before inviting arbitrary Google
+   accounts. The basic `openid`, `email`, and `profile` scopes do not require Cratebook
+   to request access to Google Drive, contacts, or other account data.
+4. In Supabase **Authentication → Sign In / Providers → Google**, enable Google and
+   save the web client ID and client secret. Store the secret only in Google and
+   Supabase; do not put it in Vercel or this repository.
+5. Add the same public client ID to Vercel as
+   `NEXT_PUBLIC_GOOGLE_CLIENT_ID`, redeploy, and verify that **Continue with Google**
+   appears on `/sign-in`.
+
+Until a custom sending domain is available, Resend's `onboarding@resend.dev` test
+sender can deliver only to the Resend account owner's email. Keep email sign-in as an
+existing-account fallback and direct new collectors to Google. Configure and verify a
+custom sending domain before promising magic-link signup to arbitrary addresses.
+
+### 5. Verify the hosted environment
 
 1. Open the production URL on a phone or narrow browser window.
-2. Request a magic link using an email inbox you can access.
-3. Follow the email link, choose a username, and confirm `/collection` loads.
+2. Choose **Continue with Google** using an account you control.
+3. For a new account, choose a username and confirm `/collection` loads. For an
+   existing account with the same verified email, confirm the existing collection
+   opens rather than creating a duplicate user.
 4. Edit and save the profile at `/settings`.
 5. Create a small branch and pull request, then confirm Vercel posts a working Preview
-   deployment and that its magic-link flow returns to the Preview URL.
+   deployment. Add that exact Preview origin to the Google client before testing
+   Google there, or use the local magic-link flow instead.
 
 After catalogue or schema changes, also verify the album-first journey against the
 production deployment with a disposable test record:
@@ -270,15 +319,17 @@ production deployment with a disposable test record:
 6. Move the test wish to the collection and confirm metadata and notes carry over.
 7. Remove every test item created during the check so production data remains tidy.
 
-Production verification requires an authenticated browser session and access to the
-magic-link inbox. Public smoke checks and migration-list parity do not by themselves
-verify the complete album-first journey.
+Production verification requires an authenticated browser session. Public smoke
+checks and migration-list parity do not by themselves verify the complete album-first
+journey.
 
 Steps 1–4 are verified in production. The pull-request Preview check in step 5 remains
 open and is tracked in `MVP_PLAN.md`.
 
-If a magic link returns to localhost or is rejected, recheck the Supabase Site URL,
-redirect allowlist, Vercel team/account slug, and redeploy after environment changes.
+If Google remains unavailable, confirm that the Google audience is in Production, the
+current origin is authorized, the Supabase provider is enabled, and the Vercel client
+ID matches the web client. If a magic link returns to localhost or is rejected,
+recheck the Supabase Site URL and redirect allowlist.
 
 The publishable Supabase key is designed for browser use with RLS. Never put a
 Supabase secret/service-role key in a `NEXT_PUBLIC_` variable, `.env.local` in Git, or
@@ -373,8 +424,9 @@ Review the generated output before replacing the committed types.
 ## Environment variables
 
 Only variables prefixed with `NEXT_PUBLIC_` are exposed to the browser. The Supabase
-URL and publishable key are intentionally public. `SUPABASE_SECRET_KEY` authorizes
-account deletion and must remain server-only; never expose a secret or service-role key
-with a `NEXT_PUBLIC_` prefix.
+URL, publishable key, and Google OAuth client ID are intentionally public.
+`SUPABASE_SECRET_KEY` authorizes account deletion and must remain server-only; the
+Google OAuth client secret belongs only in Supabase. Never expose either secret with a
+`NEXT_PUBLIC_` prefix.
 
 See `.env.example` for the currently required values.

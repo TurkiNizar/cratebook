@@ -47,7 +47,7 @@ describe("Next.js security headers", () => {
       "Content-Security-Policy": expect.stringContaining(
         "frame-ancestors 'none'",
       ),
-      "Cross-Origin-Opener-Policy": "same-origin",
+      "Cross-Origin-Opener-Policy": "same-origin-allow-popups",
       "Permissions-Policy": "camera=(), geolocation=(), microphone=()",
       "Referrer-Policy": "strict-origin-when-cross-origin",
       "Strict-Transport-Security": "max-age=63072000; includeSubDomains",

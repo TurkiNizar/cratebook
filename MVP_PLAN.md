@@ -926,6 +926,7 @@ implemented, and verified.
 - [ ] **POST-14 — Capacitor iOS and Android applications**
 - [ ] **POST-15 — Camera-assisted cover or catalogue recognition**
 - [ ] **POST-16 — Personal-copy photo uploads**
+- [ ] **POST-17 — Google sign-in and installed-PWA authentication continuity**
 
 These stable `POST-##` references do not imply priority. Check an item only after its
 scope and prerequisites are settled and the implementation is complete and verified.
@@ -1042,6 +1043,7 @@ production environment.
 | 2026-09-13 | Keep the installed MVP network-dependent, give it a stable root identity, and launch into the collection                                     | Installation should make the existing online companion easier to reach without implying offline support; a stable identity allows launch behavior to evolve without creating a duplicate installed app            |
 | 2026-09-13 | Bound collection, wishlist, and public-profile lists to 24 records per server-rendered page                                                  | Keeps database responses, rendered DOM size, and image work predictable as crates grow while preserving shareable filter and page URLs without adding client-side state                                           |
 | 2026-09-13 | Restrict direct profile-table reads to owners and require every visitor view to use narrow public projections                                | Prevents anonymous or authenticated visitors from bypassing the reviewed projection and reading internal identifiers, timestamps, or the reserved avatar storage path                                             |
+| 2026-09-14 | Make Google the primary hosted sign-in through a nonce-bound popup ID-token exchange while retaining email as a fallback                     | New collectors cannot use the Resend test sender without a custom domain, and a same-window popup flow avoids requiring an installed PWA to recover a magic link opened from another application                  |
 
 ## 20. Progress log
 
@@ -1127,6 +1129,8 @@ the README under **Hosted Supabase and Vercel**.
 - [x] Allow localhost, the exact production callback, and Vercel Preview redirects
 - [x] Redeploy after environment-variable changes
 - [x] Verify hosted sign-in, onboarding, collection access, and profile editing
+- [x] Configure the Google web client, hosted Supabase provider, and Vercel public client ID
+- [ ] Publish the Google external audience and verify new-user sign-in from production
 - [ ] Verify a pull request receives a working Vercel Preview deployment
 
 Do not mark this checklist complete until the hosted magic-link journey has been

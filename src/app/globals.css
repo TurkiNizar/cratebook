@@ -804,6 +804,99 @@ a {
   cursor: pointer;
 }
 
+.google-sign-in {
+  display: grid;
+  gap: 10px;
+}
+
+.google-sign-in-button {
+  display: grid;
+  min-height: 44px;
+  place-items: center;
+}
+
+.auth-divider {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 12px;
+  margin: 24px 0;
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  height: 1px;
+  background: var(--line);
+  content: "";
+}
+
+.field-hint a {
+  color: var(--ink);
+  text-underline-offset: 3px;
+}
+
+.public-info-page {
+  width: min(720px, calc(100% - 40px));
+  min-height: 100vh;
+  margin-inline: auto;
+  padding: 48px 0 64px;
+}
+
+.public-info-page > .brand-link {
+  display: inline-flex;
+  margin-bottom: 56px;
+}
+
+.public-info-page article {
+  display: grid;
+  gap: 16px;
+}
+
+.public-info-page h1,
+.public-info-page h2,
+.public-info-page p {
+  margin: 0;
+}
+
+.public-info-page h1,
+.public-info-page h2 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 500;
+}
+
+.public-info-page h1 {
+  font-size: clamp(38px, 8vw, 58px);
+  letter-spacing: -0.04em;
+}
+
+.public-info-page h2 {
+  margin-top: 18px;
+  font-size: 24px;
+}
+
+.public-info-page article > p:not(.eyebrow) {
+  color: var(--muted);
+  line-height: 1.75;
+}
+
+.public-info-page > nav {
+  display: flex;
+  gap: 22px;
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+  font-size: 14px;
+}
+
+.public-info-page > nav a {
+  color: var(--ink);
+  text-underline-offset: 4px;
+}
+
 .app-page {
   min-height: 100vh;
   padding: 28px 28px calc(110px + env(safe-area-inset-bottom));

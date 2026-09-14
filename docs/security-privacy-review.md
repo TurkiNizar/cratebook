@@ -1,6 +1,6 @@
 # Security and privacy review
 
-Reviewed: 2026-09-13
+Reviewed: 2026-09-14
 
 This review covers the MVP application boundary, Supabase schema and permissions,
 public sharing, exports, account deletion, catalogue access, browser defenses, and
@@ -21,7 +21,8 @@ found during the review were corrected:
 
 ## Data and trust boundaries
 
-- Supabase Auth establishes the user identity. Server Actions and private route
+- Supabase Auth establishes the user identity through a Google ID-token exchange or
+  email magic link. Server Actions and private route
   handlers call `auth.getUser()` again at the mutation or export boundary rather
   than relying only on the protected layout or proxy.
 - User-owned tables have RLS enabled and ownership policies. Mutating RPCs derive the
@@ -52,8 +53,11 @@ found during the review were corrected:
   Archive HTTPS endpoints. Requests have bounded inputs, timeouts, retries, response
   sizes, caching, coalescing, and provider-respecting throttling. Search always has a
   manual fallback.
-- Magic-link delivery is handled by Supabase Auth, including its provider-side abuse
-  controls. Cratebook does not expose a generic email or network proxy endpoint.
+- Google Identity Services provides a popup credential with a cryptographic nonce;
+  Supabase validates the ID token and creates or links the identity. Cratebook asks
+  only for basic identity data. Magic-link delivery remains handled by Supabase Auth,
+  including its provider-side abuse controls. Cratebook does not expose a generic
+  email or network proxy endpoint.
 
 ## Browser and deployment defenses
 
@@ -65,7 +69,9 @@ All routes receive:
 - `X-Content-Type-Options: nosniff`;
 - `Referrer-Policy: strict-origin-when-cross-origin`;
 - restrictive camera, geolocation, and microphone permissions for the current MVP;
-- `Cross-Origin-Opener-Policy: same-origin`;
+- `Cross-Origin-Opener-Policy: same-origin-allow-popups`, which retains opener
+  isolation for unrelated cross-origin documents while allowing the Google sign-in
+  popup to complete;
 - two-year HTTPS-only transport policy and disabled DNS prefetching;
 - no framework-identifying `X-Powered-By` header.
 

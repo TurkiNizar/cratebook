@@ -28,7 +28,10 @@ export async function requestMagicLink(formData: FormData) {
   });
 
   if (error) {
-    redirect(`/sign-in?error=${encodeURIComponent(error.message)}`);
+    const message = /sending confirmation email/i.test(error.message)
+      ? "Email sign-in is temporarily unavailable for this address. Continue with Google instead."
+      : "We could not send a sign-in link. Please try again.";
+    redirect(`/sign-in?error=${encodeURIComponent(message)}`);
   }
 
   redirect("/sign-in?sent=1");

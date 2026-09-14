@@ -25,6 +25,39 @@ test("introduces the product and links to sign in", async ({ page }) => {
   await expect(collectionPreview.getByRole("heading")).toHaveCount(0);
 });
 
+test("publishes the privacy and terms pages used by account sign-in", async ({
+  page,
+}) => {
+  await page.goto("/sign-in");
+
+  if (process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID) {
+    const googleSignIn = page.locator(".google-sign-in");
+    await expect(googleSignIn).toBeVisible();
+    const googleBox = await googleSignIn.boundingBox();
+    const panelBox = await page.locator(".auth-panel").boundingBox();
+    expect(googleBox).not.toBeNull();
+    expect(panelBox).not.toBeNull();
+    expect(googleBox!.width).toBeLessThanOrEqual(panelBox!.width);
+  }
+
+  await expect(page.getByRole("link", { name: /terms/i })).toHaveAttribute(
+    "href",
+    "/terms",
+  );
+  await expect(
+    page.getByRole("link", { name: /privacy notice/i }),
+  ).toHaveAttribute("href", "/privacy");
+
+  await page.goto("/privacy");
+  await expect(
+    page.getByRole("heading", { name: "Privacy notice", level: 1 }),
+  ).toBeVisible();
+  await page.goto("/terms");
+  await expect(
+    page.getByRole("heading", { name: "Terms of use", level: 1 }),
+  ).toBeVisible();
+});
+
 test("sends the reviewed browser security headers", async ({ request }) => {
   const response = await request.get("/");
   const headers = response.headers();
@@ -32,7 +65,9 @@ test("sends the reviewed browser security headers", async ({ request }) => {
   expect(headers["content-security-policy"]).toContain(
     "frame-ancestors 'none'",
   );
-  expect(headers["cross-origin-opener-policy"]).toBe("same-origin");
+  expect(headers["cross-origin-opener-policy"]).toBe(
+    "same-origin-allow-popups",
+  );
   expect(headers["permissions-policy"]).toBe(
     "camera=(), geolocation=(), microphone=()",
   );

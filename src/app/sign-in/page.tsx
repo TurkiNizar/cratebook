@@ -4,6 +4,7 @@ import Link from "next/link";
 import { BrandMark } from "@/components/brand-mark";
 
 import { requestMagicLink } from "./actions";
+import { GoogleSignIn } from "./google-sign-in";
 
 export const metadata: Metadata = {
   title: "Sign in",
@@ -19,6 +20,7 @@ type SignInPageProps = {
 
 export default async function SignInPage({ searchParams }: SignInPageProps) {
   const { accountDeleted, error, sent } = await searchParams;
+  const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
   return (
     <main className="auth-page">
@@ -35,8 +37,9 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
           <p className="eyebrow">Welcome to your crate</p>
           <h1>Sign in without a password.</h1>
           <p className="auth-lead">
-            We will email you a secure link. New here? The same link creates
-            your account.
+            {googleClientId
+              ? "Continue with Google to create or open your account in this window."
+              : "We will email you a secure link. New here? The same link creates your account."}
           </p>
           {accountDeleted === "1" ? (
             <p className="form-message form-message-success" role="status">
@@ -44,6 +47,13 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
             </p>
           ) : null}
 
+          {googleClientId ? <GoogleSignIn clientId={googleClientId} /> : null}
+
+          {googleClientId ? (
+            <div className="auth-divider">
+              <span>or use email</span>
+            </div>
+          ) : null}
           <form className="form-stack" action={requestMagicLink}>
             <div className="field">
               <label htmlFor="email">Email address</label>
@@ -72,8 +82,11 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
             </button>
           </form>
           <p className="field-hint" style={{ marginTop: 18 }}>
-            By continuing, you agree to keep excellent records. The musical
-            kind.
+            {googleClientId
+              ? "Email delivery is temporarily limited to addresses that have used it before. New collectors should continue with Google. "
+              : null}
+            By continuing, you agree to our <Link href="/terms">terms</Link> and
+            acknowledge our <Link href="/privacy">privacy notice</Link>.
           </p>
         </div>
       </section>
