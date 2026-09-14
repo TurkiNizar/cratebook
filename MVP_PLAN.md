@@ -891,39 +891,44 @@ invited collectors without developer assistance.
 
 ## 14. Explicitly outside the MVP
 
-- Marketplace, payments, selling, and auctions
-- Trades or loans between users
-- Following system, activity feed, likes, and public comments
-- Direct messages
-- Automated market valuations
-- Spotify, Apple Music, or listening-history integration
-- Push notifications
-- Complex offline writes and synchronization
-- Guaranteed exact-pressing recognition
-- AI-driven recommendations
-- Social moderation system beyond basic public-profile safeguards
-- Native App Store and Google Play release
+- [ ] **OUT-01 — Marketplace, payments, selling, and auctions**
+- [ ] **OUT-02 — Trades or loans between users**
+- [ ] **OUT-03 — Following system, activity feed, likes, and public comments**
+- [ ] **OUT-04 — Direct messages**
+- [ ] **OUT-05 — Automated market valuations**
+- [ ] **OUT-06 — Spotify, Apple Music, or listening-history integration**
+- [ ] **OUT-07 — Push notifications**
+- [ ] **OUT-08 — Complex offline writes and synchronization**
+- [ ] **OUT-09 — Guaranteed exact-pressing recognition**
+- [ ] **OUT-10 — AI-driven recommendations**
+- [ ] **OUT-11 — Social moderation beyond basic public-profile safeguards**
+- [ ] **OUT-12 — Native App Store and Google Play release**
 
-These items require a scope decision before being promoted into an MVP milestone.
+These stable `OUT-##` references do not imply priority. An item requires an explicit
+scope decision before implementation; mark it complete only after it is promoted,
+implemented, and verified.
 
 ## 15. Post-MVP candidate backlog
 
-- Barcode scanning with candidate confirmation
-- Random-record picker (“What should I spin?”)
-- Last-played date and play count
-- Listening diary
-- Collection statistics and private spend summaries
-- Shelf, crate, or room location
-- Lending tracker
-- Private/unlisted sharing links
-- Gift-friendly wishlist behavior
-- Friends, reactions, and recommendations
-- Collection imports from other services
-- Enhanced exports and printable wishlist
-- Offline read access to recent collection data
-- Capacitor iOS and Android applications
-- Camera-assisted cover or catalogue recognition
-- Personal-copy photo uploads
+- [ ] **POST-01 — Barcode scanning with candidate confirmation**
+- [ ] **POST-02 — Random-record picker (“What should I spin?”)**
+- [ ] **POST-03 — Last-played date and play count**
+- [ ] **POST-04 — Listening diary**
+- [ ] **POST-05 — Collection statistics and private spend summaries**
+- [ ] **POST-06 — Shelf, crate, or room location**
+- [ ] **POST-07 — Lending tracker**
+- [ ] **POST-08 — Private/unlisted sharing links**
+- [ ] **POST-09 — Gift-friendly wishlist behavior**
+- [ ] **POST-10 — Friends, reactions, and recommendations**
+- [ ] **POST-11 — Collection imports from other services**
+- [ ] **POST-12 — Enhanced exports and printable wishlist**
+- [ ] **POST-13 — Offline read access to recent collection data**
+- [ ] **POST-14 — Capacitor iOS and Android applications**
+- [ ] **POST-15 — Camera-assisted cover or catalogue recognition**
+- [ ] **POST-16 — Personal-copy photo uploads**
+
+These stable `POST-##` references do not imply priority. Check an item only after its
+scope and prerequisites are settled and the implementation is complete and verified.
 
 ## 16. Risks and mitigations
 
