@@ -206,11 +206,19 @@ export function GoogleSignIn({ clientId }: GoogleSignInProps) {
           setIsLoading(false);
         }}
       />
-      <div
-        ref={buttonContainer}
-        className={`google-sign-in-button${isButtonReady ? "is-ready" : ""}`}
-        aria-busy={isLoading || isSigningIn}
-      />
+      <div className="google-sign-in-button-slot">
+        {!isButtonReady ? (
+          <div className="google-sign-in-placeholder" aria-hidden="true">
+            <span className="google-sign-in-placeholder-mark">G</span>
+            <span>Continue with Google</span>
+          </div>
+        ) : null}
+        <div
+          ref={buttonContainer}
+          className={`google-sign-in-button${isButtonReady ? "is-ready" : ""}`}
+          aria-busy={isLoading || isSigningIn}
+        />
+      </div>
       {isLoading ? (
         <p className="field-hint" role="status">
           Loading Google sign-in…
