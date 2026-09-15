@@ -122,10 +122,9 @@ export function GoogleSignIn({ clientId }: GoogleSignInProps) {
       let renderedWidth = 0;
       const renderButton = () => {
         if (!buttonContainer.current) return;
-        const width = Math.min(
-          Math.max(buttonContainer.current.clientWidth, 240),
-          400,
-        );
+        const containerWidth = buttonContainer.current.clientWidth;
+        if (!containerWidth) return;
+        const width = Math.min(Math.max(containerWidth, 240), 400);
         if (
           renderedWidth === width &&
           buttonContainer.current.childElementCount
