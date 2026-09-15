@@ -42,10 +42,6 @@ describe("GoogleSignIn", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    Object.defineProperty(HTMLElement.prototype, "clientWidth", {
-      configurable: true,
-      value: 320,
-    });
     Object.defineProperty(globalThis, "ResizeObserver", {
       configurable: true,
       value: class {

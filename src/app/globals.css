@@ -813,40 +813,6 @@ a {
   display: grid;
   min-height: 44px;
   place-items: center;
-  opacity: 0;
-}
-
-.google-sign-in-button.is-ready {
-  opacity: 1;
-}
-
-.google-sign-in-button-slot {
-  min-height: 44px;
-  position: relative;
-}
-
-.google-sign-in-placeholder {
-  align-items: center;
-  background: #fff;
-  border: 1px solid #747775;
-  border-radius: 22px;
-  color: #1f1f1f;
-  display: flex;
-  font-size: 14px;
-  font-weight: 500;
-  gap: 12px;
-  height: 44px;
-  justify-content: center;
-  left: 0;
-  position: absolute;
-  right: 0;
-  top: 0;
-}
-
-.google-sign-in-placeholder-mark {
-  color: #4285f4;
-  font-size: 20px;
-  font-weight: 600;
 }
 
 .auth-divider {

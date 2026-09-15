@@ -43,8 +43,6 @@ type GoogleSignInProps = {
   clientId: string;
 };
 
-const GOOGLE_BUTTON_SETTLE_DELAY_MS = 350;
-
 function base64Url(bytes: Uint8Array) {
   const binary = Array.from(bytes, (byte) => String.fromCharCode(byte)).join(
     "",
@@ -76,10 +74,8 @@ export function GoogleSignIn({ clientId }: GoogleSignInProps) {
   const buttonContainer = useRef<HTMLDivElement>(null);
   const initializationStarted = useRef(false);
   const resizeObserver = useRef<ResizeObserver>(null);
-  const readyTimeout = useRef<number | null>(null);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [isButtonReady, setIsButtonReady] = useState(false);
   const [isSigningIn, setIsSigningIn] = useState(false);
 
   const initializeGoogle = useCallback(async () => {
@@ -123,50 +119,19 @@ export function GoogleSignIn({ clientId }: GoogleSignInProps) {
         },
       });
 
-      let renderedWidth = 0;
       const renderButton = () => {
         if (!buttonContainer.current) return;
-        const containerWidth = buttonContainer.current.clientWidth;
-        if (!containerWidth) return;
-        const width = Math.min(Math.max(containerWidth, 240), 400);
-        if (
-          renderedWidth === width &&
-          buttonContainer.current.childElementCount
-        ) {
-          return;
-        }
-        renderedWidth = width;
-        setIsButtonReady(false);
-        if (readyTimeout.current !== null) {
-          window.clearTimeout(readyTimeout.current);
-          readyTimeout.current = null;
-        }
         buttonContainer.current.replaceChildren();
         google.accounts.id.renderButton(buttonContainer.current, {
           shape: "pill",
           size: "large",
           text: "continue_with",
           theme: "outline",
-          width,
+          width: Math.min(
+            Math.max(buttonContainer.current.clientWidth, 240),
+            400,
+          ),
         });
-        const iframe = buttonContainer.current.querySelector("iframe");
-        if (iframe) {
-          iframe.addEventListener(
-            "load",
-            () => {
-              // GIS may repaint the iframe once immediately after load. Keep
-              // it hidden for a short settling window so users never see the
-              // intermediate button style.
-              readyTimeout.current = window.setTimeout(
-                () => setIsButtonReady(true),
-                GOOGLE_BUTTON_SETTLE_DELAY_MS,
-              );
-            },
-            { once: true },
-          );
-        } else {
-          setIsButtonReady(true);
-        }
         setIsLoading(false);
       };
 
@@ -183,15 +148,7 @@ export function GoogleSignIn({ clientId }: GoogleSignInProps) {
     }
   }, [clientId, router]);
 
-  useEffect(
-    () => () => {
-      resizeObserver.current?.disconnect();
-      if (readyTimeout.current !== null) {
-        window.clearTimeout(readyTimeout.current);
-      }
-    },
-    [],
-  );
+  useEffect(() => () => resizeObserver.current?.disconnect(), []);
 
   return (
     <div className="google-sign-in">
@@ -206,19 +163,11 @@ export function GoogleSignIn({ clientId }: GoogleSignInProps) {
           setIsLoading(false);
         }}
       />
-      <div className="google-sign-in-button-slot">
-        {!isButtonReady ? (
-          <div className="google-sign-in-placeholder" aria-hidden="true">
-            <span className="google-sign-in-placeholder-mark">G</span>
-            <span>Continue with Google</span>
-          </div>
-        ) : null}
-        <div
-          ref={buttonContainer}
-          className={`google-sign-in-button${isButtonReady ? "is-ready" : ""}`}
-          aria-busy={isLoading || isSigningIn}
-        />
-      </div>
+      <div
+        ref={buttonContainer}
+        className="google-sign-in-button"
+        aria-busy={isLoading || isSigningIn}
+      />
       {isLoading ? (
         <p className="field-hint" role="status">
           Loading Google sign-in…
