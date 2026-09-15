@@ -43,6 +43,8 @@ type GoogleSignInProps = {
   clientId: string;
 };
 
+const GOOGLE_BUTTON_SETTLE_DELAY_MS = 350;
+
 function base64Url(bytes: Uint8Array) {
   const binary = Array.from(bytes, (byte) => String.fromCharCode(byte)).join(
     "",
@@ -74,6 +76,7 @@ export function GoogleSignIn({ clientId }: GoogleSignInProps) {
   const buttonContainer = useRef<HTMLDivElement>(null);
   const initializationStarted = useRef(false);
   const resizeObserver = useRef<ResizeObserver>(null);
+  const readyTimeout = useRef<number | null>(null);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isButtonReady, setIsButtonReady] = useState(false);
@@ -134,6 +137,10 @@ export function GoogleSignIn({ clientId }: GoogleSignInProps) {
         }
         renderedWidth = width;
         setIsButtonReady(false);
+        if (readyTimeout.current !== null) {
+          window.clearTimeout(readyTimeout.current);
+          readyTimeout.current = null;
+        }
         buttonContainer.current.replaceChildren();
         google.accounts.id.renderButton(buttonContainer.current, {
           shape: "pill",
@@ -144,9 +151,19 @@ export function GoogleSignIn({ clientId }: GoogleSignInProps) {
         });
         const iframe = buttonContainer.current.querySelector("iframe");
         if (iframe) {
-          iframe.addEventListener("load", () => setIsButtonReady(true), {
-            once: true,
-          });
+          iframe.addEventListener(
+            "load",
+            () => {
+              // GIS may repaint the iframe once immediately after load. Keep
+              // it hidden for a short settling window so users never see the
+              // intermediate button style.
+              readyTimeout.current = window.setTimeout(
+                () => setIsButtonReady(true),
+                GOOGLE_BUTTON_SETTLE_DELAY_MS,
+              );
+            },
+            { once: true },
+          );
         } else {
           setIsButtonReady(true);
         }
@@ -166,7 +183,15 @@ export function GoogleSignIn({ clientId }: GoogleSignInProps) {
     }
   }, [clientId, router]);
 
-  useEffect(() => () => resizeObserver.current?.disconnect(), []);
+  useEffect(
+    () => () => {
+      resizeObserver.current?.disconnect();
+      if (readyTimeout.current !== null) {
+        window.clearTimeout(readyTimeout.current);
+      }
+    },
+    [],
+  );
 
   return (
     <div className="google-sign-in">
