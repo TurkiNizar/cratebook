@@ -76,6 +76,7 @@ export function GoogleSignIn({ clientId }: GoogleSignInProps) {
   const resizeObserver = useRef<ResizeObserver>(null);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [isButtonReady, setIsButtonReady] = useState(false);
   const [isSigningIn, setIsSigningIn] = useState(false);
 
   const initializeGoogle = useCallback(async () => {
@@ -132,6 +133,7 @@ export function GoogleSignIn({ clientId }: GoogleSignInProps) {
           return;
         }
         renderedWidth = width;
+        setIsButtonReady(false);
         buttonContainer.current.replaceChildren();
         google.accounts.id.renderButton(buttonContainer.current, {
           shape: "pill",
@@ -140,6 +142,14 @@ export function GoogleSignIn({ clientId }: GoogleSignInProps) {
           theme: "outline",
           width,
         });
+        const iframe = buttonContainer.current.querySelector("iframe");
+        if (iframe) {
+          iframe.addEventListener("load", () => setIsButtonReady(true), {
+            once: true,
+          });
+        } else {
+          setIsButtonReady(true);
+        }
         setIsLoading(false);
       };
 
@@ -173,7 +183,7 @@ export function GoogleSignIn({ clientId }: GoogleSignInProps) {
       />
       <div
         ref={buttonContainer}
-        className="google-sign-in-button"
+        className={`google-sign-in-button${isButtonReady ? "is-ready" : ""}`}
         aria-busy={isLoading || isSigningIn}
       />
       {isLoading ? (

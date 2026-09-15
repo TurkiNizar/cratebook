@@ -813,6 +813,11 @@ a {
   display: grid;
   min-height: 44px;
   place-items: center;
+  opacity: 0;
+}
+
+.google-sign-in-button.is-ready {
+  opacity: 1;
 }
 
 .auth-divider {
