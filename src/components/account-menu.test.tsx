@@ -40,9 +40,15 @@ describe("AccountMenu", () => {
     expect(
       screen.getByRole("link", { name: "Profile settings" }),
     ).toHaveAttribute("href", "/settings");
+    const publicProfileLink = screen.getByRole("link", {
+      name: "Preview public profile (opens in new tab)",
+    });
+    expect(publicProfileLink).toHaveAttribute("href", "/u/listener");
+    expect(publicProfileLink).toHaveAttribute("target", "_blank");
+    expect(publicProfileLink).toHaveAttribute("rel", "noopener noreferrer");
     expect(
-      screen.getByRole("link", { name: "Preview public profile" }),
-    ).toHaveAttribute("href", "/u/listener");
+      publicProfileLink.querySelector(".account-menu-external-icon"),
+    ).toBeVisible();
     expect(screen.getByRole("button", { name: "Sign out" })).toBeVisible();
     expect(
       screen.getByRole("link", { name: "Profile settings" }),

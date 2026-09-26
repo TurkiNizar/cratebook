@@ -1003,6 +1003,18 @@ a {
   text-align: left;
 }
 
+.account-menu-external-icon {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  margin-left: auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
 .account-menu-links a:hover,
 .account-menu-sign-out:hover {
   background: var(--paper);

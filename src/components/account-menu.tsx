@@ -88,8 +88,22 @@ export function AccountMenu({
             >
               Profile settings
             </Link>
-            <Link href={`/u/${username}`} onClick={() => setIsOpen(false)}>
-              Preview public profile
+            <Link
+              href={`/u/${username}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Preview public profile (opens in new tab)"
+              onClick={() => setIsOpen(false)}
+            >
+              <span>Preview public profile</span>
+              <svg
+                className="account-menu-external-icon"
+                aria-hidden="true"
+                viewBox="0 0 20 20"
+              >
+                <path d="M8 5h7v7M15 5 6 14" />
+                <path d="M13 11v4H5V7h4" />
+              </svg>
             </Link>
           </nav>
           <form action={signOutAction} className="account-menu-sign-out-form">

@@ -668,8 +668,15 @@ test.describe("local passwordless authentication", () => {
       page.getByRole("link", { name: "Profile settings" }),
     ).toBeFocused();
     await expect(
-      page.getByRole("link", { name: "Preview public profile" }),
+      page.getByRole("link", {
+        name: "Preview public profile (opens in new tab)",
+      }),
     ).toHaveAttribute("href", `/u/${username}`);
+    await expect(
+      page.getByRole("link", {
+        name: "Preview public profile (opens in new tab)",
+      }),
+    ).toHaveAttribute("target", "_blank");
     await expect(page.getByRole("button", { name: "Sign out" })).toBeVisible();
     await page.keyboard.press("Escape");
     await expect(page.getByRole("navigation", { name: "Account" })).toHaveCount(
