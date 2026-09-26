@@ -1,38 +1,103 @@
 "use server";
 
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
 
-export async function requestMagicLink(formData: FormData) {
-  const email = String(formData.get("email") ?? "")
+export type EmailOtpState = {
+  email: string;
+  message: string;
+  status: "idle" | "error" | "code-sent";
+};
+
+export const initialEmailOtpState: EmailOtpState = {
+  email: "",
+  message: "",
+  status: "idle",
+};
+
+function normalizeEmail(value: FormDataEntryValue | null) {
+  return String(value ?? "")
     .trim()
     .toLowerCase();
+}
 
-  if (!email || !email.includes("@")) {
-    redirect("/sign-in?error=Enter%20a%20valid%20email%20address");
+function isValidEmail(email: string) {
+  return email.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+export async function requestEmailOtp(
+  _previousState: EmailOtpState,
+  formData: FormData,
+): Promise<EmailOtpState> {
+  const email = normalizeEmail(formData.get("email"));
+
+  if (!isValidEmail(email)) {
+    return {
+      email,
+      message: "Enter a valid email address.",
+      status: "error",
+    };
   }
 
-  const requestHeaders = await headers();
-  const origin =
-    requestHeaders.get("origin") ??
-    process.env.NEXT_PUBLIC_SITE_URL ??
-    "http://localhost:3000";
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithOtp({
+  const { error } = await supabase.auth.signInWithOtp({ email });
+
+  if (error) {
+    return {
+      email,
+      message: /sending confirmation email/i.test(error.message)
+        ? "Email sign-in is temporarily unavailable for this address. Continue with Google instead."
+        : "We could not send a sign-in code. Please wait a moment and try again.",
+      status: "error",
+    };
+  }
+
+  return {
     email,
-    options: {
-      emailRedirectTo: `${origin}/auth/callback`,
-    },
+    message: `Enter the six-digit code sent to ${email}.`,
+    status: "code-sent",
+  };
+}
+
+export async function verifyEmailOtp(
+  _previousState: EmailOtpState,
+  formData: FormData,
+): Promise<EmailOtpState> {
+  const email = normalizeEmail(formData.get("email"));
+  const token = String(formData.get("token") ?? "").trim();
+
+  if (!isValidEmail(email)) {
+    return {
+      email: "",
+      message: "Request a new sign-in code.",
+      status: "error",
+    };
+  }
+
+  if (!/^\d{6}$/.test(token)) {
+    return {
+      email,
+      message: "Enter the six-digit code from your email.",
+      status: "code-sent",
+    };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.verifyOtp({
+    email,
+    token,
+    type: "email",
   });
 
   if (error) {
-    const message = /sending confirmation email/i.test(error.message)
-      ? "Email sign-in is temporarily unavailable for this address. Continue with Google instead."
-      : "We could not send a sign-in link. Please try again.";
-    redirect(`/sign-in?error=${encodeURIComponent(message)}`);
+    return {
+      email,
+      message:
+        "That code is invalid or expired. Request a new code and try again.",
+      status: "code-sent",
+    };
   }
 
-  redirect("/sign-in?sent=1");
+  redirect("/collection");
 }

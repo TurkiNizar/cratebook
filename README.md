@@ -75,14 +75,16 @@ SUPABASE_SECRET_KEY=paste-the-secret-key-from-supabase-start
 ```
 
 The Google client ID is public configuration. Omit it when you only need the local
-Mailpit magic-link flow; the Google button is hidden when the value is absent.
+Mailpit email-code flow; the Google button is hidden when the value is absent. Local
+Supabase uses the committed OTP email template and expires each code after 10 minutes.
 
 Start the app with `npm run dev`, then:
 
 1. Open <http://localhost:3000/sign-in>.
 2. Submit any local test email, for example `collector@example.com`.
 3. Open Mailpit at <http://127.0.0.1:54324>.
-4. Open the newest email and follow its sign-in link.
+4. Open the newest email, copy its six-digit code, and enter the code on the still-open
+   Cratebook sign-in screen.
 5. Choose a username on the onboarding screen.
 6. Confirm that you arrive at the empty collection screen.
 7. Choose **Add → Search the catalogue**, search by artist, title, barcode, or
@@ -251,7 +253,27 @@ values. The wildcard permits generated Vercel Preview URLs; keep the production
 callback exact. Supabase documents the same Vercel pattern in its
 [redirect URL guide](https://supabase.com/docs/guides/auth/redirect-urls#vercel-preview-urls).
 
-### 4. Configure Google sign-in
+### 4. Configure email OTP and Google sign-in
+
+Email fallback uses a six-digit Supabase OTP so an installed iOS or Android PWA can
+create its session without opening a sign-in link in a separate browser. Before
+deploying the OTP interface, open **Supabase → Authentication → Email Templates →
+Magic Link**, set the subject to `Your Cratebook sign-in code`, and replace the body
+with an OTP-only template such as:
+
+```html
+<h2>Your Cratebook sign-in code</h2>
+<p>Enter this six-digit code in Cratebook:</p>
+<p>{{ .Token }}</p>
+<p>This code expires in 10 minutes and can only be used once.</p>
+```
+
+Do not include `{{ .ConfirmationURL }}` in this template: that variable changes the
+same Supabase passwordless flow back into a magic link. Under **Authentication → Sign
+In / Providers → Email**, set **Email OTP expiration** to `600` seconds and the code
+length to `6`. The equivalent local settings and template are committed in
+`supabase/config.toml` and `supabase/templates/magic_link.html`; restart the local
+stack after changing them.
 
 Google sign-in uses Google Identity Services' popup credential flow and Supabase's
 ID-token exchange. It returns to `/collection` in the same browser or installed PWA;
@@ -288,7 +310,7 @@ email as an existing Supabase user is linked automatically by Supabase.
 Until a custom sending domain is available, Resend's `onboarding@resend.dev` test
 sender can deliver only to the Resend account owner's email. Keep email sign-in as an
 existing-account fallback and direct new collectors to Google. Configure and verify a
-custom sending domain before promising magic-link signup to arbitrary addresses.
+custom sending domain before promising email-code signup to arbitrary addresses.
 
 ### 5. Verify the hosted environment
 
@@ -300,7 +322,7 @@ custom sending domain before promising magic-link signup to arbitrary addresses.
 4. Edit and save the profile at `/settings`.
 5. Create a small branch and pull request, then confirm Vercel posts a working Preview
    deployment. Add that exact Preview origin to the Google client before testing
-   Google there, or use the local magic-link flow instead.
+   Google there, or use the local email-code flow instead.
 
 After catalogue or schema changes, also verify the album-first journey against the
 production deployment with a disposable test record:
@@ -328,8 +350,9 @@ open and is tracked in `MVP_PLAN.md`.
 
 If Google remains unavailable, confirm that the Google audience is in Production, the
 current origin is authorized, the Supabase provider is enabled, and the Vercel client
-ID matches the web client. If a magic link returns to localhost or is rejected,
-recheck the Supabase Site URL and redirect allowlist.
+ID matches the web client. If an email contains a link instead of a six-digit code,
+recheck the hosted Magic Link email template; if a code is rejected, confirm the OTP
+expiration and request a fresh code.
 
 The publishable Supabase key is designed for browser use with RLS. Never put a
 Supabase secret/service-role key in a `NEXT_PUBLIC_` variable, `.env.local` in Git, or
@@ -386,7 +409,7 @@ provider, and can optionally probe Cover Art Archive artwork; they are intention
 not CI checks. The fixture, methodology, baseline, and provider comparison are documented in
 [`catalogue-quality/README.md`](./catalogue-quality/README.md).
 
-Run the optional real magic-link, onboarding, collection maintenance, wishlist
+Run the optional real email-OTP, onboarding, collection maintenance, wishlist
 management, search, and profile journey through Mailpit across the full browser matrix:
 
 ```bash

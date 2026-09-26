@@ -30,6 +30,14 @@ test("publishes the privacy and terms pages used by account sign-in", async ({
 }) => {
   await page.goto("/sign-in");
 
+  await expect(
+    page.getByRole("button", { name: "Email me a sign-in code" }),
+  ).toBeVisible();
+  await expect(page.getByLabel("Email address")).toHaveAttribute(
+    "autocomplete",
+    "email",
+  );
+
   if (process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID) {
     const googleSignIn = page.locator(".google-sign-in");
     await expect(googleSignIn).toBeVisible();

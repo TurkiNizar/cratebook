@@ -10,7 +10,9 @@ vi.mock("next/navigation", () => ({ redirect: mocks.redirect }));
 vi.mock("@/lib/optional-user", () => ({
   getOptionalUser: mocks.getOptionalUser,
 }));
-vi.mock("./actions", () => ({ requestMagicLink: vi.fn() }));
+vi.mock("./email-otp-sign-in", () => ({
+  EmailOtpSignIn: () => <button>Email me a sign-in code</button>,
+}));
 vi.mock("./google-sign-in", () => ({ GoogleSignIn: () => null }));
 
 import SignInPage from "./page";
@@ -25,7 +27,7 @@ describe("SignInPage", () => {
     render(await SignInPage({ searchParams: Promise.resolve({}) }));
 
     expect(
-      screen.getByRole("button", { name: /email me a sign-in link/i }),
+      screen.getByRole("button", { name: /email me a sign-in code/i }),
     ).toBeVisible();
     expect(mocks.redirect).not.toHaveBeenCalled();
   });

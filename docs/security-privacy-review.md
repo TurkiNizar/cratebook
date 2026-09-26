@@ -22,7 +22,7 @@ found during the review were corrected:
 ## Data and trust boundaries
 
 - Supabase Auth establishes the user identity through a Google ID-token exchange or
-  email magic link. Server Actions and private route
+  email one-time code. Server Actions and private route
   handlers call `auth.getUser()` again at the mutation or export boundary rather
   than relying only on the protected layout or proxy.
 - User-owned tables have RLS enabled and ownership policies. Mutating RPCs derive the

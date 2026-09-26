@@ -344,14 +344,8 @@ async function signInAndCompleteOnboarding(
   await page.goto("/sign-in");
   await expectNoAccessibilityViolations(page);
   await page.getByLabel("Email address").fill(email);
-  await page.getByRole("button", { name: /email me a sign-in link/i }).click();
-  await expect(page.getByText(/check your inbox/i)).toBeVisible();
-  await expect
-    .poll(async () => {
-      const cookies = await page.context().cookies();
-      return cookies.some((cookie) => cookie.name.includes("code-verifier"));
-    })
-    .toBe(true);
+  await page.getByRole("button", { name: /email me a sign-in code/i }).click();
+  await expect(page.getByLabel("Sign-in code")).toBeVisible();
 
   let messageId: string | undefined;
   await expect
@@ -384,13 +378,12 @@ async function signInAndCompleteOnboarding(
     HTML?: string;
     Text?: string;
   };
-  const content = (message.HTML ?? message.Text ?? "").replaceAll("&amp;", "&");
-  const confirmationUrl = content
-    .match(/https?:\/\/[^\s"'<>]+/g)
-    ?.find((url) => url.includes("/auth/v1/verify"));
+  const content = message.HTML ?? message.Text ?? "";
+  const signInCode = content.match(/\b\d{6}\b/)?.[0];
 
-  expect(confirmationUrl).toBeDefined();
-  await page.goto(confirmationUrl!);
+  expect(signInCode).toBeDefined();
+  await page.getByLabel("Sign-in code").fill(signInCode!);
+  await page.getByRole("button", { name: "Verify code" }).click();
   await expect(page).toHaveURL(/\/onboarding(?:\?|$)/);
   await expect(
     page.getByRole("heading", { name: /name your crate/i }),

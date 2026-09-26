@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { BrandMark } from "@/components/brand-mark";
 import { getOptionalUser } from "@/lib/optional-user";
 
-import { requestMagicLink } from "./actions";
+import { EmailOtpSignIn } from "./email-otp-sign-in";
 import { GoogleSignIn } from "./google-sign-in";
 
 export const metadata: Metadata = {
@@ -16,7 +16,6 @@ type SignInPageProps = {
   searchParams: Promise<{
     accountDeleted?: string;
     error?: string;
-    sent?: string;
   }>;
 };
 
@@ -27,7 +26,7 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
     redirect("/collection");
   }
 
-  const { accountDeleted, error, sent } = await searchParams;
+  const { accountDeleted, error } = await searchParams;
   const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
   return (
@@ -47,7 +46,7 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
           <p className="auth-lead">
             {googleClientId
               ? "Continue with Google to create or open your account in this window."
-              : "We will email you a secure link. New here? The same link creates your account."}
+              : "We will email you a six-digit code. New here? The same code creates your account."}
           </p>
           {accountDeleted === "1" ? (
             <p className="form-message form-message-success" role="status">
@@ -62,33 +61,12 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
               <span>or use email</span>
             </div>
           ) : null}
-          <form className="form-stack" action={requestMagicLink}>
-            <div className="field">
-              <label htmlFor="email">Email address</label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                inputMode="email"
-                autoComplete="email"
-                placeholder="you@example.com"
-                required
-              />
-            </div>
-            {error && (
-              <p className="form-message form-message-error" role="alert">
-                {error}
-              </p>
-            )}
-            {sent && (
-              <p className="form-message form-message-success" role="status">
-                Check your inbox. Your Cratebook sign-in link is on its way.
-              </p>
-            )}
-            <button className="button" type="submit">
-              Email me a sign-in link
-            </button>
-          </form>
+          {error ? (
+            <p className="form-message form-message-error" role="alert">
+              {error}
+            </p>
+          ) : null}
+          <EmailOtpSignIn />
           <p className="field-hint" style={{ marginTop: 18 }}>
             {googleClientId
               ? "Email delivery is temporarily limited to addresses that have used it before. New collectors should continue with Google. "

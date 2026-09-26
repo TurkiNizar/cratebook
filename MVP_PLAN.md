@@ -109,7 +109,7 @@ privacy-conscious events for:
 
 ### 4.1 Account and profile
 
-- Email magic-link authentication
+- Email one-time-code authentication verified in the current browser or installed PWA
 - Unique username
 - Display name
 - Optional profile photo
@@ -379,7 +379,7 @@ Acceptance criteria:
 - **Application framework:** Next.js using the App Router
 - **UI:** React, Tailwind CSS, and a small accessible component layer
 - **Database:** PostgreSQL managed by Supabase
-- **Authentication:** Supabase Auth with email magic links
+- **Authentication:** Supabase Auth with Google ID tokens and email one-time codes
 - **File storage:** Supabase Storage
 - **Authorization:** PostgreSQL Row-Level Security (RLS)
 - **Web hosting:** Vercel
@@ -632,7 +632,7 @@ Exit condition: the product scope, main journeys, and technical direction are ap
 - [x] Implement phone bottom navigation and desktop adaptation
 - [x] Create Supabase project configuration and local migrations
 - [x] Implement database foundation and generated types
-- [x] Configure email magic-link authentication
+- [x] Configure passwordless email authentication
 - [x] Implement onboarding and profile editing
 - [x] Add initial RLS policies and authorization tests
 - [x] Create PWA manifest, icons, and metadata foundation
@@ -928,6 +928,15 @@ implemented, and verified.
 - [ ] **POST-16 — Personal-copy photo uploads**
 - [x] **POST-17 — Google sign-in and installed-PWA authentication continuity**
 - [x] **POST-18 — Avatar account menu for profile, settings, public preview, and sign-out**
+- [~] **POST-19 — PWA-safe email OTP sign-in with in-app code verification**
+  - [x] Replace magic-link request redirects with an in-app six-digit code request and
+        verification flow that creates the Supabase session in the current context.
+  - [x] Configure matching 10-minute, six-digit local and hosted Supabase templates
+        without changing unrelated hosted auth configuration.
+  - [x] Cover validation, provider failures, invalid/expired codes, session entry,
+        responsive sign-in rendering, and the Mailpit journey in automated tests.
+  - [ ] Verify real email delivery and session creation from the installed production
+        PWA using an existing-account inbox; do not create disposable production data.
 
 These stable `POST-##` references do not imply priority. Check an item only after its
 scope and prerequisites are settled and the implementation is complete and verified.
@@ -1045,6 +1054,7 @@ production environment.
 | 2026-09-13 | Bound collection, wishlist, and public-profile lists to 24 records per server-rendered page                                                  | Keeps database responses, rendered DOM size, and image work predictable as crates grow while preserving shareable filter and page URLs without adding client-side state                                           |
 | 2026-09-13 | Restrict direct profile-table reads to owners and require every visitor view to use narrow public projections                                | Prevents anonymous or authenticated visitors from bypassing the reviewed projection and reading internal identifiers, timestamps, or the reserved avatar storage path                                             |
 | 2026-09-14 | Make Google the primary hosted sign-in through a nonce-bound popup ID-token exchange while retaining email as a fallback                     | New collectors cannot use the Resend test sender without a custom domain, and a same-window popup flow avoids requiring an installed PWA to recover a magic link opened from another application                  |
+| 2026-09-26 | Replace the email magic-link fallback with a six-digit Supabase OTP entered and verified inside the installed PWA                            | iOS keeps Home Screen web-app cookies separate from Safari, so in-app verification creates the session in the correct context without reinstalling the PWA; Google remains the primary sign-in method             |
 
 ## 20. Progress log
 
@@ -1118,6 +1128,7 @@ in version control; this log records product-level progress and changes.
 | 2026-09-26 | Post-MVP  | Closed POST-17 after the owner confirmed Google sign-in works in production; the nonce-bound same-window popup flow preserves the installed-PWA context, opens existing sessions directly, routes new users through onboarding, and retains email as a fallback                                                                                                                                    | Verify a pull request receives a working Vercel Preview deployment     |
 | 2026-09-26 | Post-MVP  | Added POST-18 as a candidate evolution for the currently inert initials avatar: an accessible account menu can identify the signed-in profile and provide direct profile settings, public-preview, and sign-out actions without duplicating primary collection navigation                                                                                                                          | Define and implement the account menu                                  |
 | 2026-09-26 | Post-MVP  | Completed POST-18 with a 44px accessible initials menu for signed-in identity, profile settings, public-profile preview, and sign-out; the preview now opens in a clearly marked new tab, keyboard and outside dismissal remain covered, and focused tests, type-check, lint, and production build pass                                                                                            | Verify the account menu in the hosted deployment                       |
+| 2026-09-26 | Post-MVP  | Implemented POST-19's in-app six-digit OTP request and verification flow, 10-minute expiry, recovery controls, local template, and isolated hosted auth update; 261 tests, lint, type-check, build, and all 25 public browser checks pass                                                                                                                                                          | Verify real OTP sign-in from the installed production PWA              |
 
 ## 21. Hosted environment checklist
 
@@ -1138,8 +1149,9 @@ the README under **Hosted Supabase and Vercel**.
 - [x] Verify hosted sign-in, onboarding, collection access, and profile editing
 - [x] Configure the Google web client, hosted Supabase provider, and Vercel public client ID
 - [x] Publish the Google external audience and verify new-user sign-in from production
+- [x] Configure the hosted email template for a six-digit OTP with a 10-minute expiry
 - [ ] Verify a pull request receives a working Vercel Preview deployment
 
-Do not mark this checklist complete until the hosted magic-link journey has been
-tested. Do not store the database password or any secret/service-role key in Git or
-in a browser-exposed `NEXT_PUBLIC_` variable.
+Do not mark POST-19 complete until the hosted email-OTP journey has been tested in the
+installed PWA. Do not store the database password or any secret/service-role key in
+Git or in a browser-exposed `NEXT_PUBLIC_` variable.
