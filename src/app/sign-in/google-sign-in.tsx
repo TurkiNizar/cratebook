@@ -119,18 +119,22 @@ export function GoogleSignIn({ clientId }: GoogleSignInProps) {
         },
       });
 
+      let renderedWidth = 0;
       const renderButton = () => {
         if (!buttonContainer.current) return;
+        const containerWidth = buttonContainer.current.clientWidth;
+        if (!containerWidth) return;
+        const width = Math.min(Math.max(containerWidth, 240), 400);
+        if (renderedWidth === width) return;
+
+        renderedWidth = width;
         buttonContainer.current.replaceChildren();
         google.accounts.id.renderButton(buttonContainer.current, {
           shape: "pill",
           size: "large",
           text: "continue_with",
           theme: "outline",
-          width: Math.min(
-            Math.max(buttonContainer.current.clientWidth, 240),
-            400,
-          ),
+          width,
         });
         setIsLoading(false);
       };

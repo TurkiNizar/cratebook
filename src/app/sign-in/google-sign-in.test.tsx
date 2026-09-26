@@ -29,6 +29,7 @@ import { GoogleSignIn } from "./google-sign-in";
 
 describe("GoogleSignIn", () => {
   let credentialCallback: (response: { credential?: string }) => void;
+  let resizeCallback: ResizeObserverCallback;
   const initialize = vi.fn(
     (options: { callback: typeof credentialCallback }) => {
       credentialCallback = options.callback;
@@ -42,9 +43,17 @@ describe("GoogleSignIn", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    Object.defineProperty(HTMLElement.prototype, "clientWidth", {
+      configurable: true,
+      value: 320,
+    });
     Object.defineProperty(globalThis, "ResizeObserver", {
       configurable: true,
-      value: class {
+      value: class MockResizeObserver {
+        constructor(callback: ResizeObserverCallback) {
+          resizeCallback = callback;
+        }
+
         disconnect() {}
         observe() {}
       },
@@ -75,6 +84,30 @@ describe("GoogleSignIn", () => {
     expect(
       screen.getByRole("button", { name: /continue with google/i }),
     ).toBeVisible();
+  });
+
+  it("does not recreate the button when its container width is unchanged", async () => {
+    render(<GoogleSignIn clientId="public-client-id" />);
+    await waitFor(() => expect(renderButton).toHaveBeenCalledOnce());
+
+    act(() => {
+      resizeCallback([], {} as ResizeObserver);
+      resizeCallback([], {} as ResizeObserver);
+    });
+
+    expect(renderButton).toHaveBeenCalledOnce();
+
+    Object.defineProperty(HTMLElement.prototype, "clientWidth", {
+      configurable: true,
+      value: 360,
+    });
+    act(() => resizeCallback([], {} as ResizeObserver));
+
+    expect(renderButton).toHaveBeenCalledTimes(2);
+    expect(renderButton).toHaveBeenLastCalledWith(
+      expect.any(HTMLElement),
+      expect.objectContaining({ width: 360 }),
+    );
   });
 
   it("exchanges the credential and enters the authenticated app", async () => {
