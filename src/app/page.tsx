@@ -3,6 +3,9 @@ import Link from "next/link";
 import { BrandMark } from "@/components/brand-mark";
 import { ArrowIcon, SearchIcon } from "@/components/icons";
 import { InstallApp } from "@/components/install-app";
+import { createClient } from "@/lib/supabase/server";
+
+export const dynamic = "force-dynamic";
 
 const records = [
   { artist: "Miles Davis", title: "Kind of Blue", color: "blue", year: "1959" },
@@ -20,7 +23,13 @@ const records = [
   },
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const entryHref = user ? "/collection" : "/sign-in";
+
   return (
     <main className="landing-page">
       <header className="site-header content-width">
@@ -28,11 +37,11 @@ export default function HomePage() {
           <BrandMark />
         </Link>
         <nav aria-label="Main navigation">
-          <Link className="text-link" href="/sign-in">
-            Sign in
+          <Link className="text-link" href={entryHref}>
+            {user ? "My collection" : "Sign in"}
           </Link>
-          <Link className="button button-small" href="/sign-in">
-            Start your crate
+          <Link className="button button-small" href={entryHref}>
+            {user ? "Open my collection" : "Start your crate"}
           </Link>
         </nav>
       </header>
@@ -47,8 +56,9 @@ export default function HomePage() {
             the hundredth.
           </p>
           <div className="hero-actions">
-            <Link className="button" href="/sign-in">
-              Build your collection <ArrowIcon width={18} height={18} />
+            <Link className="button" href={entryHref}>
+              {user ? "Open my collection" : "Build your collection"}{" "}
+              <ArrowIcon width={18} height={18} />
             </Link>
             <div className="hero-secondary-actions">
               <a className="text-link text-link-arrow" href="#how-it-works">

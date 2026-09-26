@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 import { BrandMark } from "@/components/brand-mark";
+import { createClient } from "@/lib/supabase/server";
 
 import { requestMagicLink } from "./actions";
 import { GoogleSignIn } from "./google-sign-in";
@@ -19,6 +21,15 @@ type SignInPageProps = {
 };
 
 export default async function SignInPage({ searchParams }: SignInPageProps) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user) {
+    redirect("/collection");
+  }
+
   const { accountDeleted, error, sent } = await searchParams;
   const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
