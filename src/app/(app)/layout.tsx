@@ -1,9 +1,12 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { AccountMenu } from "@/components/account-menu";
 import { BottomNavigation } from "@/components/bottom-navigation";
 import { BrandMark } from "@/components/brand-mark";
 import { createClient } from "@/lib/supabase/server";
+
+import { signOut } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -50,9 +53,11 @@ export default async function AppLayout({
         >
           <BrandMark />
         </Link>
-        <span className="avatar-placeholder" aria-hidden="true">
-          {profile.username.slice(0, 2).toUpperCase()}
-        </span>
+        <AccountMenu
+          username={profile.username}
+          email={user.email}
+          signOutAction={signOut}
+        />
       </header>
       <div id="app-content" tabIndex={-1}>
         {children}

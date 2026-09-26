@@ -8,6 +8,7 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock("next/navigation", () => ({ redirect: mocks.redirect }));
+vi.mock("./actions", () => ({ signOut: vi.fn() }));
 vi.mock("@/components/bottom-navigation", () => ({
   BottomNavigation: () => <nav aria-label="Primary navigation" />,
 }));
@@ -28,7 +29,7 @@ describe("AppLayout profile gate", () => {
   beforeEach(() => {
     vi.resetAllMocks();
     mocks.getUser.mockResolvedValue({
-      data: { user: { id: "owner-id" } },
+      data: { user: { id: "owner-id", email: "listener@example.com" } },
       error: null,
     });
     mocks.redirect.mockImplementation((destination: string) => {
@@ -45,6 +46,9 @@ describe("AppLayout profile gate", () => {
     render(await AppLayout({ children: <p>Private collection</p> }));
 
     expect(screen.getByText("Private collection")).toBeVisible();
+    expect(
+      screen.getByRole("button", { name: "Open account menu for listener" }),
+    ).toBeVisible();
     expect(mocks.redirect).not.toHaveBeenCalled();
   });
 

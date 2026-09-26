@@ -649,8 +649,34 @@ test.describe("local passwordless authentication", () => {
     page,
     request,
   }, testInfo) => {
-    await signInAndCompleteOnboarding(page, request, testInfo);
+    const username = await signInAndCompleteOnboarding(page, request, testInfo);
     const verifyKeyboard = supportsPlainTabNavigation(testInfo);
+
+    const accountTrigger = page.getByRole("button", {
+      name: `Open account menu for ${username}`,
+    });
+    await expect(accountTrigger).toBeVisible();
+    const accountTriggerBox = await accountTrigger.boundingBox();
+    expect(accountTriggerBox).not.toBeNull();
+    expect(accountTriggerBox!.width).toBeGreaterThanOrEqual(44);
+    expect(accountTriggerBox!.height).toBeGreaterThanOrEqual(44);
+    await accountTrigger.click();
+    await expect(
+      page.getByRole("navigation", { name: "Account" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Profile settings" }),
+    ).toBeFocused();
+    await expect(
+      page.getByRole("link", { name: "Preview public profile" }),
+    ).toHaveAttribute("href", `/u/${username}`);
+    await expect(page.getByRole("button", { name: "Sign out" })).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("navigation", { name: "Account" })).toHaveCount(
+      0,
+    );
+    await expect(accountTrigger).toBeFocused();
+    await expectNoAccessibilityViolations(page, ".account-menu");
 
     const skipLink = page.getByRole("link", { name: "Skip to main content" });
     expect(
