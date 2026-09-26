@@ -2,15 +2,15 @@ import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
-  createClient: vi.fn(),
-  getUser: vi.fn(),
+  getOptionalUser: vi.fn(),
   redirect: vi.fn(),
 }));
 
 vi.mock("next/navigation", () => ({ redirect: mocks.redirect }));
-vi.mock("@/lib/supabase/server", () => ({
-  createClient: mocks.createClient,
+vi.mock("@/lib/optional-user", () => ({
+  getOptionalUser: mocks.getOptionalUser,
 }));
+vi.mock("./actions", () => ({ requestMagicLink: vi.fn() }));
 vi.mock("./google-sign-in", () => ({ GoogleSignIn: () => null }));
 
 import SignInPage from "./page";
@@ -18,8 +18,7 @@ import SignInPage from "./page";
 describe("SignInPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mocks.createClient.mockResolvedValue({ auth: { getUser: mocks.getUser } });
-    mocks.getUser.mockResolvedValue({ data: { user: null } });
+    mocks.getOptionalUser.mockResolvedValue(null);
   });
 
   it("renders sign-in controls for signed-out visitors", async () => {
@@ -32,7 +31,7 @@ describe("SignInPage", () => {
   });
 
   it("returns visitors with a valid session to their collection", async () => {
-    mocks.getUser.mockResolvedValue({ data: { user: { id: "user-1" } } });
+    mocks.getOptionalUser.mockResolvedValue({ id: "user-1" });
     mocks.redirect.mockImplementation(() => {
       throw new Error("NEXT_REDIRECT");
     });

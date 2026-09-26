@@ -3,7 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { BrandMark } from "@/components/brand-mark";
-import { createClient } from "@/lib/supabase/server";
+import { getOptionalUser } from "@/lib/optional-user";
 
 import { requestMagicLink } from "./actions";
 import { GoogleSignIn } from "./google-sign-in";
@@ -21,10 +21,7 @@ type SignInPageProps = {
 };
 
 export default async function SignInPage({ searchParams }: SignInPageProps) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getOptionalUser();
 
   if (user) {
     redirect("/collection");

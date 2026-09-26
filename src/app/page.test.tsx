@@ -2,12 +2,11 @@ import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
-  createClient: vi.fn(),
-  getUser: vi.fn(),
+  getOptionalUser: vi.fn(),
 }));
 
-vi.mock("@/lib/supabase/server", () => ({
-  createClient: mocks.createClient,
+vi.mock("@/lib/optional-user", () => ({
+  getOptionalUser: mocks.getOptionalUser,
 }));
 vi.mock("@/components/install-app", () => ({ InstallApp: () => null }));
 
@@ -16,8 +15,7 @@ import HomePage from "./page";
 describe("HomePage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mocks.createClient.mockResolvedValue({ auth: { getUser: mocks.getUser } });
-    mocks.getUser.mockResolvedValue({ data: { user: null } });
+    mocks.getOptionalUser.mockResolvedValue(null);
   });
 
   it("sends signed-out visitors to sign in", async () => {
@@ -33,7 +31,7 @@ describe("HomePage", () => {
   });
 
   it("opens the collection for visitors with a valid session", async () => {
-    mocks.getUser.mockResolvedValue({ data: { user: { id: "user-1" } } });
+    mocks.getOptionalUser.mockResolvedValue({ id: "user-1" });
 
     render(await HomePage());
 

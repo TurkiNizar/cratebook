@@ -3,7 +3,7 @@ import Link from "next/link";
 import { BrandMark } from "@/components/brand-mark";
 import { ArrowIcon, SearchIcon } from "@/components/icons";
 import { InstallApp } from "@/components/install-app";
-import { createClient } from "@/lib/supabase/server";
+import { getOptionalUser } from "@/lib/optional-user";
 
 export const dynamic = "force-dynamic";
 
@@ -24,10 +24,7 @@ const records = [
 ];
 
 export default async function HomePage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getOptionalUser();
   const entryHref = user ? "/collection" : "/sign-in";
 
   return (
