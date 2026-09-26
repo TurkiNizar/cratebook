@@ -8,7 +8,6 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock("./actions", () => ({
-  initialEmailOtpState: { email: "", message: "", status: "idle" },
   requestEmailOtp: mocks.requestEmailOtp,
   verifyEmailOtp: mocks.verifyEmailOtp,
 }));

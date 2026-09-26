@@ -2,11 +2,8 @@
 
 import { useActionState, useState } from "react";
 
-import {
-  initialEmailOtpState,
-  requestEmailOtp,
-  verifyEmailOtp,
-} from "./actions";
+import { requestEmailOtp, verifyEmailOtp } from "./actions";
+import { initialEmailOtpState } from "./email-otp-state";
 
 export function EmailOtpSignIn() {
   const [requestState, requestAction, requestPending] = useActionState(

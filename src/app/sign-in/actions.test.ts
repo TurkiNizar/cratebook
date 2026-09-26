@@ -16,11 +16,10 @@ vi.mock("@/lib/supabase/server", () => ({
   }),
 }));
 
-import {
-  initialEmailOtpState,
-  requestEmailOtp,
-  verifyEmailOtp,
-} from "./actions";
+import * as emailOtpActions from "./actions";
+import { initialEmailOtpState } from "./email-otp-state";
+
+const { requestEmailOtp, verifyEmailOtp } = emailOtpActions;
 
 describe("email OTP actions", () => {
   beforeEach(() => {
@@ -28,6 +27,13 @@ describe("email OTP actions", () => {
     mocks.redirect.mockImplementation(() => {
       throw new Error("NEXT_REDIRECT");
     });
+  });
+
+  it("exports only async Server Actions from the use-server module", () => {
+    expect(Object.values(emailOtpActions)).toEqual([
+      expect.any(Function),
+      expect.any(Function),
+    ]);
   });
 
   it("requests an in-app code for a normalized email", async () => {

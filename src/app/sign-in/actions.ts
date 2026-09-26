@@ -4,17 +4,7 @@ import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
 
-export type EmailOtpState = {
-  email: string;
-  message: string;
-  status: "idle" | "error" | "code-sent";
-};
-
-export const initialEmailOtpState: EmailOtpState = {
-  email: "",
-  message: "",
-  status: "idle",
-};
+import type { EmailOtpState } from "./email-otp-state";
 
 function normalizeEmail(value: FormDataEntryValue | null) {
   return String(value ?? "")
