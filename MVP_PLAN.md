@@ -927,6 +927,7 @@ implemented, and verified.
 - [ ] **POST-15 — Camera-assisted cover or catalogue recognition**
 - [ ] **POST-16 — Personal-copy photo uploads**
 - [x] **POST-17 — Google sign-in and installed-PWA authentication continuity**
+- [ ] **POST-18 — Avatar account menu for profile, settings, public preview, and sign-out**
 
 These stable `POST-##` references do not imply priority. Check an item only after its
 scope and prerequisites are settled and the implementation is complete and verified.
@@ -1115,6 +1116,7 @@ in version control; this log records product-level progress and changes.
 | 2026-09-26 | Post-MVP  | Stopped Google sign-in hover flicker by rendering the GIS button only when its measured container width actually changes, while preserving responsive resizing; the regression test, type-check, lint, separate production build, 249-test suite, and five-case Chromium public-route suite pass                                                                                                   | Deploy and verify Google-button hover stability in production          |
 | 2026-09-26 | Post-MVP  | Kept public entry routes available when Supabase session validation is unconfigured or temporarily unavailable after credential-free browser CI exposed the dependency; authenticated sessions still receive direct collection entry and protected routes retain strict gates; seven focused tests, type-check, lint, build, and all 25 public cases across five browsers pass without credentials | Push the correction and confirm every hosted check passes              |
 | 2026-09-26 | Post-MVP  | Closed POST-17 after the owner confirmed Google sign-in works in production; the nonce-bound same-window popup flow preserves the installed-PWA context, opens existing sessions directly, routes new users through onboarding, and retains email as a fallback                                                                                                                                    | Verify a pull request receives a working Vercel Preview deployment     |
+| 2026-09-26 | Post-MVP  | Added POST-18 as a candidate evolution for the currently inert initials avatar: an accessible account menu can identify the signed-in profile and provide direct profile settings, public-preview, and sign-out actions without duplicating primary collection navigation                                                                                                                          | Define and implement the account menu                                  |
 
 ## 21. Hosted environment checklist
 
